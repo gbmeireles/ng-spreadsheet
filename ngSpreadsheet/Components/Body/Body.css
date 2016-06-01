@@ -1,0 +1,7 @@
+:host {
+    position: relative;
+    height: 400px;
+    max-height: 400px;
+    overflow-y: hidden;
+    display: block;
+}

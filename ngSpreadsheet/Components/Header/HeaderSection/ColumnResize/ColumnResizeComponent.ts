@@ -1,4 +1,4 @@
-import { Directive, Input, ElementRef, HostBinding, HostListener, Renderer, ApplicationRef } from '@angular/core';
+import { Component, Input, ElementRef, HostBinding, HostListener, Renderer, ApplicationRef } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import { Inject, forwardRef, Host } from '@angular/core';
 import {
@@ -10,14 +10,17 @@ import {
 } from  '../../../../Services/Services';
 import * as _ from 'lodash';
 
-@Directive({
+@Component({
+    moduleId: __moduleName,
     selector: 'GgColumnResize',
+    styleUrls: ['ColumnResize.css'],
+    template: '<div [class.active]="isDragging" [style.height]="height" [style.left]="left"></div>',
 })
 export class ColumnResizeComponent implements OnInit, OnDestroy {
     @Input('gridColumn') gridColumn: GridColumn;
-    @HostBinding('class.active') isDragging: boolean = false;
-    @HostBinding('style.height') height: number;
-    @HostBinding('style.left') left: number;
+    isDragging: boolean = false;
+    height: number;
+    left: number;
 
     private isInitialized: boolean = false;
     private originalLeft: number = 0;

@@ -17,13 +17,11 @@ import { GridData } from '../../../Model/GridData';
 import { GridRowListMap } from '../../../Model/GridRowListMap';
 
 @Component({
+    moduleId: __moduleName,
     directives: [ColumnRowComponent, ColumnResizeComponent],
     selector: 'GgHeaderSection',
-    template: `
-    <GgColumnCornerCell *ngIf="gridSectionName === 'RowNumber'"></GgColumnCornerCell>
-    <GgColumnRow [gridSectionName]="gridSectionName" [visibleGridColumnList]="visibleGridColumnList"></GgColumnRow>
-    <GgColumnResize [gridColumn]="gridColumn" *ngFor="let gridColumn of visibleGridColumnList"></GgColumnResize>
-    <ng-content></ng-content>`,
+    templateUrl: 'HeaderSection.html',
+    styleUrls: ['HeaderSection.css'],
 })
 export class HeaderSectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;

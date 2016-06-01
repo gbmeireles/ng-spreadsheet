@@ -1,17 +1,13 @@
 import { Component, ViewChild, forwardRef, Injector, ChangeDetectionStrategy } from '@angular/core';
 import { HTTP_PROVIDERS, Http }    from '@angular/http';
-import { GridComponent } from './grid/Grid';
+import { GridComponent, GridData, ColumnDefinition, GridCell, ContentTypeEnum } from '../ngSpreadsheet';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import { TreeToListConverter } from './tree/Services/TreeToListConverter';
-import { GridData } from './grid/Model/GridData';
-import { ColumnDefinition } from './grid/Model/ColumnDefinition';
-import { GridCell } from './grid/Model/GridCell';
-import { ContentTypeEnum } from './grid/Model/ContentTypeEnum';
-import { GridTextEditorComponent } from './GridTextEditorComponent';
+import { TextEditorComponent } from './TextEditorComponent';
 import { SimpleColumnCreator } from './SimpleColumnCreator';
 
 @Component({
-    directives: [GridComponent, CORE_DIRECTIVES, NgFor, GridTextEditorComponent],
+    directives: [GridComponent, CORE_DIRECTIVES, NgFor],
     providers: [HTTP_PROVIDERS, TreeToListConverter, SimpleColumnCreator],
     selector: 'my-app',
     templateUrl: 'app/app.html',
@@ -54,7 +50,7 @@ export class AppComponent {
                         colspan: 1,
                         columnIndex: columnIndex,
                         data: data,
-                        editableComponentType: GridTextEditorComponent,
+                        editableComponentType: TextEditorComponent,
                         formattedData: data === undefined ? '--' : (Math.round(rowData.periodValueMap[period.id] * 100) / 100).toString(),
                         rowspan: 1,
                     };
@@ -94,7 +90,6 @@ export class AppComponent {
                     return 'standard';
                 }
             },
-            providerList: [GridTextEditorComponent],
             rowHeight: 30,
 
         };

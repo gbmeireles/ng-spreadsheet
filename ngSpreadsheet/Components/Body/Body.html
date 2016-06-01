@@ -1,0 +1,11 @@
+<GgBodySection #rowNumberSection gridSectionName="RowNumber">
+    <GgNumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></GgNumberRowList>
+</GgBodySection>
+<GgBodySection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name"
+    tabindex="0">
+    <GgRowList [rowList]="gridSection.visibleDataRowList" [gridSectionName]="gridSection.name"></GgRowList>
+    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * 30" style="position: absolute; width:2px; top:0;"></div>
+</GgBodySection>
+<GgBodySection gridSectionName="Scroll">
+    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * 30"></div>
+</GgBodySection>

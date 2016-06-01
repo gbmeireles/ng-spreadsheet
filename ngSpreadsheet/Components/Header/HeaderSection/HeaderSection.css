@@ -1,0 +1,11 @@
+:host {
+    display: block;
+    position: absolute;
+    height: 100%;
+    outline: none;
+    overflow-x: hidden;
+}
+
+:host([gridSectionName="RowNumber"]) {
+    width: 20px;
+}

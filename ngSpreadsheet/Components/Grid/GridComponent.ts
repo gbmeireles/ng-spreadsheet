@@ -16,10 +16,6 @@ import { HeaderComponent } from '../../Components/Header/HeaderComponent';
 import { BodyComponent } from '../../Components/Body/BodyComponent';
 import { RowComponent } from '../../Components/RowList/Row/RowComponent';
 import { CellComponent } from '../../Components/RowList/Cell/CellComponent';
-import { BodySectionComponent } from '../../Components/Body/BodySection/BodySectionComponent';
-import { HeaderSectionComponent } from '../../Components/Header/HeaderSection/HeaderSectionComponent';
-import { NumberRowListComponent } from '../../Components/NumberRowList/NumberRowListComponent';
-import { RowListComponent } from '../../Components/RowList/RowListComponent';
 import { DetailsBarComponent } from '../../Components/DetailsBar/DetailsBarComponent';
 import { StatusBarComponent } from '../../Components/StatusBar/StatusBarComponent';
 import {
@@ -53,16 +49,9 @@ import { ContentTypeEnum } from '../../Model/ContentTypeEnum';
     moduleId: __moduleName,
     changeDetection: ChangeDetectionStrategy.Default,
     directives: [
+        DetailsBarComponent,
         HeaderComponent,
         BodyComponent,
-        RowComponent,
-        CellComponent,
-        BodySectionComponent,
-        HeaderSectionComponent,
-        NumberRowListComponent,
-        RowListComponent,
-        NgFor,
-        DetailsBarComponent,
         StatusBarComponent,
     ],
     providers: [
@@ -74,9 +63,8 @@ import { ContentTypeEnum } from '../../Model/ContentTypeEnum';
 export class GridComponent implements OnInit, OnDestroy {
     @Input('id') id: string;
     @Output() onGridEvent: EventEmitter<GridEvent<any>> = new EventEmitter<GridEvent<any>>(false);
-    @ViewChild(BodySectionComponent) rowNumberSection: BodySectionComponent;
     statusMessage: string;
-    statusMessageTimeout:number;
+    statusMessageTimeout: number;
     gridSectionList: any[] = [];
     numberDataRowList: GridRow[] = [];
     numberTitleRowList: GridRow[] = [];
@@ -161,7 +149,6 @@ export class GridComponent implements OnInit, OnDestroy {
     }
 
     update(gridData: GridData) {
-        this.bodyScrollManager.set(this.rowNumberSection.updateScrollTop());
         this.rowHeight = gridData.rowHeight || this.rowHeight;
         this.rowHeightManager.set(this.rowHeight);
 

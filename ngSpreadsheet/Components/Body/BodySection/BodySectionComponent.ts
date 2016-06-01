@@ -1,4 +1,4 @@
-import { HostBinding, HostListener, Directive, Input, ElementRef } from '@angular/core';
+import { HostBinding, HostListener, Component, Input, ElementRef } from '@angular/core';
 import { OnInit, OnChanges, OnDestroy } from '@angular/core';
 import {
     SectionPositionInformationMapManager,
@@ -13,8 +13,11 @@ import {
 } from '../../../Services/Services';
 import { Cell } from '../../../Model/Model';
 
-@Directive({
+@Component({
+    moduleId: __moduleName,
     selector: 'GgBodySection',
+    styleUrls: ['BodySection.css'],
+    template: '<ng-content></ng-content>',
 })
 export class BodySectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;
