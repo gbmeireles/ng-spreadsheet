@@ -229,8 +229,10 @@ System.register(['@angular/core', '../../../Model/Model', '../../../Services/Ser
                 ], CellComponent.prototype, "onDoubleClick", null);
                 CellComponent = __decorate([
                     core_1.Component({
+                        moduleId: __moduleName,
                         selector: 'GgCell',
                         template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
+                        styleUrls: ['Cell.css']
                     }), 
                     __metadata('design:paramtypes', [core_1.DynamicComponentLoader, core_1.ElementRef, core_1.ApplicationRef, Services_1.GridDataManager, Services_1.ColumnPositionInformationMapManager, Services_1.CellPositionUpdater, Services_1.CellListMapManager, Services_1.CellNavigator, Services_1.ActiveCellManager, core_1.ChangeDetectorRef, core_1.Renderer, core_1.ViewContainerRef, Services_1.GridComponentManager])
                 ], CellComponent);

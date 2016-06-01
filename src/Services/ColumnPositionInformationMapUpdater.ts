@@ -4,6 +4,7 @@ import {
     ColumnListManager,
     ColumnPositionInformationMapManager,
 } from '../Services/Managers/Managers';
+import { Column } from '../Model/Column';
 
 @Injectable()
 export class ColumnPositionInformationMapUpdater {

@@ -1,4 +1,4 @@
-import { GridCell } from '../Model/GridCell';
+import { GridCell } from './GridCell';
 
 export interface Cell {
     left: number;

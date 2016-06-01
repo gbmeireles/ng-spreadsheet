@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridData } from '../Model/Model';
+import { GridData, GridColumn, Column } from '../Model/Model';
 import { ColumnListManager } from '../Services/Managers/Managers';
 
 @Injectable()

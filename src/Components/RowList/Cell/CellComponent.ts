@@ -38,8 +38,10 @@ import {
 } from '../../../Model/CustomComponent/CustomComponent';
 
 @Component({
+    moduleId: __moduleName,
     selector: 'GgCell',
     template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
+    styleUrls: ['Cell.css']
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('cell') gridCell: GridCell;

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BodyWidthManager } from '../Services/Managers/Managers';
 import { GridColumnListGetter } from '../Services/GridColumnListGetter';
-import { GridSection } from '../Model/Model';
+import { GridSection, SectionPositionInformationMap } from '../Model/Model';
 
 @Injectable()
 export class SectionPositionInformationMapCalculator {

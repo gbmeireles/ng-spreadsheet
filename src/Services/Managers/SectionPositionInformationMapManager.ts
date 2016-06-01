@@ -1,6 +1,7 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { SubscriptionManager } from './SubscriptionManager';
 import { TableIdManager } from './TableIdManager';
+import { SectionPositionInformationMap } from '../../Model/SectionPositionInformationMap';
 
 @Injectable()
 export class SectionPositionInformationMapManager {

@@ -17,6 +17,7 @@ import {
     GridRow,
     Cell,
     ContentTypeEnum,
+    CellIndexData,
 } from '../Model/Model';
 
 @Injectable()

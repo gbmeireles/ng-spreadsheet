@@ -15,6 +15,8 @@ import { ColumnResizeComponent } from './ColumnResize/ColumnResizeComponent';
 import { GridRow } from '../../../Model/GridRow';
 import { GridData } from '../../../Model/GridData';
 import { GridRowListMap } from '../../../Model/GridRowListMap';
+import { GridColumn } from '../../../Model/GridColumn';
+import { SectionPositionInformationMap } from '../../../Model/SectionPositionInformationMap';
 
 @Component({
     moduleId: __moduleName,

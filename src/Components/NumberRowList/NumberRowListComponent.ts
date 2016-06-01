@@ -1,16 +1,14 @@
 import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { RowComponent } from '../RowList/Row/RowComponent';
+import { RowComponent } from '../Row/RowComponent';
 import { GridRow } from '../../Model/GridRow';
 
 @Component({
+    moduleId: __moduleName,
     changeDetection: ChangeDetectionStrategy.OnPush,
     directives: [RowComponent],
     selector: `GgNumberRowList`,
-    template: `
-    <GgRow *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" gridSectionName="RowNumber" [index]="i">
-        <GgRowHandlerCell [style.lineHeight.px]="rowHeight">{{numberRow.rowNumber}}</GgRowHandlerCell>
-    </GgRow>
-    `,
+    templateUrl: 'NumberRowList.html',
+    styleUrls: ['NumberRowList.css'],
 })
 export class NumberRowListComponent {
     @Input('numberRowList') numberRowList: GridRow[];

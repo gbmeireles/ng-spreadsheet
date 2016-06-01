@@ -1,4 +1,4 @@
-interface GridEvent<T> {
+export interface GridEvent<T> {
     eventType: string;
     eventData: T;
 }

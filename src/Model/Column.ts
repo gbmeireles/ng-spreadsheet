@@ -1,4 +1,4 @@
-interface Column {
+export interface Column {
     startIndex: number;
     endIndex: number;
     style?: string;

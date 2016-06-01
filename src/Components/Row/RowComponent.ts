@@ -1,6 +1,6 @@
 import {
     HostBinding,
-    Directive,
+    Component,
     Input,
     QueryList,
     ContentChildren,
@@ -13,14 +13,17 @@ import {
 import { OnInit, OnDestroy } from '@angular/core';
 import { TemplateRef, ViewContainerRef } from '@angular/core';
 import { ElementRef, Host, Inject, forwardRef } from '@angular/core';
-import { GridRow } from '../../../Model/GridRow';
-import { ContentTypeEnum } from '../../../Model/ContentTypeEnum';
+import { GridRow } from '../../Model/GridRow';
+import { ContentTypeEnum } from '../../Model/ContentTypeEnum';
 import {
     BodySectionScrollWidthManager,
-} from '../../../Services/Services';
+} from '../../Services/Services';
 
-@Directive({
+@Component({
+    moduleId: __moduleName,
     selector: 'GgRow',
+    template: '<ng-content></ng-content>',
+    styleUrls: ['Row.css'],
 })
 export class RowComponent implements OnInit, OnDestroy {
     @Input('index') index: number;

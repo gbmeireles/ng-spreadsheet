@@ -1,4 +1,5 @@
 import { GridRow } from '../Model/GridRow';
+import { Column } from '../Model/Column';
 
 export interface GridSection {
     name: string;

@@ -3,6 +3,7 @@ import {
     GridRow,
     GridData,
     GridSection,
+    Column,
 } from '../Model/Model';
 import { TitleGridRowListGetter } from '../Services/TitleGridRowListGetter';
 import { DataGridRowListGetter } from '../Services/DataGridRowListGetter';

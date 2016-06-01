@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GridData } from '../Model/Model';
+import { Column } from '../Model/Column';
 
 @Injectable()
 export class ColumnListGetter {

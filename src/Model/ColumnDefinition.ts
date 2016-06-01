@@ -1,5 +1,6 @@
-import { GridData } from '../Model/GridData';
-import { GridCell } from '../Model/GridCell';
+import { GridData } from './GridData';
+import { GridCell } from './GridCell';
+import { Column } from './Column';
 
 export interface ColumnDefinition {
     name: string;

@@ -1,4 +1,4 @@
-System.register(['@angular/core', '../RowList/Row/RowComponent'], function(exports_1) {
+System.register(['@angular/core', '../Row/RowComponent'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -38,7 +38,8 @@ System.register(['@angular/core', '../RowList/Row/RowComponent'], function(expor
                         changeDetection: core_1.ChangeDetectionStrategy.OnPush,
                         directives: [RowComponent_1.RowComponent],
                         selector: "GgNumberRowList",
-                        template: "\n    <GgRow *ngFor=\"let numberRow of numberRowList; trackBy:rowIndentity; let i = index\" [row]=\"numberRow\" gridSectionName=\"RowNumber\" [index]=\"i\">\n        <GgRowHandlerCell [style.lineHeight.px]=\"rowHeight\">{{numberRow.rowNumber}}</GgRowHandlerCell>\n    </GgRow>\n    ",
+                        templateUrl: 'NumberRowList.html',
+                        styleUrls: ['NumberRowList.css'],
                     }), 
                     __metadata('design:paramtypes', [])
                 ], NumberRowListComponent);

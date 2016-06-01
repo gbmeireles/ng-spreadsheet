@@ -14,7 +14,7 @@ import { AfterContentInit, OnInit } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import { HeaderComponent } from '../../Components/Header/HeaderComponent';
 import { BodyComponent } from '../../Components/Body/BodyComponent';
-import { RowComponent } from '../../Components/RowList/Row/RowComponent';
+import { RowComponent } from '../../Components/Row/RowComponent';
 import { CellComponent } from '../../Components/RowList/Cell/CellComponent';
 import { DetailsBarComponent } from '../../Components/DetailsBar/DetailsBarComponent';
 import { StatusBarComponent } from '../../Components/StatusBar/StatusBarComponent';
@@ -44,6 +44,9 @@ import { GridRow } from '../../Model/GridRow';
 import { GridCell } from '../../Model/GridCell';
 import { GridSection } from '../../Model/GridSection';
 import { ContentTypeEnum } from '../../Model/ContentTypeEnum';
+import { Column } from '../../Model/Column';
+import { ColumnPositionInformationMap } from '../../Model/ColumnPositionInformationMap';
+import { GridEvent } from '../../Model/CustomComponent/GridEvent';
 
 @Component({
     moduleId: __moduleName,

@@ -1,6 +1,8 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { SubscriptionManager } from './SubscriptionManager';
 import { TableIdManager } from './TableIdManager';
+import { Column } from '../../Model/Column';
+import { ColumnPositionInformationMap } from '../../Model/ColumnPositionInformationMap';
 
 @Injectable()
 export class ColumnPositionInformationMapManager {

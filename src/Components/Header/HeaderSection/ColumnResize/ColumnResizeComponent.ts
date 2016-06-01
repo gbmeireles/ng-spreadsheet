@@ -8,6 +8,8 @@ import {
     RowHeightManager,
     CellListMapManager,
 } from  '../../../../Services/Services';
+import { GridColumn } from  '../../../../Model/GridColumn';
+import { ColumnPositionInformationMap } from  '../../../../Model/ColumnPositionInformationMap';
 import * as _ from 'lodash';
 
 @Component({

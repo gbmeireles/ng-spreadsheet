@@ -1,6 +1,6 @@
 import { Component, ViewChild, forwardRef, Injector, ChangeDetectionStrategy } from '@angular/core';
 import { HTTP_PROVIDERS, Http }    from '@angular/http';
-import { GridComponent, GridData, ColumnDefinition, GridCell, ContentTypeEnum } from 'ngSpreadsheet';
+import { GridComponent, GridData, ColumnDefinition, GridCell, ContentTypeEnum, Column } from 'ng-spreadsheet';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import { TreeToListConverter } from './tree/Services/TreeToListConverter';
 import { TextEditorComponent } from './TextEditorComponent';

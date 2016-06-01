@@ -17,6 +17,8 @@ import {
 } from '../../../../../Services/Services';
 import { Cell } from '../../../../../Model/Cell';
 import { GridCell } from '../../../../../Model/GridCell';
+import { Column } from '../../../../../Model/Column';
+import { GridColumn } from '../../../../../Model/GridColumn';
 
 @Directive({
     selector: 'GgColumnCell',

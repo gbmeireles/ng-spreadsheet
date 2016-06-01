@@ -6,3 +6,8 @@ export { ColumnDefinition } from './ColumnDefinition';
 export { GridRowListMap } from './GridRowListMap';
 export { GridSection } from './GridSection';
 export { GridData } from './GridData';
+export { Column } from './Column';
+export { SectionPositionInformationMap } from './SectionPositionInformationMap';
+export { CellIndexData } from './CellIndexData';
+export { ColumnPositionInformationMap } from './ColumnPositionInformationMap';
+export { GridColumn } from './GridColumn';

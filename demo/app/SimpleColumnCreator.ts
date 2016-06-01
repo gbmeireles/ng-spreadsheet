@@ -1,4 +1,4 @@
-import { GridData, ColumnDefinition, GridCell } from 'ngSpreadsheet';
+import { GridData, ColumnDefinition, GridCell, Column } from 'ng-spreadsheet';
 
 export class SimpleColumnCreator {
     constructor() {

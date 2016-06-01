@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { GridColumnListGetter } from '../Services/GridColumnListGetter';
 import { SectionPositionInformationMapManager } from '../Services/Managers/Managers';
+import { Column } from '../Model/Column';
+import { GridColumn } from '../Model/GridColumn';
+import { ColumnPositionInformationMap } from '../Model/ColumnPositionInformationMap';
 
 @Injectable()
 export class ColumnPositionInformationMapCalculator {

@@ -1,6 +1,6 @@
 import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { OnChanges, SimpleChange } from '@angular/core';
-import { RowComponent } from './Row/RowComponent';
+import { RowComponent } from '../Row/RowComponent';
 import { CellComponent } from './Cell/CellComponent';
 import {
     RowViewportVisibleRowCountGetter,

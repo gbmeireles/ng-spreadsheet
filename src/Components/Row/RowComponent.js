@@ -1,4 +1,4 @@
-System.register(['@angular/core', '../../../Model/ContentTypeEnum', '../../../Services/Services'], function(exports_1) {
+System.register(['@angular/core', '../../Model/ContentTypeEnum', '../../Services/Services'], function(exports_1) {
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -90,8 +90,11 @@ System.register(['@angular/core', '../../../Model/ContentTypeEnum', '../../../Se
                     __metadata('design:type', String)
                 ], RowComponent.prototype, "gridSectionName", void 0);
                 RowComponent = __decorate([
-                    core_1.Directive({
+                    core_1.Component({
+                        moduleId: __moduleName,
                         selector: 'GgRow',
+                        template: '<ng-content></ng-content>',
+                        styleUrls: ['Row.css'],
                     }), 
                     __metadata('design:paramtypes', [core_2.ElementRef, Services_1.BodySectionScrollWidthManager, core_1.Renderer])
                 ], RowComponent);

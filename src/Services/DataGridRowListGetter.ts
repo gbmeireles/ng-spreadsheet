@@ -5,6 +5,7 @@ import {
     GridRow,
     ContentTypeEnum,
     ColumnDefinition,
+    Column,
 } from '../Model/Model';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Component, ElementRef, DynamicComponentLoader, Input, ViewChild } from '@angular/core';
 import { OnInit } from '@angular/core';
-import { EditableComponent, GridCell, GridComponent } from 'ngSpreadsheet';
+import { EditableComponent, GridCell, GridComponent } from 'ng-spreadsheet';
 
 @Component({
     selector: 'InputTest',

@@ -1,35 +1,14 @@
-import { BodyComponent } from './Body/BodyComponent';
-import { HeaderComponent } from './Header/HeaderComponent';
-import { RowComponent } from './RowList/Row/RowComponent';
-import { GridComponent } from './Grid/GridComponent';
-import { CellComponent } from './RowList/Cell/CellComponent';
-import { ColumnCellComponent } from './Header/HeaderSection/ColumnRow/ColumnCell/ColumnCellComponent';
-import { ColumnResizeComponent } from './Header/HeaderSection/ColumnResize/ColumnResizeComponent';
-import { ColumnRowComponent } from './Header/HeaderSection/ColumnRow/ColumnRowComponent';
-import { BodySectionComponent } from './Body/BodySection/BodySectionComponent';
-import { HeaderSectionComponent } from './Header/HeaderSection/HeaderSectionComponent';
-import { NumberRowListComponent } from './NumberRowList/NumberRowListComponent';
-import { RowListComponent } from './RowList/RowListComponent';
-import { DetailsBarComponent } from './DetailsBar/DetailsBarComponent';
-import { StatusBarComponent } from './StatusBar/StatusBarComponent';
-
-export {
-BodyComponent,
-CellComponent,
-ColumnCellComponent,
-ColumnResizeComponent,
-ColumnRowComponent,
-HeaderComponent,
-RowComponent,
-GridComponent,
-BodySectionComponent,
-HeaderSectionComponent,
-NumberRowListComponent,
-RowListComponent,
-DetailsBarComponent,
-StatusBarComponent
-}
-
-export const GG_COMPONENTS: Array<any> = [
-    GridComponent,
-];
+export { BodyComponent } from './Body/BodyComponent';
+export { HeaderComponent } from './Header/HeaderComponent';
+export { RowComponent } from './Row/RowComponent';
+export { GridComponent } from './Grid/GridComponent';
+export { CellComponent } from './RowList/Cell/CellComponent';
+export { ColumnCellComponent } from './Header/HeaderSection/ColumnRow/ColumnCell/ColumnCellComponent';
+export { ColumnResizeComponent } from './Header/HeaderSection/ColumnResize/ColumnResizeComponent';
+export { ColumnRowComponent } from './Header/HeaderSection/ColumnRow/ColumnRowComponent';
+export { BodySectionComponent } from './Body/BodySection/BodySectionComponent';
+export { HeaderSectionComponent } from './Header/HeaderSection/HeaderSectionComponent';
+export { NumberRowListComponent } from './NumberRowList/NumberRowListComponent';
+export { RowListComponent } from './RowList/RowListComponent';
+export { DetailsBarComponent } from './DetailsBar/DetailsBarComponent';
+export { StatusBarComponent } from './StatusBar/StatusBarComponent';

@@ -11,7 +11,7 @@ import {
     ActiveCellManager,
     ColumnPositionInformationMapManager,
 } from '../../../Services/Services';
-import { Cell } from '../../../Model/Model';
+import { Cell, SectionPositionInformationMap } from '../../../Model/Model';
 
 @Component({
     moduleId: __moduleName,

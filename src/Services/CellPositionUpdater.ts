@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Cell } from '../Model/Model';
+import { Cell, ColumnPositionInformationMap } from '../Model/Model';
 
 @Injectable()
 export class CellPositionUpdater {

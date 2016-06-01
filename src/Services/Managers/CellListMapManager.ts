@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ColumnListManager } from './ColumnListManager';
-import { Cell } from '../../Model/Model';
+import { Cell, GridColumn } from '../../Model/Model';
 
 @Injectable()
 export class CellListMapManager {

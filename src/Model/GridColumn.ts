@@ -1,4 +1,4 @@
-interface GridColumn {
+export interface GridColumn {
     name: string;
     index: number;
     style?: string;

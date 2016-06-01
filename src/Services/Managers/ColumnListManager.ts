@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SubscriptionManager } from './SubscriptionManager';
+import { Column } from '../../Model/Column';
 
 @Injectable()
 export class ColumnListManager {

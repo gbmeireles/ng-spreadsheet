@@ -6,7 +6,7 @@ import {
     SectionPositionInformationMapManager,
 } from '../Services/Managers/Managers';
 import { ColumnToRenderIndexListGetter } from '../Services/ColumnToRenderIndexListGetter';
-import { GridRow } from '../Model/Model';
+import { GridRow, SectionPositionInformationMap } from '../Model/Model';
 
 @Injectable()
 export class ColumnViewportUpdater {
