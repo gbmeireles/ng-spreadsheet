@@ -1,0 +1,4 @@
+<GgRow *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" [row]="row" [gridSectionName]="gridSectionName" [index]="i">
+    <GgCell [cell]="cell" [index]="cellIndex" [rowData]="row?.rowData" *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity">
+    </GgCell>
+</GgRow>

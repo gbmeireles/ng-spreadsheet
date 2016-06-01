@@ -1,0 +1,4 @@
+<GgColumnCell [gridColumn]="gridColumn" [index]="columnIndex" *ngFor="let gridColumn of visibleGridColumnList; let columnIndex = index; trackBy:cellIndentity;">
+    <span>{{gridColumnIdentifierMap[gridColumn.index]}}</span>
+    <span><i class="fa fa-caret-square-down"></i></span>
+</GgColumnCell>
