@@ -19,7 +19,7 @@ import { GridColumn } from '../../../Model/GridColumn';
 import { SectionPositionInformationMap } from '../../../Model/SectionPositionInformationMap';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     directives: [ColumnRowComponent, ColumnResizeComponent],
     selector: 'GgHeaderSection',
     templateUrl: 'HeaderSection.html',

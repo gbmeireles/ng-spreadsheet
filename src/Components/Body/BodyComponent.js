@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../../Services/Services', '../../Components/Body/BodySection/BodySectionComponent', '../../Components/NumberRowList/NumberRowListComponent', '../../Components/RowList/RowListComponent'], function(exports_1) {
+System.register(['@angular/core', '../../Services/Services', '../../Components/Body/BodySection/BodySectionComponent', '../../Components/NumberRowList/NumberRowListComponent', '../../Components/RowList/RowListComponent'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -85,7 +87,7 @@ System.register(['@angular/core', '../../Services/Services', '../../Components/B
                 ], BodyComponent.prototype, "onScroll", null);
                 BodyComponent = __decorate([
                     core_1.Component({
-                        moduleId: __moduleName,
+                        moduleId: module.id,
                         selector: 'GgBody',
                         templateUrl: 'Body.html',
                         styleUrls: ['Body.css'],
@@ -94,7 +96,7 @@ System.register(['@angular/core', '../../Services/Services', '../../Components/B
                     __metadata('design:paramtypes', [core_1.ElementRef, Services_1.BodyWidthManager, Services_1.BodyScrollManager, Services_1.BodyHeightManager, Services_1.RowHeightManager])
                 ], BodyComponent);
                 return BodyComponent;
-            })();
+            }());
             exports_1("BodyComponent", BodyComponent);
         }
     }

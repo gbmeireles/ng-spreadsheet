@@ -49,7 +49,7 @@ import { ColumnPositionInformationMap } from '../../Model/ColumnPositionInformat
 import { GridEvent } from '../../Model/CustomComponent/GridEvent';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     changeDetection: ChangeDetectionStrategy.Default,
     directives: [
         DetailsBarComponent,
@@ -99,7 +99,7 @@ export class GridComponent implements OnInit, OnDestroy {
         private bodySectionScrollManager: BodySectionScrollManager,
         private gridComponentManager: GridComponentManager) {
 
-        this.gridComponentManager.set(this);
+        this.gridComponentManager.set(<any>this);
         this.updateGridColumnMap(this.columnListManager.get());
         this.columnListManager.subscribe((columnList) => {
             this.updateGridColumnMap(columnList);
@@ -153,6 +153,8 @@ export class GridComponent implements OnInit, OnDestroy {
     }
 
     update(gridData: GridData) {
+        this.gridDataManager.set(gridData);
+
         this.body.updateScrollTop();
         this.rowHeight = gridData.rowHeight || this.rowHeight;
         this.rowHeightManager.set(this.rowHeight);
@@ -160,12 +162,10 @@ export class GridComponent implements OnInit, OnDestroy {
         this.columnList = this.columnListGetter.get(gridData);
 
         var gridSectionList = this.gridSectionListGetter.get(gridData, this.columnList);
+        this.gridSectionListManager.set(gridSectionList);
 
         this.headerRowCount = gridSectionList[0].titleRowList.length;
-
         this.columnListManager.set(this.columnList);
-        this.gridDataManager.set(gridData);
-        this.gridSectionListManager.set(gridSectionList);
 
         this.updateBodySectionScrollWidth(this.columnPositionInformationMapManager.get());
 

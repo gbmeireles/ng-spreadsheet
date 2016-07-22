@@ -10,7 +10,7 @@ import { GridRow } from '../../Model/GridRow';
 import { GridCell } from '../../Model/GridCell';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     changeDetection: ChangeDetectionStrategy.Default,
     directives: [RowComponent, CellComponent],
     selector: `GgRowList`,

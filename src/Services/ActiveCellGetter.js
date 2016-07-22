@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../Services/Managers/Managers', '../Services/CellNavigator'], function(exports_1) {
+System.register(['@angular/core', '../Services/Managers/Managers', '../Services/CellNavigator'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -41,7 +43,7 @@ System.register(['@angular/core', '../Services/Managers/Managers', '../Services/
                     __metadata('design:paramtypes', [Managers_1.CellListMapManager, CellNavigator_1.CellNavigator])
                 ], ActiveCellGetter);
                 return ActiveCellGetter;
-            })();
+            }());
             exports_1("ActiveCellGetter", ActiveCellGetter);
         }
     }

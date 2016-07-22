@@ -38,10 +38,10 @@ import {
 } from '../../../Model/CustomComponent/CustomComponent';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgCell',
     template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
-    styleUrls: ['Cell.css']
+    styleUrls: ['Cell.css'],
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('cell') gridCell: GridCell;
@@ -169,6 +169,9 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             var gridComponent = this.gridComponentManager.get();
             this.dcl.loadNextToLocation(this.gridCell.viewableComponentType, this.cellViewContainer,
                 ReflectiveInjector.resolve(gridData.providerList)).then((componentRef: ComponentRef<ViewableComponent>) => {
+                    if (this.viewComponent) {
+                        this.viewComponent.destroy();
+                    }
                     this.viewComponent = componentRef;
                     componentRef.instance.onRowInit(gridComponent, this.gridCell, this.rowData);
                 });
@@ -199,7 +202,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         } else {
             this.goToViewMode();
         }
-        if (this.index === 0) {
+        if (this.index === 0 && columnPositionInformationMap && columnPositionInformationMap[this.columnIndex]) {
             this.renderer.setElementStyle(this.el.nativeElement, 'margin-left', `${columnPositionInformationMap[this.columnIndex].left}px`);
         }
         this.updadteIsActiveStatus(gridCell);

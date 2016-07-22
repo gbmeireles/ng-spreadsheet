@@ -1,4 +1,6 @@
-System.register(['./src/Components/Components', './src/Model/Model', './src/Model/CustomComponent/CustomComponent'], function(exports_1) {
+System.register(['./src/Components/Components', './src/Model/Model'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var exportedNames_1 = {
         'GridComponent': true
     };
@@ -18,9 +20,6 @@ System.register(['./src/Components/Components', './src/Model/Model', './src/Mode
             },
             function (Model_1_1) {
                 exportStar_1(Model_1_1);
-            },
-            function (CustomComponent_1_1) {
-                exportStar_1(CustomComponent_1_1);
             }],
         execute: function() {
         }

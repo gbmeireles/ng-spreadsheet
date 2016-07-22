@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../../../Model/Model', '../../../Services/Services'], function(exports_1) {
+System.register(['@angular/core', '../../../Model/Model', '../../../Services/Services'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -122,6 +124,9 @@ System.register(['@angular/core', '../../../Model/Model', '../../../Services/Ser
                         var gridData = this.gridDataManager.get();
                         var gridComponent = this.gridComponentManager.get();
                         this.dcl.loadNextToLocation(this.gridCell.viewableComponentType, this.cellViewContainer, core_1.ReflectiveInjector.resolve(gridData.providerList)).then(function (componentRef) {
+                            if (_this.viewComponent) {
+                                _this.viewComponent.destroy();
+                            }
                             _this.viewComponent = componentRef;
                             componentRef.instance.onRowInit(gridComponent, _this.gridCell, _this.rowData);
                         });
@@ -152,7 +157,7 @@ System.register(['@angular/core', '../../../Model/Model', '../../../Services/Ser
                     else {
                         this.goToViewMode();
                     }
-                    if (this.index === 0) {
+                    if (this.index === 0 && columnPositionInformationMap && columnPositionInformationMap[this.columnIndex]) {
                         this.renderer.setElementStyle(this.el.nativeElement, 'margin-left', columnPositionInformationMap[this.columnIndex].left + "px");
                     }
                     this.updadteIsActiveStatus(gridCell);
@@ -229,15 +234,15 @@ System.register(['@angular/core', '../../../Model/Model', '../../../Services/Ser
                 ], CellComponent.prototype, "onDoubleClick", null);
                 CellComponent = __decorate([
                     core_1.Component({
-                        moduleId: __moduleName,
+                        moduleId: module.id,
                         selector: 'GgCell',
                         template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
-                        styleUrls: ['Cell.css']
+                        styleUrls: ['Cell.css'],
                     }), 
                     __metadata('design:paramtypes', [core_1.DynamicComponentLoader, core_1.ElementRef, core_1.ApplicationRef, Services_1.GridDataManager, Services_1.ColumnPositionInformationMapManager, Services_1.CellPositionUpdater, Services_1.CellListMapManager, Services_1.CellNavigator, Services_1.ActiveCellManager, core_1.ChangeDetectorRef, core_1.Renderer, core_1.ViewContainerRef, Services_1.GridComponentManager])
                 ], CellComponent);
                 return CellComponent;
-            })();
+            }());
             exports_1("CellComponent", CellComponent);
         }
     }

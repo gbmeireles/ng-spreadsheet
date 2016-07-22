@@ -1,4 +1,6 @@
-System.register(['@angular/core', './Managers/Managers', '../Model/Model'], function(exports_1) {
+System.register(['@angular/core', './Managers/Managers', '../Model/Model'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -137,7 +139,7 @@ System.register(['@angular/core', './Managers/Managers', '../Model/Model'], func
                     __metadata('design:paramtypes', [Managers_1.CellListMapManager, Managers_1.ColumnListManager, Managers_1.GridSectionListManager, Managers_1.BodyHeightManager, Managers_1.BodyScrollManager, Managers_1.RowHeightManager, Managers_1.SectionPositionInformationMapManager, Managers_1.BodySectionScrollManager, Managers_1.SubscriptionManager, Managers_1.ActiveCellManager, Managers_1.ColumnPositionInformationMapManager])
                 ], CellNavigator);
                 return CellNavigator;
-            })();
+            }());
             exports_1("CellNavigator", CellNavigator);
         }
     }
