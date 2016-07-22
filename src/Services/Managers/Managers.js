@@ -1,137 +1,74 @@
-System.register(['./CellListMapManager', './SectionPositionInformationMapManager', './ColumnListManager', './ColumnPositionInformationMapManager', './BodySectionWidthManager', './GridSectionListManager', './BodySectionScrollManager', './BodyWidthManager', './GridDataManager', './RowHeightManager', './BodyHeightManager', './BodyScrollManager', './ActiveCellManager', './ColumnDefinitionListManager', './BodySectionScrollWidthManager', './SubscriptionManager', './GridComponentManager', './TableIdManager'], function(exports_1, context_1) {
-    "use strict";
-    var __moduleName = context_1 && context_1.id;
-    var CellListMapManager_1, SectionPositionInformationMapManager_1, ColumnListManager_1, ColumnPositionInformationMapManager_1, BodySectionWidthManager_1, GridSectionListManager_1, BodySectionScrollManager_1, BodyWidthManager_1, GridDataManager_1, RowHeightManager_1, BodyHeightManager_1, BodyScrollManager_1, ActiveCellManager_1, ColumnDefinitionListManager_1, SubscriptionManager_1, BodySectionScrollWidthManager_1, TableIdManager_1, GridComponentManager_1;
-    var MANAGERS;
-    return {
-        setters:[
-            function (CellListMapManager_2_1) {
-                exports_1({
-                    "CellListMapManager": CellListMapManager_2_1["CellListMapManager"]
-                });
-                CellListMapManager_1 = CellListMapManager_2_1;
-            },
-            function (SectionPositionInformationMapManager_2_1) {
-                exports_1({
-                    "SectionPositionInformationMapManager": SectionPositionInformationMapManager_2_1["SectionPositionInformationMapManager"]
-                });
-                SectionPositionInformationMapManager_1 = SectionPositionInformationMapManager_2_1;
-            },
-            function (ColumnListManager_2_1) {
-                exports_1({
-                    "ColumnListManager": ColumnListManager_2_1["ColumnListManager"]
-                });
-                ColumnListManager_1 = ColumnListManager_2_1;
-            },
-            function (ColumnPositionInformationMapManager_2_1) {
-                exports_1({
-                    "ColumnPositionInformationMapManager": ColumnPositionInformationMapManager_2_1["ColumnPositionInformationMapManager"]
-                });
-                ColumnPositionInformationMapManager_1 = ColumnPositionInformationMapManager_2_1;
-            },
-            function (BodySectionWidthManager_2_1) {
-                exports_1({
-                    "BodySectionWidthManager": BodySectionWidthManager_2_1["BodySectionWidthManager"]
-                });
-                BodySectionWidthManager_1 = BodySectionWidthManager_2_1;
-            },
-            function (GridSectionListManager_2_1) {
-                exports_1({
-                    "GridSectionListManager": GridSectionListManager_2_1["GridSectionListManager"]
-                });
-                GridSectionListManager_1 = GridSectionListManager_2_1;
-            },
-            function (BodySectionScrollManager_2_1) {
-                exports_1({
-                    "BodySectionScrollManager": BodySectionScrollManager_2_1["BodySectionScrollManager"]
-                });
-                BodySectionScrollManager_1 = BodySectionScrollManager_2_1;
-            },
-            function (BodyWidthManager_2_1) {
-                exports_1({
-                    "BodyWidthManager": BodyWidthManager_2_1["BodyWidthManager"]
-                });
-                BodyWidthManager_1 = BodyWidthManager_2_1;
-            },
-            function (GridDataManager_2_1) {
-                exports_1({
-                    "GridDataManager": GridDataManager_2_1["GridDataManager"]
-                });
-                GridDataManager_1 = GridDataManager_2_1;
-            },
-            function (RowHeightManager_2_1) {
-                exports_1({
-                    "RowHeightManager": RowHeightManager_2_1["RowHeightManager"]
-                });
-                RowHeightManager_1 = RowHeightManager_2_1;
-            },
-            function (BodyHeightManager_2_1) {
-                exports_1({
-                    "BodyHeightManager": BodyHeightManager_2_1["BodyHeightManager"]
-                });
-                BodyHeightManager_1 = BodyHeightManager_2_1;
-            },
-            function (BodyScrollManager_2_1) {
-                exports_1({
-                    "BodyScrollManager": BodyScrollManager_2_1["BodyScrollManager"]
-                });
-                BodyScrollManager_1 = BodyScrollManager_2_1;
-            },
-            function (ActiveCellManager_2_1) {
-                exports_1({
-                    "ActiveCellManager": ActiveCellManager_2_1["ActiveCellManager"]
-                });
-                ActiveCellManager_1 = ActiveCellManager_2_1;
-            },
-            function (ColumnDefinitionListManager_2_1) {
-                exports_1({
-                    "ColumnDefinitionListManager": ColumnDefinitionListManager_2_1["ColumnDefinitionListManager"]
-                });
-                ColumnDefinitionListManager_1 = ColumnDefinitionListManager_2_1;
-            },
-            function (BodySectionScrollWidthManager_2_1) {
-                exports_1({
-                    "BodySectionScrollWidthManager": BodySectionScrollWidthManager_2_1["BodySectionScrollWidthManager"]
-                });
-                BodySectionScrollWidthManager_1 = BodySectionScrollWidthManager_2_1;
-            },
-            function (SubscriptionManager_2_1) {
-                exports_1({
-                    "SubscriptionManager": SubscriptionManager_2_1["SubscriptionManager"]
-                });
-                SubscriptionManager_1 = SubscriptionManager_2_1;
-            },
-            function (GridComponentManager_2_1) {
-                exports_1({
-                    "GridComponentManager": GridComponentManager_2_1["GridComponentManager"]
-                });
-                GridComponentManager_1 = GridComponentManager_2_1;
-            },
-            function (TableIdManager_1_1) {
-                TableIdManager_1 = TableIdManager_1_1;
-            }],
-        execute: function() {
-            exports_1("MANAGERS", MANAGERS = [
-                CellListMapManager_1.CellListMapManager,
-                SectionPositionInformationMapManager_1.SectionPositionInformationMapManager,
-                ColumnListManager_1.ColumnListManager,
-                ColumnPositionInformationMapManager_1.ColumnPositionInformationMapManager,
-                BodySectionWidthManager_1.BodySectionWidthManager,
-                GridSectionListManager_1.GridSectionListManager,
-                BodySectionScrollManager_1.BodySectionScrollManager,
-                BodyWidthManager_1.BodyWidthManager,
-                GridDataManager_1.GridDataManager,
-                RowHeightManager_1.RowHeightManager,
-                BodyHeightManager_1.BodyHeightManager,
-                BodyScrollManager_1.BodyScrollManager,
-                ActiveCellManager_1.ActiveCellManager,
-                ColumnDefinitionListManager_1.ColumnDefinitionListManager,
-                BodySectionScrollWidthManager_1.BodySectionScrollWidthManager,
-                SubscriptionManager_1.SubscriptionManager,
-                TableIdManager_1.TableIdManager,
-                GridComponentManager_1.GridComponentManager,
-            ]);
-        }
-    }
-});
+"use strict";
+var CellListMapManager_1 = require('./CellListMapManager');
+exports.CellListMapManager = CellListMapManager_1.CellListMapManager;
+var SectionPositionInformationMapManager_1 = require('./SectionPositionInformationMapManager');
+exports.SectionPositionInformationMapManager = SectionPositionInformationMapManager_1.SectionPositionInformationMapManager;
+var ColumnListManager_1 = require('./ColumnListManager');
+exports.ColumnListManager = ColumnListManager_1.ColumnListManager;
+var ColumnPositionInformationMapManager_1 = require('./ColumnPositionInformationMapManager');
+exports.ColumnPositionInformationMapManager = ColumnPositionInformationMapManager_1.ColumnPositionInformationMapManager;
+var BodySectionWidthManager_1 = require('./BodySectionWidthManager');
+exports.BodySectionWidthManager = BodySectionWidthManager_1.BodySectionWidthManager;
+var GridSectionListManager_1 = require('./GridSectionListManager');
+exports.GridSectionListManager = GridSectionListManager_1.GridSectionListManager;
+var BodySectionScrollManager_1 = require('./BodySectionScrollManager');
+exports.BodySectionScrollManager = BodySectionScrollManager_1.BodySectionScrollManager;
+var BodyWidthManager_1 = require('./BodyWidthManager');
+exports.BodyWidthManager = BodyWidthManager_1.BodyWidthManager;
+var GridDataManager_1 = require('./GridDataManager');
+exports.GridDataManager = GridDataManager_1.GridDataManager;
+var RowHeightManager_1 = require('./RowHeightManager');
+exports.RowHeightManager = RowHeightManager_1.RowHeightManager;
+var BodyHeightManager_1 = require('./BodyHeightManager');
+exports.BodyHeightManager = BodyHeightManager_1.BodyHeightManager;
+var BodyScrollManager_1 = require('./BodyScrollManager');
+exports.BodyScrollManager = BodyScrollManager_1.BodyScrollManager;
+var ActiveCellManager_1 = require('./ActiveCellManager');
+exports.ActiveCellManager = ActiveCellManager_1.ActiveCellManager;
+var ColumnDefinitionListManager_1 = require('./ColumnDefinitionListManager');
+exports.ColumnDefinitionListManager = ColumnDefinitionListManager_1.ColumnDefinitionListManager;
+var BodySectionScrollWidthManager_1 = require('./BodySectionScrollWidthManager');
+exports.BodySectionScrollWidthManager = BodySectionScrollWidthManager_1.BodySectionScrollWidthManager;
+var SubscriptionManager_1 = require('./SubscriptionManager');
+exports.SubscriptionManager = SubscriptionManager_1.SubscriptionManager;
+var GridComponentManager_1 = require('./GridComponentManager');
+exports.GridComponentManager = GridComponentManager_1.GridComponentManager;
+var CellListMapManager_2 = require('./CellListMapManager');
+var SectionPositionInformationMapManager_2 = require('./SectionPositionInformationMapManager');
+var ColumnListManager_2 = require('./ColumnListManager');
+var ColumnPositionInformationMapManager_2 = require('./ColumnPositionInformationMapManager');
+var BodySectionWidthManager_2 = require('./BodySectionWidthManager');
+var GridSectionListManager_2 = require('./GridSectionListManager');
+var BodySectionScrollManager_2 = require('./BodySectionScrollManager');
+var BodyWidthManager_2 = require('./BodyWidthManager');
+var GridDataManager_2 = require('./GridDataManager');
+var RowHeightManager_2 = require('./RowHeightManager');
+var BodyHeightManager_2 = require('./BodyHeightManager');
+var BodyScrollManager_2 = require('./BodyScrollManager');
+var ActiveCellManager_2 = require('./ActiveCellManager');
+var ColumnDefinitionListManager_2 = require('./ColumnDefinitionListManager');
+var SubscriptionManager_2 = require('./SubscriptionManager');
+var BodySectionScrollWidthManager_2 = require('./BodySectionScrollWidthManager');
+var TableIdManager_1 = require('./TableIdManager');
+var GridComponentManager_2 = require('./GridComponentManager');
+exports.MANAGERS = [
+    CellListMapManager_2.CellListMapManager,
+    SectionPositionInformationMapManager_2.SectionPositionInformationMapManager,
+    ColumnListManager_2.ColumnListManager,
+    ColumnPositionInformationMapManager_2.ColumnPositionInformationMapManager,
+    BodySectionWidthManager_2.BodySectionWidthManager,
+    GridSectionListManager_2.GridSectionListManager,
+    BodySectionScrollManager_2.BodySectionScrollManager,
+    BodyWidthManager_2.BodyWidthManager,
+    GridDataManager_2.GridDataManager,
+    RowHeightManager_2.RowHeightManager,
+    BodyHeightManager_2.BodyHeightManager,
+    BodyScrollManager_2.BodyScrollManager,
+    ActiveCellManager_2.ActiveCellManager,
+    ColumnDefinitionListManager_2.ColumnDefinitionListManager,
+    BodySectionScrollWidthManager_2.BodySectionScrollWidthManager,
+    SubscriptionManager_2.SubscriptionManager,
+    TableIdManager_1.TableIdManager,
+    GridComponentManager_2.GridComponentManager,
+];
 //# sourceMappingURL=Managers.js.map

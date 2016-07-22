@@ -1,28 +1,8 @@
-System.register(['./src/Components/Components', './src/Model/Model'], function(exports_1, context_1) {
-    "use strict";
-    var __moduleName = context_1 && context_1.id;
-    var exportedNames_1 = {
-        'GridComponent': true
-    };
-    function exportStar_1(m) {
-        var exports = {};
-        for(var n in m) {
-            if (n !== "default"&& !exportedNames_1.hasOwnProperty(n)) exports[n] = m[n];
-        }
-        exports_1(exports);
-    }
-    return {
-        setters:[
-            function (Components_1_1) {
-                exports_1({
-                    "GridComponent": Components_1_1["GridComponent"]
-                });
-            },
-            function (Model_1_1) {
-                exportStar_1(Model_1_1);
-            }],
-        execute: function() {
-        }
-    }
-});
+"use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+var Components_1 = require('./src/Components/Components');
+exports.GridComponent = Components_1.GridComponent;
+__export(require('./src/Model/Model'));
 //# sourceMappingURL=index.js.map
