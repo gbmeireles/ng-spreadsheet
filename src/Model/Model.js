@@ -1,4 +1,6 @@
-System.register(['./ContentTypeEnum'], function(exports_1) {
+System.register(['./ContentTypeEnum'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     return {
         setters:[
             function (ContentTypeEnum_1_1) {

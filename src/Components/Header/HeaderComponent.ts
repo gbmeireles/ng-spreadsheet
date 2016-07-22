@@ -10,7 +10,7 @@ import { GridSection } from '../../Model/GridSection';
 import { GridRow } from '../../Model/GridRow';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgHeader',
     templateUrl: 'Header.html',
     styleUrls: ['Header.css'],

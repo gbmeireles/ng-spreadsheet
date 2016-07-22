@@ -14,7 +14,7 @@ import {
 import { Cell, SectionPositionInformationMap } from '../../../Model/Model';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgBodySection',
     styleUrls: ['BodySection.css'],
     template: '<ng-content></ng-content>',

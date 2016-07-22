@@ -1,4 +1,6 @@
-System.register(['./Body/BodyComponent', './Header/HeaderComponent', './Row/RowComponent', './Grid/GridComponent', './RowList/Cell/CellComponent', './Header/HeaderSection/ColumnRow/ColumnCell/ColumnCellComponent', './Header/HeaderSection/ColumnResize/ColumnResizeComponent', './Header/HeaderSection/ColumnRow/ColumnRowComponent', './Body/BodySection/BodySectionComponent', './Header/HeaderSection/HeaderSectionComponent', './NumberRowList/NumberRowListComponent', './RowList/RowListComponent', './DetailsBar/DetailsBarComponent', './StatusBar/StatusBarComponent'], function(exports_1) {
+System.register(['./Body/BodyComponent', './Header/HeaderComponent', './Row/RowComponent', './Grid/GridComponent', './RowList/Cell/CellComponent', './Header/HeaderSection/ColumnRow/ColumnCell/ColumnCellComponent', './Header/HeaderSection/ColumnResize/ColumnResizeComponent', './Header/HeaderSection/ColumnRow/ColumnRowComponent', './Body/BodySection/BodySectionComponent', './Header/HeaderSection/HeaderSectionComponent', './NumberRowList/NumberRowListComponent', './RowList/RowListComponent', './DetailsBar/DetailsBarComponent', './StatusBar/StatusBarComponent'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     return {
         setters:[
             function (BodyComponent_1_1) {

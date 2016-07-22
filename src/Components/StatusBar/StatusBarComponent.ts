@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChange } from '@angular/core';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgStatusBar',
     templateUrl: 'StatusBar.html',
     styleUrls: ['StatusBar.css'],

@@ -13,7 +13,7 @@ import { NumberRowListComponent } from '../../Components/NumberRowList/NumberRow
 import { RowListComponent } from '../../Components/RowList/RowListComponent';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgBody',
     templateUrl: 'Body.html',
     styleUrls: ['Body.css'],

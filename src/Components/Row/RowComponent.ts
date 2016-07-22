@@ -20,7 +20,7 @@ import {
 } from '../../Services/Services';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgRow',
     template: '<ng-content></ng-content>',
     styleUrls: ['Row.css'],

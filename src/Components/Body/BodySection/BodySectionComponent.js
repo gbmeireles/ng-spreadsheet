@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../../../Services/Services'], function(exports_1) {
+System.register(['@angular/core', '../../../Services/Services'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -258,7 +260,7 @@ System.register(['@angular/core', '../../../Services/Services'], function(export
                 ], BodySectionComponent.prototype, "onScroll", null);
                 BodySectionComponent = __decorate([
                     core_1.Component({
-                        moduleId: __moduleName,
+                        moduleId: module.id,
                         selector: 'GgBodySection',
                         styleUrls: ['BodySection.css'],
                         template: '<ng-content></ng-content>',
@@ -266,7 +268,7 @@ System.register(['@angular/core', '../../../Services/Services'], function(export
                     __metadata('design:paramtypes', [core_1.ElementRef, Services_1.BodyScrollManager, Services_1.BodySectionScrollManager, Services_1.SectionPositionInformationMapManager, Services_1.CellNavigator, Services_1.RowHeightManager, Services_1.ActiveCellGetter, Services_1.GridSectionListManager, Services_1.ActiveCellManager, Services_1.ColumnPositionInformationMapManager])
                 ], BodySectionComponent);
                 return BodySectionComponent;
-            })();
+            }());
             exports_1("BodySectionComponent", BodySectionComponent);
         }
     }

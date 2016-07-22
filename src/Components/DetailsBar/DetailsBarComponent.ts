@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ActiveCellManager } from '../../Services/Managers/ActiveCellManager';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgDetailsBar',
     templateUrl: 'DetailsBar.html',
     styleUrls: ['DetailsBar.css'],

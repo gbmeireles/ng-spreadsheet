@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../../Services/Services', '../../Components/NumberRowList/NumberRowListComponent', '../../Components/Header/HeaderSection/HeaderSectionComponent', '../../Components/RowList/RowListComponent'], function(exports_1) {
+System.register(['@angular/core', '../../Services/Services', '../../Components/NumberRowList/NumberRowListComponent', '../../Components/Header/HeaderSection/HeaderSectionComponent', '../../Components/RowList/RowListComponent'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -62,7 +64,7 @@ System.register(['@angular/core', '../../Services/Services', '../../Components/N
                 ], HeaderComponent.prototype, "gridSectionList", void 0);
                 HeaderComponent = __decorate([
                     core_1.Component({
-                        moduleId: __moduleName,
+                        moduleId: module.id,
                         selector: 'GgHeader',
                         templateUrl: 'Header.html',
                         styleUrls: ['Header.css'],
@@ -71,7 +73,7 @@ System.register(['@angular/core', '../../Services/Services', '../../Components/N
                     __metadata('design:paramtypes', [Services_1.RowHeightManager])
                 ], HeaderComponent);
                 return HeaderComponent;
-            })();
+            }());
             exports_1("HeaderComponent", HeaderComponent);
         }
     }

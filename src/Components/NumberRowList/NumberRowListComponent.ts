@@ -3,7 +3,7 @@ import { RowComponent } from '../Row/RowComponent';
 import { GridRow } from '../../Model/GridRow';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     changeDetection: ChangeDetectionStrategy.OnPush,
     directives: [RowComponent],
     selector: `GgNumberRowList`,

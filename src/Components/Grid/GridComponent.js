@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../../Components/Header/HeaderComponent', '../../Components/Body/BodyComponent', '../../Components/DetailsBar/DetailsBarComponent', '../../Components/StatusBar/StatusBarComponent', '../../Services/Services', '../../Model/ContentTypeEnum'], function(exports_1) {
+System.register(['@angular/core', '../../Components/Header/HeaderComponent', '../../Components/Body/BodyComponent', '../../Components/DetailsBar/DetailsBarComponent', '../../Components/StatusBar/StatusBarComponent', '../../Services/Services', '../../Model/ContentTypeEnum'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -108,15 +110,15 @@ System.register(['@angular/core', '../../Components/Header/HeaderComponent', '..
                     return 'gridSection_' + index;
                 };
                 GridComponent.prototype.update = function (gridData) {
+                    this.gridDataManager.set(gridData);
                     this.body.updateScrollTop();
                     this.rowHeight = gridData.rowHeight || this.rowHeight;
                     this.rowHeightManager.set(this.rowHeight);
                     this.columnList = this.columnListGetter.get(gridData);
                     var gridSectionList = this.gridSectionListGetter.get(gridData, this.columnList);
+                    this.gridSectionListManager.set(gridSectionList);
                     this.headerRowCount = gridSectionList[0].titleRowList.length;
                     this.columnListManager.set(this.columnList);
-                    this.gridDataManager.set(gridData);
-                    this.gridSectionListManager.set(gridSectionList);
                     this.updateBodySectionScrollWidth(this.columnPositionInformationMapManager.get());
                     this.cdr.markForCheck();
                 };
@@ -200,7 +202,7 @@ System.register(['@angular/core', '../../Components/Header/HeaderComponent', '..
                 ], GridComponent.prototype, "onFocus", null);
                 GridComponent = __decorate([
                     core_1.Component({
-                        moduleId: __moduleName,
+                        moduleId: module.id,
                         changeDetection: core_1.ChangeDetectionStrategy.Default,
                         directives: [
                             DetailsBarComponent_1.DetailsBarComponent,
@@ -217,7 +219,7 @@ System.register(['@angular/core', '../../Components/Header/HeaderComponent', '..
                     __metadata('design:paramtypes', [core_1.ElementRef, Services_1.ColumnListGetter, Services_1.ColumnPositionInformationMapUpdater, Services_1.SectionPositionInformationMapUpdater, Services_1.GridDataManager, Services_1.GridSectionListGetter, Services_1.ColumnListManager, Services_1.ColumnViewportUpdater, Services_1.RowViewportUpdater, Services_1.GridSectionListManager, Services_1.RowHeightManager, Services_1.CellListMapManager, Services_1.ColumnPositionInformationMapManager, Services_1.GridColumnListGetter, Services_1.BodySectionScrollWidthManager, core_1.ChangeDetectorRef, Services_1.BodyScrollManager, Services_1.BodySectionScrollManager, Services_1.GridComponentManager])
                 ], GridComponent);
                 return GridComponent;
-            })();
+            }());
             exports_1("GridComponent", GridComponent);
         }
     }

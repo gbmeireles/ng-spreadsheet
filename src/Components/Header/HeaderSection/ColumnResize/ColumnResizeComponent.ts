@@ -13,7 +13,7 @@ import { ColumnPositionInformationMap } from  '../../../../Model/ColumnPositionI
 import * as _ from 'lodash';
 
 @Component({
-    moduleId: __moduleName,
+    moduleId: module.id,
     selector: 'GgColumnResize',
     styleUrls: ['ColumnResize.css'],
     template: '<div [class.active]="isDragging" [style.height]="height" [style.left]="left"></div>',

@@ -1,4 +1,6 @@
-System.register(['@angular/core', '../Services/Managers/GridSectionListManager', '../Services/Managers/Managers', '../Services/RowViewportVisibleRowCountGetter'], function(exports_1) {
+System.register(['@angular/core', '../Services/Managers/GridSectionListManager', '../Services/Managers/Managers', '../Services/RowViewportVisibleRowCountGetter'], function(exports_1, context_1) {
+    "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -77,7 +79,7 @@ System.register(['@angular/core', '../Services/Managers/GridSectionListManager',
                     __metadata('design:paramtypes', [GridSectionListManager_1.GridSectionListManager, Managers_1.RowHeightManager, RowViewportVisibleRowCountGetter_1.RowViewportVisibleRowCountGetter])
                 ], RowToRenderIndexListGetter);
                 return RowToRenderIndexListGetter;
-            })();
+            }());
             exports_1("RowToRenderIndexListGetter", RowToRenderIndexListGetter);
         }
     }
