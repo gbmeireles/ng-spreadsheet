@@ -48,6 +48,12 @@ import { Column } from '../../Model/Column';
 import { ColumnPositionInformationMap } from '../../Model/ColumnPositionInformationMap';
 import { GridEvent } from '../../Model/CustomComponent/GridEvent';
 
+const html = `
+<GgDetailsBar></GgDetailsBar>
+<GgHeader [rowCount]="headerRowCount" [numberTitleRowList]="numberTitleRowList" [gridSectionList]="gridSectionList"></GgHeader>
+<GgBody [numberDataRowList]="numberDataRowList" [gridSectionList]="gridSectionList"></GgBody>
+<GgStatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></GgStatusBar>`;
+
 @Component({
     moduleId: module.id,
     changeDetection: ChangeDetectionStrategy.Default,
@@ -61,7 +67,7 @@ import { GridEvent } from '../../Model/CustomComponent/GridEvent';
         GRID_SCOPE_SERVICES,
     ],
     selector: 'GgGrid',
-    templateUrl: 'Grid.html',
+    template: html,
 })
 export class GridComponent implements OnInit, OnDestroy {
     @Input('id') id: string;

@@ -1,10 +1,39 @@
 import { Component, Input, OnInit, OnChanges, SimpleChange } from '@angular/core';
 
+const css = `
+:host {
+    display: block;
+    position: relative;
+}
+
+div {
+    height: 20px;
+    background-color: #E6E6E6;
+    position: relative;
+    border: 1px solid #C6C6C6;
+    transition: all 0.4s ease-out;
+    transform: translate(0,-100%);
+    display: none;
+    opacity: 0;
+}
+
+div.is-visible {
+    display: block;
+    transition: all 0.4s ease-out;
+    opacity: 1;
+    transform: translate(0,0);
+}`;
+
+const html = `
+<div [class.is-visible]="isVisible">
+    <span>{{message}}</span>
+</div>`;
+
 @Component({
     moduleId: module.id,
     selector: 'GgStatusBar',
-    templateUrl: 'StatusBar.html',
-    styleUrls: ['StatusBar.css'],
+    template: html,
+    styles: [css],
 })
 export class StatusBarComponent implements OnInit, OnChanges {
     @Input('message') message = '';

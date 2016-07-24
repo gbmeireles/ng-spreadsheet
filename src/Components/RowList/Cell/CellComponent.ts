@@ -37,11 +37,27 @@ import {
     ViewableComponent,
 } from '../../../Model/CustomComponent/CustomComponent';
 
+const css = `
+:host {
+    display: block;
+    float: left;
+    overflow: hidden;
+    white-space: nowrap;
+    -moz-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    height: 100%;
+    position: relative;
+}
+
+GgCellComponent {
+    padding: 2px;
+}`;
+
 @Component({
     moduleId: module.id,
     selector: 'GgCell',
     template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
-    styleUrls: ['Cell.css'],
+    styles: [css],
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('cell') gridCell: GridCell;

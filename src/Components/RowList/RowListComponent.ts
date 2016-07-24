@@ -9,12 +9,18 @@ import {
 import { GridRow } from '../../Model/GridRow';
 import { GridCell } from '../../Model/GridCell';
 
+const html = `
+<GgRow *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" [row]="row" [gridSectionName]="gridSectionName" [index]="i">
+    <GgCell [cell]="cell" [index]="cellIndex" [rowData]="row?.rowData" 
+        *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity">
+    </GgCell>
+</GgRow>`;
+
 @Component({
-    moduleId: module.id,
     changeDetection: ChangeDetectionStrategy.Default,
     directives: [RowComponent, CellComponent],
     selector: `GgRowList`,
-    templateUrl: 'RowList.html',
+    template: html,
 })
 export class RowListComponent {
     @Input('rowList') rowList: GridRow[];

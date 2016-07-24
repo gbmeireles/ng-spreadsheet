@@ -13,10 +13,38 @@ import {
 } from '../../../Services/Services';
 import { Cell, SectionPositionInformationMap } from '../../../Model/Model';
 
+const css = `
+:host {
+    display: block;
+    position: absolute;
+    height: 100%;
+    outline: none;
+}
+
+:host[gridSectionName="RowNumber"] {
+    width: 20px;
+}
+
+:host[gridSectionName="Scroll"] {
+    width: 20px;
+    right: 0;
+    overflow-y: scroll;
+}
+
+:host[gridSectionName="Scroll"] GgRow {
+    visibility: hidden;
+}
+
+:host {
+    overflow-x: scroll;
+    overflow-y: hidden;
+}
+`;
+
 @Component({
     moduleId: module.id,
     selector: 'GgBodySection',
-    styleUrls: ['BodySection.css'],
+    styles: [css],
     template: '<ng-content></ng-content>',
 })
 export class BodySectionComponent implements OnDestroy, OnInit {

@@ -12,11 +12,33 @@ import { BodySectionComponent } from '../../Components/Body/BodySection/BodySect
 import { NumberRowListComponent } from '../../Components/NumberRowList/NumberRowListComponent';
 import { RowListComponent } from '../../Components/RowList/RowListComponent';
 
+const css = `
+:host {
+    position: relative;
+    height: 400px;
+    max-height: 400px;
+    overflow-y: hidden;
+    display: block;
+}`;
+
+const html = `
+<GgBodySection #rowNumberSection gridSectionName="RowNumber">
+    <GgNumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></GgNumberRowList>
+</GgBodySection>
+<GgBodySection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name"
+    tabindex="0">
+    <GgRowList [rowList]="gridSection.visibleDataRowList" [gridSectionName]="gridSection.name"></GgRowList>
+    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * 30" style="position: absolute; width:2px; top:0;"></div>
+</GgBodySection>
+<GgBodySection gridSectionName="Scroll">
+    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * 30"></div>
+</GgBodySection>`;
+
 @Component({
     moduleId: module.id,
     selector: 'GgBody',
-    templateUrl: 'Body.html',
-    styleUrls: ['Body.css'],
+    template: html,
+    styles: [css],
     directives: [BodySectionComponent, NumberRowListComponent, RowListComponent],
 })
 export class BodyComponent implements OnInit {

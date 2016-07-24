@@ -1,4 +1,6 @@
-del /S app\*.js
-del /S app\*.map
-del /S ngSpreadsheet\*.js
-del /S ngSpreadsheet\*.map
+del /S src\*.js
+del /S src\*.map
+del /S src\*.d.ts
+del /S dist\*.js
+del /S dist\*.map
+del /S dist\*.d.ts

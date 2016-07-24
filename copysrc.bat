@@ -1,0 +1,1 @@
+XCOPY src "C:\Dropbox\Projetos\Gemain.v2\Frontend\node_modules\ng-spreadsheet\src" /E /Y /I

@@ -9,11 +9,29 @@ import { RowListComponent } from '../../Components/RowList/RowListComponent';
 import { GridSection } from '../../Model/GridSection';
 import { GridRow } from '../../Model/GridRow';
 
+const html = `
+<GgHeaderSection gridSectionName="RowNumber">
+    <GgNumberRowList [numberRowList]="numberTitleRowList" [rowHeight]="rowHeight"></GgNumberRowList>
+</GgHeaderSection>
+<GgHeaderSection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name">
+    <GgRowList [rowList]="gridSection.titleRowList" [gridSectionName]="gridSection.name"></GgRowList>
+</GgHeaderSection>
+<GgHeaderSection gridSectionName="Scroll">
+</GgHeaderSection>`;
+
+const css = `
+:host {
+    display: block;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+}`;
+
 @Component({
     moduleId: module.id,
     selector: 'GgHeader',
-    templateUrl: 'Header.html',
-    styleUrls: ['Header.css'],
+    template: html,
+    styles: [css],
     directives: [NumberRowListComponent, HeaderSectionComponent, RowListComponent],
 })
 export class HeaderComponent implements OnDestroy {

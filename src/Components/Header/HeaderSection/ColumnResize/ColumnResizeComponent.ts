@@ -7,16 +7,35 @@ import {
     ColumnPositionInformationMapCalculator,
     RowHeightManager,
     CellListMapManager,
-} from  '../../../../Services/Services';
-import { GridColumn } from  '../../../../Model/GridColumn';
-import { ColumnPositionInformationMap } from  '../../../../Model/ColumnPositionInformationMap';
+} from '../../../../Services/Services';
+import { GridColumn } from '../../../../Model/GridColumn';
+import { ColumnPositionInformationMap } from '../../../../Model/ColumnPositionInformationMap';
 import * as _ from 'lodash';
+
+var css = `
+div {
+    width: 4px;
+    cursor: col-resize;
+    display: block;
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    background-color: black;
+    transition: opacity 0.4s ease-out;
+}
+
+div:hover, div.active {
+    opacity: 1;
+    transition: opacity 0.4s ease-out;
+}`;
+
+var html = `<div [class.active]="isDragging" [style.height]="height" [style.left]="left"></div>`;
 
 @Component({
     moduleId: module.id,
     selector: 'GgColumnResize',
-    styleUrls: ['ColumnResize.css'],
-    template: '<div [class.active]="isDragging" [style.height]="height" [style.left]="left"></div>',
+    styles: [css],
+    template: html,
 })
 export class ColumnResizeComponent implements OnInit, OnDestroy {
     @Input('gridColumn') gridColumn: GridColumn;

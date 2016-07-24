@@ -13,12 +13,36 @@ import { GridColumn } from '../../../../Model/GridColumn';
 const columnUnitList: string[] =
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
+const css = `
+:host {
+    display: block;
+    position: relative;
+    height: 20px;
+}
+
+GgColumnCell {
+    background-color: #E6E6E6;
+    border-right: 1px inset #A3A3A3;
+    text-align: center;
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+}`;
+
+const html = `
+<GgColumnCell *ngFor="let gridColumn of visibleGridColumnList; let columnIndex = index; trackBy:cellIndentity;" 
+    [gridColumn]="gridColumn" [index]="columnIndex">
+    <span>{{gridColumnIdentifierMap[gridColumn.index]}}</span>
+    <span><i class="fa fa-caret-square-down"></i></span>
+</GgColumnCell>`;
+
 @Component({
     moduleId: module.id,
     directives: [ColumnCellComponent, NgFor],
     selector: 'GgColumnRow',
-    templateUrl: 'ColumnRow.html',
-    styleUrls: ['ColumnRow.css'],
+    template: html,
+    styles: [css],
 })
 export class ColumnRowComponent implements OnInit, OnDestroy {
     @Input('gridSectionName') gridSectionName: string;

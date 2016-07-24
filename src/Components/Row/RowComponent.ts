@@ -19,11 +19,16 @@ import {
     BodySectionScrollWidthManager,
 } from '../../Services/Services';
 
+const css = `:host {
+    display: block;
+    position: relative;
+    height: 20px;
+}`;
+
 @Component({
-    moduleId: module.id,
     selector: 'GgRow',
     template: '<ng-content></ng-content>',
-    styleUrls: ['Row.css'],
+    styles: [css],
 })
 export class RowComponent implements OnInit, OnDestroy {
     @Input('index') index: number;

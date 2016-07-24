@@ -1,8 +1,0 @@
-<GgHeaderSection gridSectionName="RowNumber">
-    <GgNumberRowList [numberRowList]="numberTitleRowList" [rowHeight]="rowHeight"></GgNumberRowList>
-</GgHeaderSection>
-<GgHeaderSection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name">
-    <GgRowList [rowList]="gridSection.titleRowList" [gridSectionName]="gridSection.name"></GgRowList>
-</GgHeaderSection>
-<GgHeaderSection gridSectionName="Scroll">
-</GgHeaderSection>

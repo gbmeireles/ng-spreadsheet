@@ -1,4 +1,4 @@
-import { HostBinding, HostListener, Component, Input, ElementRef  } from '@angular/core';
+import { HostBinding, HostListener, Component, Input, ElementRef } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import {
     SectionPositionInformationMapManager,
@@ -18,12 +18,41 @@ import { GridRowListMap } from '../../../Model/GridRowListMap';
 import { GridColumn } from '../../../Model/GridColumn';
 import { SectionPositionInformationMap } from '../../../Model/SectionPositionInformationMap';
 
+const html = `
+<GgColumnCornerCell *ngIf="gridSectionName === 'RowNumber'"></GgColumnCornerCell>
+<GgColumnRow [gridSectionName]="gridSectionName" [visibleGridColumnList]="visibleGridColumnList"></GgColumnRow>
+<GgColumnResize [gridColumn]="gridColumn" *ngFor="let gridColumn of visibleGridColumnList"></GgColumnResize>
+<ng-content></ng-content>`;
+
+const css = `
+:host {
+    display: block;
+    position: absolute;
+    height: 100%;
+    outline: none;
+    overflow-x: hidden;
+}
+
+:host([gridSectionName="RowNumber"]) {
+    width: 20px;
+}
+
+GgColumnCornerCell {
+    display: block;
+    position: absolute;
+    width: 20px;
+    background-color: #E6E6E6;
+    height: 20px;
+    border-bottom: 1px inset #A3A3A3;
+    border-right: 1px inset #A3A3A3;
+}`;
+
 @Component({
     moduleId: module.id,
     directives: [ColumnRowComponent, ColumnResizeComponent],
     selector: 'GgHeaderSection',
-    templateUrl: 'HeaderSection.html',
-    styleUrls: ['HeaderSection.css'],
+    template: html,
+    styles: [css],
 })
 export class HeaderSectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;
