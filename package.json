@@ -5,8 +5,7 @@
   "main": "dist/ngSpreadsheet.js",
   "scripts": {
     "tsc": "tsc",
-    "typings": "typings",
-    "prepublish": "tsc"
+    "typings": "typings"
   },
   "author": {
     "name": "Guilherme Meireles",
