@@ -42,7 +42,6 @@ const css = `
 `;
 
 @Component({
-    moduleId: module.id,
     selector: 'GgBodySection',
     styles: [css],
     template: '<ng-content></ng-content>',

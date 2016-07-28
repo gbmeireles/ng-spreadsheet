@@ -38,7 +38,6 @@ const html = `
 </GgColumnCell>`;
 
 @Component({
-    moduleId: module.id,
     directives: [ColumnCellComponent, NgFor],
     selector: 'GgColumnRow',
     template: html,

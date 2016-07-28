@@ -35,7 +35,6 @@ const html = `
 </GgBodySection>`;
 
 @Component({
-    moduleId: module.id,
     selector: 'GgBody',
     template: html,
     styles: [css],

@@ -48,7 +48,6 @@ GgColumnCornerCell {
 }`;
 
 @Component({
-    moduleId: module.id,
     directives: [ColumnRowComponent, ColumnResizeComponent],
     selector: 'GgHeaderSection',
     template: html,

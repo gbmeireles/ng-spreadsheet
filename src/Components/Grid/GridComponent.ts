@@ -55,7 +55,6 @@ const html = `
 <GgStatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></GgStatusBar>`;
 
 @Component({
-    moduleId: module.id,
     changeDetection: ChangeDetectionStrategy.Default,
     directives: [
         DetailsBarComponent,

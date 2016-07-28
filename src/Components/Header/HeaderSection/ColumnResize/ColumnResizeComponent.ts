@@ -32,7 +32,6 @@ div:hover, div.active {
 var html = `<div [class.active]="isDragging" [style.height]="height" [style.left]="left"></div>`;
 
 @Component({
-    moduleId: module.id,
     selector: 'GgColumnResize',
     styles: [css],
     template: html,

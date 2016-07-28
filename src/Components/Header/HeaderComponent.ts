@@ -28,7 +28,6 @@ const css = `
 }`;
 
 @Component({
-    moduleId: module.id,
     selector: 'GgHeader',
     template: html,
     styles: [css],

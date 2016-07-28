@@ -51,10 +51,14 @@ const css = `
 
 GgCellComponent {
     padding: 2px;
-}`;
+}
+
+GgCellComponent.is-custom {
+    padding: 0px;
+}
+`;
 
 @Component({
-    moduleId: module.id,
     selector: 'GgCell',
     template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
     styles: [css],
@@ -65,6 +69,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('index') index: number;
     @HostBinding('style.width') width: number;
     @HostBinding('class.is-active') isActive: boolean = false;
+    @HostBinding('class.is-custom') isCustom: boolean = false;
     @HostBinding('class') style;
     @ViewChild('cellComponent', { read: ViewContainerRef }) cellViewContainer: ViewContainerRef;
     left: number;
@@ -132,6 +137,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
 
     goToEditMode() {
         if (this.gridCell.editableComponentType && !this.isEditing) {
+            this.isCustom = true;
             this.cdr.markForCheck();
             this.isEditing = true;
             this.clear();
@@ -163,6 +169,9 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                     });
                 });
         }
+        else {
+            this.isCustom = false;
+        }
     }
 
     cancelEdit() {
@@ -180,6 +189,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             if (!this.cellViewContainer) {
                 return;
             }
+            this.isCustom = true;
             this.cdr.markForCheck();
             var gridData = this.gridDataManager.get();
             var gridComponent = this.gridComponentManager.get();
@@ -192,8 +202,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                     componentRef.instance.onRowInit(gridComponent, this.gridCell, this.rowData);
                 });
         } else if (this.gridCell.formattedData !== undefined) {
+            this.isCustom = false;
             this.data = this.gridCell.formattedData;
         } else {
+            this.isCustom = false;
             this.data = this.gridCell.data;
         }
     }

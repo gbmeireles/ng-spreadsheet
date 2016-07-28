@@ -30,7 +30,6 @@ const html = `
 </div>`;
 
 @Component({
-    moduleId: module.id,
     selector: 'GgStatusBar',
     template: html,
     styles: [css],
