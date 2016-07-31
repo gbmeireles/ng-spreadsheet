@@ -3,7 +3,7 @@ import { GridCell } from './GridCell';
 export interface Cell {
     left: number;
     width: number;
-    columnIndex: number;
+    gridColumnIndex: number;
     sectionColumnIndex?: number;
     getScrollWidth: () => number;
     gridCell: GridCell;

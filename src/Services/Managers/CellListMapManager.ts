@@ -10,7 +10,7 @@ export class CellListMapManager {
 
     }
 
-    updateGridColumnMap(gridColumnMap) {
+    updateGridColumnMap(gridColumnMap: { [columnIndex: number]: GridColumn }) {
         this.gridColumnMap = gridColumnMap;
     }
 
@@ -23,7 +23,7 @@ export class CellListMapManager {
     }
 
     addCell(cell: Cell) {
-        var columnName = this.getColumnName(cell.columnIndex);
+        var columnName = this.getColumnName(cell.gridColumnIndex);
         if (!this.cellListMap[columnName]) {
             this.cellListMap[columnName] = [];
         }
@@ -34,7 +34,7 @@ export class CellListMapManager {
     }
 
     removeCell(cell: Cell) {
-        var columnName = this.getColumnName(cell.columnIndex);
+        var columnName = this.getColumnName(cell.gridColumnIndex);
         if (!this.cellListMap[columnName]) {
             return;
         }
@@ -47,6 +47,7 @@ export class CellListMapManager {
 
     private getColumnName(columnIndex: number): string {
         if (!this.gridColumnMap[columnIndex]) {
+            console.error('Invalid column index ' + columnIndex);
             return;
         }
         return this.gridColumnMap[columnIndex].name;

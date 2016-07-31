@@ -1,1 +1,3 @@
-XCOPY src "C:\Dropbox\Projetos\Gemain.v2\Frontend\node_modules\ng-spreadsheet\src" /E /Y /I
+call tsc
+call XCOPY src "demo\node_modules\ng-spreadsheet\src" /E /Y /I
+XCOPY dist "demo\node_modules\ng-spreadsheet\dist" /E /Y /I

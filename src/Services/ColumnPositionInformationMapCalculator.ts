@@ -15,10 +15,10 @@ export class ColumnPositionInformationMapCalculator {
         var gridColumnList = this.gridColumnListGetter.get(columnList);
         var initialColumnPositionInformationMap: ColumnPositionInformationMap = this.getInitialColumnPositionInformationMap(gridColumnList);
 
-        var columnPositionInformationMap =
-            this.getColumnPositionInformationMapFilledForGridSection(gridColumnList, initialColumnPositionInformationMap);
+        // var columnPositionInformationMap =
+        //     this.getColumnPositionInformationMapFilledForGridSection(gridColumnList, initialColumnPositionInformationMap);
 
-        return columnPositionInformationMap;
+        return initialColumnPositionInformationMap;
     }
 
     private getInitialColumnPositionInformationMap(gridColumnList: GridColumn[]) {
@@ -75,14 +75,14 @@ export class ColumnPositionInformationMapCalculator {
 
                 columnPositionInformationMap[columnIndex].width = newWidth;
             });
-            if (remaining > 0) {
-                columnPositionInformationMap[lastGridColumn.index].width + remaining;
-            }
-            var left = 0;
-            gridSectionGridColumnList.forEach(gc => {
-                columnPositionInformationMap[lastGridColumn.index].left = left;
-                left += columnPositionInformationMap[lastGridColumn.index].width;
-            });
+            // if (remaining > 0) {
+            //     columnPositionInformationMap[lastGridColumn.index].width + remaining;
+            // }
+            // left = 0;
+            // gridSectionGridColumnList.forEach(gc => {
+            //     columnPositionInformationMap[lastGridColumn.index].left = left;
+            //     left += columnPositionInformationMap[lastGridColumn.index].width;
+            // });
         });
 
         return columnPositionInformationMap;

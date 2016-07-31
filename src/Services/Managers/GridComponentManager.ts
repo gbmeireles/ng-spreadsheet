@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { SubscriptionManager } from './SubscriptionManager';
-import { GridComponent } from '../../Components/Grid/GridComponent';
+import { SpreadsheetComponent } from '../../Spreadsheet/SpreadsheetComponent';
 
 @Injectable()
 export class GridComponentManager {
-    gridComponent: GridComponent;
+    gridComponent: SpreadsheetComponent;
 
-    set(gridComponent: GridComponent) {
+    set(gridComponent: SpreadsheetComponent) {
         this.gridComponent = gridComponent;
     }
 
-    get(): GridComponent {
+    get(): SpreadsheetComponent {
         return this.gridComponent;
     }
 }

@@ -13,7 +13,7 @@ declare var System;
   // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
     'app': { main: 'main.js', defaultExtension: 'js' },
-    'ng-spreadsheet': { main: 'index.js', defaultExtension: 'js' },
+    'ng-spreadsheet': { main: 'dist/ngSpreadsheet.js', defaultExtension: 'js' },
     'rxjs': { defaultExtension: 'js' },
     'angular2-in-memory-web-api': { defaultExtension: 'js' },
     'lodash': { main: 'lodash.js', defaultExtension: 'js' },

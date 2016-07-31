@@ -1,3 +1,3 @@
-export { GridComponent} from './Components/Components';
+export { SpreadsheetComponent } from './Spreadsheet/Spreadsheet';
 export * from './Model/Model';
-export * from './Model/CustomComponent/CustomComponent';
+export * from './Spreadsheet/Model/CustomComponent';

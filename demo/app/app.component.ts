@@ -1,19 +1,19 @@
 import { Component, ViewChild, forwardRef, Injector, ChangeDetectionStrategy } from '@angular/core';
 import { HTTP_PROVIDERS, Http }    from '@angular/http';
-import { GridComponent, GridData, ColumnDefinition, GridCell, ContentTypeEnum, Column } from 'ng-spreadsheet';
+import { SpreadsheetComponent, GridData, ColumnDefinition, GridCell, ContentTypeEnum, Column } from 'ng-spreadsheet';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import { TreeToListConverter } from './tree/Services/TreeToListConverter';
 import { TextEditorComponent } from './TextEditorComponent';
 import { SimpleColumnCreator } from './SimpleColumnCreator';
 
 @Component({
-    directives: [GridComponent, CORE_DIRECTIVES, NgFor],
+    directives: [SpreadsheetComponent, CORE_DIRECTIVES, NgFor],
     providers: [HTTP_PROVIDERS, TreeToListConverter, SimpleColumnCreator],
     selector: 'my-app',
     templateUrl: 'app/app.html',
 })
 export class AppComponent {
-    @ViewChild(GridComponent) table: GridComponent;
+    @ViewChild(SpreadsheetComponent) table: SpreadsheetComponent;
     periodList: any[] = [];
 
     constructor(private http: Http, private treeToListConverter: TreeToListConverter,
@@ -37,6 +37,7 @@ export class AppComponent {
                     endIndex: columnStartIndex + this.periodList.length - 1,
                     gridSectionName: 'PeriodList',
                     startIndex: columnStartIndex,
+                    name: 'PeriodList',
                 };
             },
             getDataCellMatrix: (gridData: GridData, rowData: any, gridColumn: Column): GridCell[][] => {

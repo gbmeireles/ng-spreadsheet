@@ -1,9 +1,9 @@
-GgGrid {
+NgSpreadsheet {
   font-family: "Lato", Helvetica, Arial, sans-serif;
   font-size: 12px;
 }
 
-GgGrid input {
+NgSpreadsheet input {
     background: white;
     color: black;
     border: 1px solid green;
@@ -11,68 +11,68 @@ GgGrid input {
     height: 100%;
 }
 
-GgGrid .title {
+NgSpreadsheet .title {
   background-color: white;
   font-weight: bold;
   text-align: center;
   line-height: 30px;
   vertical-align: middle;
 }
-GgGrid .standard {
+NgSpreadsheet .standard {
   background-color: white;
   line-height: 30px;
   vertical-align: middle;
 }
-GgGrid .l1 {
+NgSpreadsheet .l1 {
   line-height: 30px;
   vertical-align: middle;
   background-color: #e2e2e2;
   font-weight: bold;
 }
-GgGrid .l2 {
+NgSpreadsheet .l2 {
   line-height: 30px;
   vertical-align: middle;
   background-color: #e7e7e7;
 }
-GgGrid .l3 {
+NgSpreadsheet .l3 {
   line-height: 30px;
   vertical-align: middle;
   background-color: #ececec;
 }
-GgGrid .l4 {
+NgSpreadsheet .l4 {
   line-height: 30px;
   vertical-align: middle;
   background-color: #f1f1f1;
 }
-GgGrid .l5 {
+NgSpreadsheet .l5 {
   line-height: 30px;
   vertical-align: middle;
   background-color: #f6f6f6;
 }
-GgGrid .l6 {
+NgSpreadsheet .l6 {
   line-height: 30px;
   vertical-align: middle;
   background-color: #f9f9f9;
 }
-GgGrid .l7 {
+NgSpreadsheet .l7 {
   background-color: #fdfdfd;
 }
-GgGrid .l8 {
+NgSpreadsheet .l8 {
   background-color: #fdfdfd;
 }
-GgGrid .l9 {
+NgSpreadsheet .l9 {
   background-color: #fdfdfd;
 }
-GgGrid .l10 {
+NgSpreadsheet .l10 {
   background-color: #fdfdfd;
 }
 
-GgGrid .title-cell {
+NgSpreadsheet .title-cell {
   border: 1px solid #EEF0F0;
 }
-GgGrid .data-cell {
+NgSpreadsheet .data-cell {
   border: 1px solid #EEF0F0;
 }
-GgGrid .is-active{
+NgSpreadsheet .is-active{
     border: 1px solid blue;
 }
