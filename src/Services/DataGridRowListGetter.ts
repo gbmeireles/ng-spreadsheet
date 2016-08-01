@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {GridRowspanSetter} from '../Services/GridRowspanSetter';
+import { GridRowspanSetter } from '../Services/GridRowspanSetter';
 import {
     GridData,
     GridRow,
@@ -17,11 +17,12 @@ export class DataGridRowListGetter {
     get(gridData: GridData, gridColumnList: Column[], titleRowListCount: number): GridRow[] {
         var result: GridRow[] = new Array(gridData.dataRowList.length);
         var columnListMap: { [tableSection: string]: ColumnDefinition[] } = {};
-        gridData.columnDefinitionList.forEach(c => {
-            if (!columnListMap[c.gridSection]) {
-                columnListMap[c.gridSection] = [];
+        gridColumnList.forEach(column => {
+            if (!columnListMap[column.gridSectionName]) {
+                columnListMap[column.gridSectionName] = [];
             }
-            columnListMap[c.gridSection].push(c);
+            var columnDefinition = gridData.columnDefinitionList.find(cd => cd.name === column.name);
+            columnListMap[column.gridSectionName].push(columnDefinition);
         });
 
         var counter = 0;

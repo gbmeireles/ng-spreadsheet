@@ -16,6 +16,7 @@ export { BodySectionScrollWidthManager } from './BodySectionScrollWidthManager';
 export { SubscriptionManager } from './SubscriptionManager';
 export { GridComponentManager } from './GridComponentManager';
 
+import { Injectable, EventEmitter } from '@angular/core';
 import { CellListMapManager } from './CellListMapManager';
 import { SectionPositionInformationMapManager } from './SectionPositionInformationMapManager';
 import { ColumnListManager } from './ColumnListManager';
@@ -54,4 +55,5 @@ export const MANAGERS: Array<any> = [
     SubscriptionManager,
     TableIdManager,
     GridComponentManager,
+
 ];

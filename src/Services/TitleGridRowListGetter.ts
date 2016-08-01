@@ -17,12 +17,14 @@ export class TitleGridRowListGetter {
     get(gridData: GridData, gridColumnList: Column[]): GridRow[] {
         var result: GridRow[] = [];
         var columnListMap: { [tableSection: string]: ColumnDefinition[] } = {};
-        gridData.columnDefinitionList.forEach(c => {
-            if (!columnListMap[c.gridSection]) {
-                columnListMap[c.gridSection] = [];
+        gridColumnList.forEach(column => {
+            if (!columnListMap[column.gridSectionName]) {
+                columnListMap[column.gridSectionName] = [];
             }
-            columnListMap[c.gridSection].push(c);
+            var columnDefinition = gridData.columnDefinitionList.find(cd => cd.name === column.name);
+            columnListMap[column.gridSectionName].push(columnDefinition);
         });
+
         gridColumnList.forEach(gridColumn => {
             var indexOfColumn = gridColumnList.indexOf(gridColumn);
             var column = columnListMap[gridColumn.gridSectionName][indexOfColumn];

@@ -9,6 +9,7 @@ import {
     HostListener,
     OnDestroy,
     ViewChild,
+    Inject,
 } from '@angular/core';
 import { AfterContentInit, OnInit } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
@@ -50,6 +51,12 @@ import {
     GridData,
     GridRow,
 } from '../Model/Model';
+import {
+    EVENT_EMITTER_TOKEN,
+    EVENT_PROVIDERS,
+    Event,
+    ColumnMovedEvent,
+} from '../Events/Events';
 import { GridEvent } from './Model/GridEvent';
 
 const html = `
@@ -71,6 +78,7 @@ const html = `
         COLUMN_RESIZE_PROVIDERS,
         COLUMN_CELL_PROVIDERS,
         CELL_PROVIDERS,
+        EVENT_PROVIDERS,
     ],
     selector: 'NgSpreadsheet',
     template: html,
@@ -109,7 +117,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         private cdr: ChangeDetectorRef,
         private bodyScrollManager: BodyScrollManager,
         private bodySectionScrollManager: BodySectionScrollManager,
-        private gridComponentManager: GridComponentManager) {
+        private gridComponentManager: GridComponentManager,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
 
         this.gridComponentManager.set(<any>this);
         this.updateGridColumnMap(this.columnListManager.get());
@@ -140,10 +149,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
                     }));
                 }
             });
-
-        this.gridDataManager.subscribe(() => {
-            this.recalculateGridData();
-        });
     }
 
     @HostListener('focusin', ['$event'])
@@ -152,7 +157,16 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-
+        this.eventEmitter.subscribe((evt: Event) => {
+            switch (evt.type) {
+                case ColumnMovedEvent.type:
+                    this.columnList = this.columnListManager.get();
+                    this.recalculateGridData();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     ngOnDestroy() {
@@ -170,6 +184,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
 
     update(gridData: GridData) {
         this.gridDataManager.set(gridData);
+        this.columnList = this.columnListGetter.get(gridData);
+
         this.recalculateGridData();
     }
 
@@ -184,7 +200,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         this.rowHeight = gridData.rowHeight || this.rowHeight;
         this.rowHeightManager.set(this.rowHeight);
 
-        this.columnList = this.columnListGetter.get(gridData);
         this.updateGridColumnMap(this.columnList);
 
         var gridSectionList = this.gridSectionListGetter.get(gridData, this.columnList);

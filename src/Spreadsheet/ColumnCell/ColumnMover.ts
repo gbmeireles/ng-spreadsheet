@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, EventEmitter } from '@angular/core';
 import {
     ColumnListManager,
     GridSectionListGetter,
@@ -6,8 +6,11 @@ import {
     GridDataManager,
 } from '../../Services/Services';
 import {
+    ColumnMovedEvent,
+    EVENT_EMITTER_TOKEN,
+} from '../../Events/Events';
+import {
     Column,
-    GridData,
 } from '../../Model/Model';
 import { ColumnGetter } from './ColumnGetter';
 
@@ -18,9 +21,14 @@ export class ColumnMover {
         private columnGetter: ColumnGetter,
         private gridSectionListGetter: GridSectionListGetter,
         private gridSectionListManager: GridSectionListManager,
-        private gridDataManager: GridDataManager) { }
+        private gridDataManager: GridDataManager,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<ColumnMovedEvent>) { }
 
     moveColumn(oldColumnIndex: number, newColumnIndex: number) {
+        if (oldColumnIndex === newColumnIndex) {
+            return;
+        }
+
         var columnList = this.columnListManager.get().slice(0).map(i => <Column>Object.assign({}, i));
         var columnToTarget = this.columnGetter.getByGridColumnIndex(newColumnIndex);
         var columnToMove = this.columnGetter.getByGridColumnIndex(oldColumnIndex);
@@ -35,19 +43,26 @@ export class ColumnMover {
             return;
         }
 
-        var gridData = <GridData>Object.assign({}, this.gridDataManager.get());
-        var columnDefinitionList = gridData.columnDefinitionList;
-        var columnDefinitionToMove = gridData.columnDefinitionList.find(cd => cd.name === columnToMove.name);
-        var columnDefinitionToTarget = gridData.columnDefinitionList.find(cd => cd.name === columnToTarget.name);
-
-        columnDefinitionList.splice(oldColumnIndex, 1);
         if (newColumnIndex > oldColumnIndex) {
-            columnDefinitionList.splice(newColumnIndex + 1, 0, columnDefinitionToMove);
+            columnList.filter(c => c.startIndex >= oldColumnIndex && c.startIndex <= newColumnIndex).forEach(c => {
+                c.startIndex--;
+                c.endIndex--;
+            });
 
         } else {
-            columnDefinitionList.splice(newColumnIndex, 0, columnDefinitionToMove);
+            columnList.filter(c => c.startIndex >= newColumnIndex && c.startIndex <= oldColumnIndex).forEach(c => {
+                c.startIndex++;
+                c.endIndex++;
+            });
         }
+        columnToMove.startIndex = newColumnIndex;
+        columnToMove.endIndex = newColumnIndex;
 
-        this.gridDataManager.set(gridData);
+        columnList.splice(oldColumnIndex, 1);
+        columnList.splice(newColumnIndex, 0, columnToMove);
+
+        this.columnListManager.set(columnList);
+
+        this.eventEmitter.emit(new ColumnMovedEvent(newColumnIndex, oldColumnIndex));
     }
 }
