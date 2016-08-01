@@ -114,17 +114,6 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
         var oldColumnIndex = columnList.indexOf(ColumnCellComponent.columnToMove);
         var newColumnIndex = columnList.indexOf(currentColumn);
 
-        var maxColumnIndex = columnList.filter(c => c.gridSectionName === ColumnCellComponent.columnToMove.gridSectionName)
-            .reduce((pv, cv) => Math.max(pv, cv.endIndex), 0);
-
-        var elPosition = this.el.nativeElement.getBoundingClientRect();
-        var middle = elPosition.left + elPosition.width / 2;
-        if (evt.pageX > middle && newColumnIndex !== maxColumnIndex) {
-            newColumnIndex = newColumnIndex + 1;
-        } else {
-            newColumnIndex = newColumnIndex;
-        }
-
         this.columnMover.moveColumn(oldColumnIndex, newColumnIndex);
     }
 

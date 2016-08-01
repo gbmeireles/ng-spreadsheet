@@ -10,6 +10,7 @@ import {
     OnDestroy,
     ViewChild,
     Inject,
+    ApplicationRef,
 } from '@angular/core';
 import { AfterContentInit, OnInit } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
@@ -127,7 +128,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         private gridComponentManager: GridComponentManager,
         @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>,
         private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
-        private spreadsheetState: SpreadsheetState) {
+        private spreadsheetState: SpreadsheetState,
+        private app: ApplicationRef) {
 
         this.gridComponentManager.set(<any>this);
         this.updateGridColumnMap(this.columnListManager.get());
@@ -209,6 +211,13 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         this.recalculateGridData(this.columnList);
 
         this.columnListManager.set(this.columnList);
+
+        var scrollTop = this.scrollTop;
+        this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop - 1));
+
+        this.app.tick();
+
+        this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
     }
 
     updateStatusMessage(message: string, timeout?: number) {
@@ -248,7 +257,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         this.columnListManager.set(columnList);
 
         this.updateBodySectionScrollWidth(this.columnPositionInformationMapManager.get());
-
         this.cdr.markForCheck();
     }
 
