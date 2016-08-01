@@ -22,15 +22,16 @@ const css = `
 }`;
 
 const html = `
-<GgBodySection #rowNumberSection gridSectionName="RowNumber">
+<GgBodySection #rowNumberSection gridSectionName="RowNumber" [scrollTop]="scrollTop">
     <GgNumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></GgNumberRowList>
+    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
 </GgBodySection>
 <GgBodySection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name"
-    tabindex="0">
+    tabindex="0" [scrollTop]="scrollTop">
     <GgRowList [rowList]="gridSection.visibleDataRowList" [gridSectionName]="gridSection.name"></GgRowList>
     <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
 </GgBodySection>
-<GgBodySection gridSectionName="Scroll">
+<GgBodySection gridSectionName="Scroll" [scrollTop]="scrollTop">
     <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight"></div>
 </GgBodySection>`;
 
@@ -41,9 +42,9 @@ const html = `
     directives: [BodySectionComponent, NumberRowListComponent, RowListComponent],
 })
 export class BodyComponent implements OnInit {
+    @Input('scrollTop') scrollTop: number;
     @Input('gridSectionList') gridSectionList: GridSection[] = [];
     @Input('numberDataRowList') numberDataRowList: GridRow[] = [];
-    @ViewChild(BodySectionComponent) rowNumberSection: BodySectionComponent;
     rowHeight: number;
     private isInitialized: boolean;
 
@@ -68,22 +69,10 @@ export class BodyComponent implements OnInit {
         this.bodyHeightManager.set(this.el.nativeElement.clientHeight);
     }
 
-    updateScrollTop() {
-        if (this.rowNumberSection) {
-            this.rowNumberSection.updateScrollTop();
-            this.bodyScrollManager.set(this.rowNumberSection.scrollTop);
-        }
-    }
-
     gridSectionIdentity(index: number, gridSection: GridSection): any {
         if (gridSection) {
             return gridSection.name;
         }
         return 'gridSection_' + index;
-    }
-
-    @HostListener('scroll')
-    onScroll() {
-        this.bodyScrollManager.set(this.el.nativeElement.scrollTop);
     }
 }

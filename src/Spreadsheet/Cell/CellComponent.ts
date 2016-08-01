@@ -10,11 +10,12 @@ import {
     ChangeDetectorRef,
     SimpleChange,
     ApplicationRef,
-    Renderer,
     ViewChild,
     ReflectiveInjector,
     AfterViewInit,
     ViewContainerRef,
+    Inject,
+    EventEmitter,
 } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import {
@@ -22,6 +23,12 @@ import {
     GridCell,
     ContentTypeEnum,
 } from '../../Model/Model';
+import {
+    EVENT_EMITTER_TOKEN,
+    Event,
+    ColumnResizedEvent,
+    ColumnMovedEvent,
+} from '../../Events/Events';
 import {
     GridDataManager,
     ColumnPositionInformationMapManager,
@@ -36,6 +43,7 @@ import {
     EditableComponent,
     ViewableComponent,
 } from '../Model/CustomComponent';
+import { Subscription } from 'rxjs/Subscription';
 
 import { IsCellActiveChecker } from './IsCellActiveChecker';
 
@@ -70,6 +78,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('rowData') rowData: any;
     @Input('index') index: number;
     @HostBinding('style.width') width: number;
+    @HostBinding('style.margin-left.px') marginLeft: number;
     @HostBinding('class.is-active') isActive: boolean = false;
     @HostBinding('class.is-custom') isCustom: boolean = false;
     @HostBinding('class') style;
@@ -81,9 +90,9 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     private viewComponent: ComponentRef<ViewableComponent>;
     private editComponent: ComponentRef<EditableComponent>;
 
-    private unregisterColumnPositionInformationMapSubscription: () => void;
     private unregisterActiveCellSubscription: () => void;
     private unregisterEditableComponentActiveCellSubscription: () => void;
+    private eventEmitterSubscription: Subscription;
 
     constructor(private dcl: DynamicComponentLoader,
         private el: ElementRef,
@@ -95,18 +104,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         private cellNavigationManager: CellNavigator,
         private activeCellManager: ActiveCellManager,
         private cdr: ChangeDetectorRef,
-        private renderer: Renderer,
         private viewContainerRef: ViewContainerRef,
         private gridComponentManager: GridComponentManager,
-        private isCellActiveChecker: IsCellActiveChecker) {
-        this.unregisterColumnPositionInformationMapSubscription =
-            this.columnPositionInformationMapManager.subscribe((columnPositionInformationMap) => {
-                this.cellPositionUpdater.update(this, columnPositionInformationMap);
-            });
-
-        this.unregisterActiveCellSubscription = this.activeCellManager.subscribe((activeCell) => {
-            this.isActive = this.isCellActiveChecker.check(this.gridCell);
-        });
+        private isCellActiveChecker: IsCellActiveChecker,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
     }
 
     @HostListener('click', ['$event'])
@@ -127,6 +128,19 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     }
 
     ngOnInit() {
+        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
+            switch (evt.type) {
+                case ColumnResizedEvent.type:
+                case ColumnMovedEvent.type:
+                    this.cellPositionUpdater.update(this, this.columnPositionInformationMapManager.get());
+                    break;
+                default:
+                    break;
+            }
+        });
+        this.unregisterActiveCellSubscription = this.activeCellManager.subscribe((activeCell) => {
+            this.isActive = this.isCellActiveChecker.check(this.gridCell);
+        });
     }
 
     ngAfterViewInit() {
@@ -218,7 +232,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
 
     ngOnDestroy() {
         this.cellListMapManager.removeCell(this);
-        this.unregisterColumnPositionInformationMapSubscription();
+        this.eventEmitterSubscription.unsubscribe();
         this.unregisterActiveCellSubscription();
     }
 
@@ -233,7 +247,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             this.goToViewMode();
         }
         if (this.index === 0 && columnPositionInformationMap && columnPositionInformationMap[this.gridColumnIndex]) {
-            this.renderer.setElementStyle(this.el.nativeElement, 'margin-left', `${columnPositionInformationMap[this.gridColumnIndex].left}px`);
+            this.marginLeft = columnPositionInformationMap[this.gridColumnIndex].left;
         }
         this.isActive = this.isCellActiveChecker.check(gridCell);
     }

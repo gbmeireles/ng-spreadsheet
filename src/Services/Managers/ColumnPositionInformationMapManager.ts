@@ -21,20 +21,5 @@ export class ColumnPositionInformationMapManager {
             return;
         }
         this.columnPositionInformationMap = columnPositionInformationMap;
-
-        this.subscriptionManager.emit(this.getKey(), columnPositionInformationMap);
-    }
-
-    subscribe(onChange: (columnPositionInformationMap: ColumnPositionInformationMap) => void) {
-        return this.subscriptionManager.subscribe(this.getKey(), onChange);
-    }
-
-    private getKey() {
-        var tableId = this.tableIdManager.get();
-        if (!tableId) {
-            console.warn('Cannot generate column position information storage key because table id is not defined');
-            return;
-        }
-        return `${tableId}_columnPositionInformationMap`;
     }
 }

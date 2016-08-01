@@ -6,17 +6,21 @@ import {
 import { NumberRowListComponent } from './NumberRowListComponent';
 import { HeaderSectionComponent } from './HeaderSectionComponent';
 import { RowListComponent } from './RowListComponent';
-import { GridSection } from '../Model/GridSection';
-import { GridRow } from '../Model/GridRow';
+import {
+    GridSection,
+    Column,
+    GridRow,
+} from '../Model/Model';
 
 const html = `
-<GgHeaderSection gridSectionName="RowNumber">
+<GgHeaderSection gridSectionName="RowNumber" [columnList]="columnList">
     <GgNumberRowList [numberRowList]="numberTitleRowList" [rowHeight]="rowHeight"></GgNumberRowList>
 </GgHeaderSection>
-<GgHeaderSection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name">
+<GgHeaderSection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" 
+    [gridSectionName]="gridSection.name" [columnList]="columnList">
     <GgRowList [rowList]="gridSection.titleRowList" [gridSectionName]="gridSection.name"></GgRowList>
 </GgHeaderSection>
-<GgHeaderSection gridSectionName="Scroll">
+<GgHeaderSection gridSectionName="Scroll" [columnList]="columnList">
 </GgHeaderSection>`;
 
 const css = `
@@ -40,6 +44,7 @@ export class HeaderComponent implements OnDestroy {
     @Input('rowCount') rowCount: number;
     @Input('numberTitleRowList') numberTitleRowList: GridRow[];
     @Input('gridSectionList') gridSectionList: GridSection[];
+    @Input('columnList') columnList: Column[];
 
     private unsubscribeToRowHeightManagerChanges: () => void;
 

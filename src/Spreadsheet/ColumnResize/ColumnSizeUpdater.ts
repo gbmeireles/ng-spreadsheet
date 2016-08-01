@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, EventEmitter } from '@angular/core';
 import {
     ColumnListManager,
     ColumnPositionInformationMapCalculator,
@@ -8,12 +8,16 @@ import {
     Column,
 } from '../../Model/Model';
 
+import {
+    ColumnResizedEvent,
+    EVENT_EMITTER_TOKEN,
+} from '../../Events/Events';
+
 @Injectable()
 export class ColumnSizeUpdater {
 
     constructor(private columnListManager: ColumnListManager,
-        private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager) { }
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<ColumnResizedEvent>) { }
 
     updateColumnSize(columnName: string, newColumnSize: number) {
         var columnList = this.columnListManager.get().slice(0).map(i => <Column>Object.assign({}, i));
@@ -23,8 +27,8 @@ export class ColumnSizeUpdater {
         }
 
         column.width = newColumnSize;
-        var columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(columnList);
-        this.columnPositionInformationMapManager.set(columnPositionInformationMap);
         this.columnListManager.set(columnList);
+
+        this.eventEmitter.emit(new ColumnResizedEvent(columnName, newColumnSize));
     }
 }

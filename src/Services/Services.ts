@@ -10,7 +10,6 @@ import { CellPositionUpdater } from './CellPositionUpdater';
 import { SectionPositionInformationMapCalculator } from './SectionPositionInformationMapCalculator';
 import { ColumnViewportUpdater } from './ColumnViewportUpdater';
 import { RowViewportUpdater } from './RowViewportUpdater';
-import { ColumnPositionInformationMapUpdater } from './ColumnPositionInformationMapUpdater';
 import { SectionPositionInformationMapUpdater } from './SectionPositionInformationMapUpdater';
 import { RowViewportVisibleRowCountGetter } from './RowViewportVisibleRowCountGetter';
 import { GridColumnListGetter } from './GridColumnListGetter';
@@ -19,6 +18,7 @@ import { GridSectionListGetter } from './GridSectionListGetter';
 import { CellNavigator } from './CellNavigator';
 import { ColumnToRenderIndexListGetter } from './ColumnToRenderIndexListGetter';
 import { RowToRenderIndexListGetter } from './RowToRenderIndexListGetter';
+
 export * from './Managers/Managers';
 
 export {
@@ -33,7 +33,6 @@ export {
     SectionPositionInformationMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
-    ColumnPositionInformationMapUpdater,
     SectionPositionInformationMapUpdater,
     RowViewportVisibleRowCountGetter,
     GridColumnListGetter,
@@ -55,7 +54,6 @@ export const GRID_SCOPE_SERVICES: Array<any> = Managers.MANAGERS.concat([
     SectionPositionInformationMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
-    ColumnPositionInformationMapUpdater,
     SectionPositionInformationMapUpdater,
     RowViewportVisibleRowCountGetter,
     GridColumnListGetter,

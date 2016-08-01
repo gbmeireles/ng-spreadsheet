@@ -6,23 +6,30 @@ import {
     HostListener,
     Renderer,
     SimpleChange,
+    Inject,
+    EventEmitter,
 } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import {
-    CellPositionUpdater,
-    ColumnPositionInformationMapManager,
-    ColumnPositionInformationMapCalculator,
-    ColumnDefinitionListManager,
     ColumnListManager,
+    ColumnPositionInformationMapManager,
 } from '../../Services/Services';
 import {
     Cell,
     GridCell,
     Column,
     GridColumn,
+    ColumnPositionInformationMap,
 } from '../../Model/Model';
+import {
+    EVENT_EMITTER_TOKEN,
+    Event,
+    ColumnResizedEvent,
+    ColumnMovedEvent,
+} from '../../Events/Events';
 import { ColumnMover } from './ColumnMover';
 import { ColumnGetter } from './ColumnGetter';
+import { Subscription } from 'rxjs/Subscription';
 
 @Directive({
     selector: 'GgColumnCell',
@@ -36,28 +43,49 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     @HostBinding('style.width') width: number;
     left: number;
     @HostBinding('draggable') draggable: boolean = true;
+    @HostBinding('style.margin-left.px') marginLeft: number = 0;
     @Input('gridColumn') gridColumn: GridColumn;
     gridColumnIndex: number = 0;
     @Input('index') index: number;
 
-    private columnInformationMapUnsubscriber: any;
+    private eventEmitterSubscription: Subscription;
 
     constructor(private el: ElementRef,
         private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
         private columnListManager: ColumnListManager,
-        private columnPositionInformationMapPositionCalculator: ColumnPositionInformationMapCalculator,
-        private cellPositionUpdater: CellPositionUpdater,
         private renderer: Renderer,
         private columnMover: ColumnMover,
-        private columnGetter: ColumnGetter) {
+        private columnGetter: ColumnGetter,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
 
-        this.columnInformationMapUnsubscriber = this.columnPositionInformationMapManager.subscribe((columnPositionInformationMap) => {
-            this.cellPositionUpdater.update(this, columnPositionInformationMap);
-            if (this.index === 0) {
-                this.renderer.setElementStyle(this.el.nativeElement, 'margin-left', `${columnPositionInformationMap[this.gridColumnIndex].left}px`);
+    }
+
+    ngOnInit() {
+        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
+            switch (evt.type) {
+                case ColumnResizedEvent.type:
+                case ColumnMovedEvent.type:
+                    this.updatePosition();
+                    break;
+                default:
+                    break;
             }
         });
+        this.gridColumnIndex = this.gridColumn.index;
+        this.updatePosition();
     }
+
+    ngOnChanges(changes: { [key: string]: SimpleChange }) {
+        if (changes['gridColumn']) {
+            this.gridColumnIndex = this.gridColumn.index;
+        }
+        this.updatePosition();
+    }
+
+    ngOnDestroy() {
+        this.eventEmitterSubscription.unsubscribe();
+    }
+
 
     @HostListener('dragstart', ['$event'])
     onDragStart(evt: DragEvent) {
@@ -86,9 +114,12 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
         var oldColumnIndex = columnList.indexOf(ColumnCellComponent.columnToMove);
         var newColumnIndex = columnList.indexOf(currentColumn);
 
+        var maxColumnIndex = columnList.filter(c => c.gridSectionName === ColumnCellComponent.columnToMove.gridSectionName)
+            .reduce((pv, cv) => Math.max(pv, cv.endIndex), 0);
+
         var elPosition = this.el.nativeElement.getBoundingClientRect();
         var middle = elPosition.left + elPosition.width / 2;
-        if (evt.pageX > middle) {
+        if (evt.pageX > middle && newColumnIndex !== maxColumnIndex) {
             newColumnIndex = newColumnIndex + 1;
         } else {
             newColumnIndex = newColumnIndex;
@@ -97,31 +128,15 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
         this.columnMover.moveColumn(oldColumnIndex, newColumnIndex);
     }
 
-    ngOnInit() {
-        this.gridColumnIndex = this.gridColumn.index;
-        var columnPositionInformationMap = this.columnPositionInformationMapManager.get();
-        this.cellPositionUpdater.update(this, columnPositionInformationMap);
-        if (this.index === 0) {
-            this.renderer.setElementStyle(this.el.nativeElement, 'margin-left', `${columnPositionInformationMap[this.gridColumnIndex].left}px`);
-        }
-    }
-
-    ngOnChanges(changes: { [key: string]: SimpleChange }) {
-        if (changes['gridColumn']) {
-            this.gridColumnIndex = this.gridColumn.index;
-            this.cellPositionUpdater.update(this, this.columnPositionInformationMapManager.get());
-        }
-        if (this.index === 0) {
-            var columnPositionInformationMap = this.columnPositionInformationMapManager.get();
-            this.renderer.setElementStyle(this.el.nativeElement, 'margin-left', `${columnPositionInformationMap[this.gridColumn.index].left}px`);
-        }
-    }
-
-    ngOnDestroy() {
-        this.columnInformationMapUnsubscriber();
-    }
-
     getScrollWidth() {
         return this.el.nativeElement.scrollWidth;
+    }
+
+    private updatePosition() {
+        var columnPositionInformation = this.columnPositionInformationMapManager.get()[this.gridColumnIndex];
+        if (this.index === 0) {
+            this.marginLeft = columnPositionInformation.left;
+        }
+        this.width = columnPositionInformation.width;
     }
 }

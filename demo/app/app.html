@@ -4,6 +4,8 @@
     </div>
     <div class="panel-body">
         <button (click)="requestData()">Request Data</button>
+        <input ref-rowNumberInput type="text" />
+        <button (click)="goToRow(rowNumberInput.value)">Go To Row</button>
         <div style="margin-top: 10px;">
             <NgSpreadsheet id="ggTable">
             </NgSpreadsheet>

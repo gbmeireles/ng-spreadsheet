@@ -1,5 +1,5 @@
 import { HostBinding, Component, Input, ElementRef, ViewChildren, Renderer } from '@angular/core';
-import { OnInit, OnDestroy } from '@angular/core';
+import { OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import {
     ColumnListManager,
@@ -43,14 +43,14 @@ const html = `
     template: html,
     styles: [css],
 })
-export class ColumnRowComponent implements OnInit, OnDestroy {
+export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     @Input('gridSectionName') gridSectionName: string;
     @HostBinding('style.height') height: number;
     @Input('visibleGridColumnList') visibleGridColumnList: GridColumn[];
+    @Input('columnList') columnList: Column[];
     gridColumnIdentifierMap: { [columnIndex: number]: string } = {};
 
     private gridColumnList: GridColumn[];
-    private columnListUnsubscribe: any;
     private unregisterScrollWidthSubscription: () => void;
 
     constructor(private el: ElementRef,
@@ -58,7 +58,6 @@ export class ColumnRowComponent implements OnInit, OnDestroy {
         private gridColumnListGetter: GridColumnListGetter,
         private bodySectionScrollWidthManager: BodySectionScrollWidthManager,
         private renderer: Renderer) {
-        this.columnListUnsubscribe = this.columnListManager.subscribe(this.updateColumnIdentifierList.bind(this));
         this.unregisterScrollWidthSubscription = this.bodySectionScrollWidthManager.subscribe((response) => {
             if (response.gridSectionName === this.gridSectionName) {
                 this.renderer.setElementStyle(this.el.nativeElement, 'minWidth', `${response.width}px`);
@@ -70,7 +69,8 @@ export class ColumnRowComponent implements OnInit, OnDestroy {
         return index;
     }
 
-    updateColumnIdentifierList(columnList: Column[]) {
+    updateColumnIdentifierList() {
+        var columnList = this.columnList || [];
         this.gridColumnIdentifierMap = {};
 
         var tensCount = 0;
@@ -91,13 +91,18 @@ export class ColumnRowComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.updateColumnIdentifierList(this.columnListManager.get());
+        this.updateColumnIdentifierList();
         var width = this.bodySectionScrollWidthManager.get(this.gridSectionName);
         this.renderer.setElementStyle(this.el.nativeElement, 'minWidth', `${width}px`);
     }
 
+    ngOnChanges(obj) {
+        if (obj['columnList']) {
+            this.updateColumnIdentifierList();
+        }
+    }
+
     ngOnDestroy() {
-        this.columnListUnsubscribe();
         this.unregisterScrollWidthSubscription();
     }
 }

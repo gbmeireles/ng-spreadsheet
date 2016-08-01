@@ -25,7 +25,6 @@ import {
     GRID_SCOPE_SERVICES,
     GridDataManager,
     ColumnListGetter,
-    ColumnPositionInformationMapUpdater,
     SectionPositionInformationMapUpdater,
     GridSectionListGetter,
     ColumnListManager,
@@ -41,6 +40,7 @@ import {
     BodySectionScrollManager,
     BodyScrollManager,
     GridComponentManager,
+    ColumnPositionInformationMapCalculator,
 } from '../Services/Services';
 import {
     ColumnPositionInformationMap,
@@ -56,13 +56,19 @@ import {
     EVENT_PROVIDERS,
     Event,
     ColumnMovedEvent,
+    ColumnResizedEvent,
+    SectionHorizontallyScrolledEvent,
+    SpreadsheetVerticallyScrolledEvent,
 } from '../Events/Events';
 import { GridEvent } from './Model/GridEvent';
+import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
+import { Subscription } from 'rxjs/Subscription';
 
 const html = `
 <GgDetailsBar></GgDetailsBar>
-<GgHeader [rowCount]="headerRowCount" [numberTitleRowList]="numberTitleRowList" [gridSectionList]="gridSectionList"></GgHeader>
-<GgBody [numberDataRowList]="numberDataRowList" [gridSectionList]="gridSectionList"></GgBody>
+<GgHeader [rowCount]="headerRowCount" [numberTitleRowList]="numberTitleRowList" 
+    [gridSectionList]="gridSectionList" [columnList]="columnList"></GgHeader>
+<GgBody [numberDataRowList]="numberDataRowList" [gridSectionList]="gridSectionList" [scrollTop]="scrollTop"></GgBody>
 <GgStatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></GgStatusBar>`;
 
 @Component({
@@ -79,6 +85,7 @@ const html = `
         COLUMN_CELL_PROVIDERS,
         CELL_PROVIDERS,
         EVENT_PROVIDERS,
+        SPREADSHEET_STATE_PROVIDERS,
     ],
     selector: 'NgSpreadsheet',
     template: html,
@@ -87,21 +94,21 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
     @Input('id') id: string;
     @Output() onGridEvent: EventEmitter<GridEvent<any>> = new EventEmitter<GridEvent<any>>(false);
     @ViewChild(BodyComponent) body: BodyComponent;
+    columnList: Column[];
     statusMessage: string;
     statusMessageTimeout: number;
     gridSectionList: any[] = [];
     numberDataRowList: GridRow[] = [];
     numberTitleRowList: GridRow[] = [];
-    columnList: Column[] = [];
     headerRowCount: number = 0;
     rowHeight: number = 20;
-    unsubscribeBodyScrollChanges: () => void;
+    scrollTop: number = 0;
     unsubscribeGridSectionListChanges: () => void;
-    unsubscribeColumnPositionInformationChanges: () => void;
+
+    private eventEmitterSubscription: Subscription;
 
     constructor(private el: ElementRef,
         private columnListGetter: ColumnListGetter,
-        private columnPositionInformationMapUpdater: ColumnPositionInformationMapUpdater,
         private sectionPositionInformationMapUpdater: SectionPositionInformationMapUpdater,
         private gridDataManager: GridDataManager,
         private gridSectionListGetter: GridSectionListGetter,
@@ -118,51 +125,64 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         private bodyScrollManager: BodyScrollManager,
         private bodySectionScrollManager: BodySectionScrollManager,
         private gridComponentManager: GridComponentManager,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>,
+        private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
+        private spreadsheetState: SpreadsheetState) {
 
         this.gridComponentManager.set(<any>this);
         this.updateGridColumnMap(this.columnListManager.get());
-        this.columnListManager.subscribe((columnList) => {
-            this.updateGridColumnMap(columnList);
-        });
 
-        var storedScrollTop = 0;
-
-        this.columnPositionInformationMapUpdater.init();
         this.sectionPositionInformationMapUpdater.init();
         this.columnViewportUpdater.init();
-        this.unsubscribeBodyScrollChanges = this.bodyScrollManager.subscribe((scrollTop: number) => {
-            storedScrollTop = scrollTop;
-            this.rowViewportUpdater.update(scrollTop);
-            this.updateGridSectionList(this.gridSectionListManager.get());
-        });
         this.unsubscribeGridSectionListChanges = this.gridSectionListManager.subscribe((gridSectionList) => {
             this.updateGridSectionList(gridSectionList);
         });
-        this.unsubscribeColumnPositionInformationChanges =
-            this.columnPositionInformationMapManager.subscribe((cpim: ColumnPositionInformationMap) => {
-                this.updateBodySectionScrollWidth(cpim);
-                if (this.gridSectionList.length > 0) {
+    }
+
+    ngOnInit() {
+        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
+            switch (evt.type) {
+                case ColumnMovedEvent.type: {
+                    let columnList = this.columnListManager.get();
+                    this.columnList = columnList;
+
+                    this.updateGridColumnMap(columnList);
+
+                    this.recalculateGridData(columnList);
+                    break;
+                }
+                case ColumnResizedEvent.type: {
+                    let columnList = this.columnListManager.get();
+                    this.columnList = columnList;
+
+                    this.updateGridColumnMap(columnList);
+
+                    let columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(columnList);
+                    this.columnPositionInformationMapManager.set(columnPositionInformationMap);
+
+                    this.updateBodySectionScrollWidth(columnPositionInformationMap);
                     this.gridSectionList.forEach(gc => this.columnViewportUpdater.update({
                         gridSectionName: gc.name,
                         scrollLeft: this.bodySectionScrollManager.get(gc.name),
                     }));
-                }
-            });
-    }
 
-    @HostListener('focusin', ['$event'])
-    onFocus(evt: FocusEvent) {
-        evt.preventDefault();
-    }
-
-    ngOnInit() {
-        this.eventEmitter.subscribe((evt: Event) => {
-            switch (evt.type) {
-                case ColumnMovedEvent.type:
-                    this.columnList = this.columnListManager.get();
-                    this.recalculateGridData();
+                    this.spreadsheetState = Object.assign({}, this.spreadsheetState, {
+                        columnPositionInformationMap: columnPositionInformationMap,
+                    });
                     break;
+                }
+                case SectionHorizontallyScrolledEvent.type: {
+                    let scrollEvt = <SectionHorizontallyScrolledEvent>evt;
+                    this.columnViewportUpdater.update({ gridSectionName: scrollEvt.payload.sectionName, scrollLeft: scrollEvt.payload.scrollLeft });
+                    break;
+                }
+                case SpreadsheetVerticallyScrolledEvent.type: {
+                    let scrollEvt = <SpreadsheetVerticallyScrolledEvent>evt;
+                    this.scrollTop = scrollEvt.payload;
+                    this.rowViewportUpdater.update(scrollEvt.payload);
+                    this.updateGridSectionList(this.gridSectionListManager.get());
+                    break;
+                }
                 default:
                     break;
             }
@@ -170,23 +190,25 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.unsubscribeBodyScrollChanges();
+        this.eventEmitterSubscription.unsubscribe();
         this.unsubscribeGridSectionListChanges();
-        this.unsubscribeColumnPositionInformationChanges();
     }
 
-    gridSectionIdentity(index: number, gridSection: GridSection): any {
-        if (gridSection) {
-            return gridSection.name;
+    goToRow(rowNumber: number) {
+        if (rowNumber > this.headerRowCount) {
+            var scrollTop = this.rowHeight * (rowNumber - 1) - this.headerRowCount * this.rowHeight;
+            this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
         }
-        return 'gridSection_' + index;
     }
+
 
     update(gridData: GridData) {
         this.gridDataManager.set(gridData);
         this.columnList = this.columnListGetter.get(gridData);
 
-        this.recalculateGridData();
+        this.recalculateGridData(this.columnList);
+
+        this.columnListManager.set(this.columnList);
     }
 
     updateStatusMessage(message: string, timeout?: number) {
@@ -194,19 +216,36 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         this.statusMessageTimeout = timeout;
     }
 
-    private recalculateGridData() {
+
+    @HostListener('focusin', ['$event'])
+    private onFocus(evt: FocusEvent) {
+        evt.preventDefault();
+    }
+
+    private gridSectionIdentity(index: number, gridSection: GridSection): any {
+        if (gridSection) {
+            return gridSection.name;
+        }
+        return 'gridSection_' + index;
+    }
+
+
+    private recalculateGridData(columnList: Column[]) {
         var gridData = this.gridDataManager.get();
-        this.body.updateScrollTop();
+
         this.rowHeight = gridData.rowHeight || this.rowHeight;
         this.rowHeightManager.set(this.rowHeight);
 
-        this.updateGridColumnMap(this.columnList);
+        this.updateGridColumnMap(columnList);
 
-        var gridSectionList = this.gridSectionListGetter.get(gridData, this.columnList);
+        let columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(columnList);
+        this.columnPositionInformationMapManager.set(columnPositionInformationMap);
+
+        var gridSectionList = this.gridSectionListGetter.get(gridData, columnList);
         this.gridSectionListManager.set(gridSectionList);
 
         this.headerRowCount = gridSectionList[0].titleRowList.length;
-        this.columnListManager.set(this.columnList);
+        this.columnListManager.set(columnList);
 
         this.updateBodySectionScrollWidth(this.columnPositionInformationMapManager.get());
 
@@ -261,7 +300,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
 
             return gridSection;
         });
-        this.cdr.detectChanges();
     }
 
     private updateBodySectionScrollWidth(cpim: ColumnPositionInformationMap) {

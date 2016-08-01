@@ -1,16 +1,22 @@
 import { Component, Input, ElementRef, HostBinding, HostListener, Renderer, ApplicationRef } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
-import { Inject, forwardRef, Host } from '@angular/core';
+import { Inject, EventEmitter, forwardRef, Host } from '@angular/core';
 import {
     ColumnPositionInformationMapManager,
     ColumnPositionInformationMapCalculator,
     RowHeightManager,
 } from '../../Services/Services';
+import {
+    EVENT_EMITTER_TOKEN,
+    Event,
+    ColumnResizedEvent,
+    ColumnMovedEvent,
+} from '../../Events/Events';
 import { GridColumn, ColumnPositionInformationMap } from '../../Model/Model';
 import { ColumnTargetWidthGetter } from './ColumnTargetWidthGetter';
 import { ColumnSizeUpdater } from './ColumnSizeUpdater';
 import { MousePositionGetter } from './MousePositionGetter';
-import * as _ from 'lodash';
+import { Subscription } from 'rxjs/Subscription';
 
 var css = `
 :host {
@@ -49,7 +55,8 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
 
     private removeMouseMoveListener: Function;
     private removeMouseUpListener: Function;
-    private columnInformationMapUnsubscribe: any;
+
+    private eventEmitterSubscription: Subscription;
 
     constructor(private el: ElementRef,
         private renderer: Renderer,
@@ -59,22 +66,31 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
         private rowHeightManager: RowHeightManager,
         private columnTargetWidthGetter: ColumnTargetWidthGetter,
         private columnSizeUpdater: ColumnSizeUpdater,
-        private mousePositionGetter: MousePositionGetter) {
+        private mousePositionGetter: MousePositionGetter,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
     }
 
     ngOnInit() {
-        this.updateHandlerPosition(this.columnPositionInformationMapManager.get());
-        this.columnInformationMapUnsubscribe = this.columnPositionInformationMapManager.subscribe((columnPositionInformationMap) => {
-            this.updateHandlerPosition(columnPositionInformationMap);
+        this.updateHandlerPosition();
+        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
+            switch (evt.type) {
+                case ColumnResizedEvent.type:
+                case ColumnMovedEvent.type:
+                    this.updateHandlerPosition();
+                    break;
+                default:
+                    break;
+            }
         });
         this.height = this.rowHeightManager.get();
     }
 
     ngOnDestroy() {
-        this.columnInformationMapUnsubscribe();
+        this.eventEmitterSubscription.unsubscribe();
     }
 
-    updateHandlerPosition(columnPositionInformationMap: ColumnPositionInformationMap) {
+    updateHandlerPosition() {
+        var columnPositionInformationMap = this.columnPositionInformationMapManager.get();
         var columnPositionInformation = columnPositionInformationMap[this.gridColumn.index];
         if (!columnPositionInformation) {
             return;

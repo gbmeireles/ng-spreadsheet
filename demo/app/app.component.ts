@@ -23,6 +23,10 @@ export class AppComponent {
         });
     }
 
+    goToRow(rowNumber) {
+        this.table.goToRow(rowNumber);
+    }
+
     getGridData() {
         var titleColumn: ColumnDefinition = this.simpleColumnCreator.createColumn('item', 'Item', 'completeCode');
         var codeColumn: ColumnDefinition = this.simpleColumnCreator.createColumn('code', 'Code', 'code');

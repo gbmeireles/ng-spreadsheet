@@ -1,5 +1,5 @@
-import { HostBinding, HostListener, Component, Input, ElementRef } from '@angular/core';
-import { OnInit, OnDestroy } from '@angular/core';
+import { Inject, EventEmitter, HostBinding, HostListener, Component, Input, ElementRef } from '@angular/core';
+import { OnInit, OnDestroy, OnChanges } from '@angular/core';
 import {
     SectionPositionInformationMapManager,
     ColumnPositionInformationMapManager,
@@ -9,18 +9,28 @@ import {
     GridColumnListGetter,
     ColumnToRenderIndexListGetter,
 } from '../Services/Services';
+import {
+    EVENT_EMITTER_TOKEN,
+    Event,
+    ColumnResizedEvent,
+    ColumnMovedEvent,
+} from '../Events/Events';
 
 import { ColumnRowComponent } from './ColumnRowComponent';
 import { ColumnResizeComponent } from './ColumnResize/ColumnResize';
-import { GridRow } from '../Model/GridRow';
-import { GridData } from '../Model/GridData';
-import { GridRowListMap } from '../Model/GridRowListMap';
-import { GridColumn } from '../Model/GridColumn';
-import { SectionPositionInformationMap } from '../Model/SectionPositionInformationMap';
+import {
+    SectionPositionInformationMap,
+    GridColumn,
+    GridRowListMap,
+    GridData,
+    GridRow,
+    Column,
+} from '../Model/Model';
+import { Subscription } from 'rxjs/Subscription';
 
 const html = `
 <GgColumnCornerCell *ngIf="gridSectionName === 'RowNumber'"></GgColumnCornerCell>
-<GgColumnRow [gridSectionName]="gridSectionName" [visibleGridColumnList]="visibleGridColumnList"></GgColumnRow>
+<GgColumnRow [gridSectionName]="gridSectionName" [visibleGridColumnList]="visibleGridColumnList" [columnList]="columnList"></GgColumnRow>
 <GgColumnResize [gridColumn]="gridColumn" *ngFor="let gridColumn of visibleGridColumnList"></GgColumnResize>
 <ng-content></ng-content>`;
 
@@ -53,17 +63,18 @@ GgColumnCornerCell {
     template: html,
     styles: [css],
 })
-export class HeaderSectionComponent implements OnDestroy, OnInit {
+export class HeaderSectionComponent implements OnDestroy, OnInit, OnChanges {
     @HostBinding('style.left') left: number;
     @HostBinding('style.width') width: number;
     @Input('gridSectionName') gridSectionName: string;
+    @Input('columnList') columnList: Column[];
     visibleGridColumnList: GridColumn[] = [];
     columnToRenderIndexList: number[];
 
     private isInitialized: boolean = false;
     private unregisterBodySectionScrollSubscription: () => void;
     private unregisterSectionPositionInformationMapSubscription: () => void;
-    private unregisterColumnPositionInformationMapSubscription: () => void;
+    private eventEmitterSubscription: Subscription;
 
     constructor(private el: ElementRef,
         private bodySectionScrollManager: BodySectionScrollManager,
@@ -72,8 +83,8 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
         private columnListManager: ColumnListManager,
         private gridColumnListGetter: GridColumnListGetter,
         private columnToRenderIndexListGetter: ColumnToRenderIndexListGetter,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager) {
-        this.subscribeToChanges();
+        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
     }
 
     ngOnInit() {
@@ -81,11 +92,19 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
             return;
         }
         this.isInitialized = true;
+        this.subscribeToChanges();
         this.updateSectionPosition();
         this.updateVisibleGridColumnList();
     }
 
+    ngOnChanges(obj) {
+        if (obj['columnList']) {
+            this.updateVisibleGridColumnList();
+        }
+    }
+
     ngOnDestroy() {
+        this.unsubscribeToChanges();
     }
 
     private subscribeToChanges() {
@@ -99,14 +118,22 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
                 this.updateVisibleGridColumnList();
             }
         });
-        this.unregisterColumnPositionInformationMapSubscription =
-            this.columnPositionInformationMapManager.subscribe(() => this.updateVisibleGridColumnList());
+        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
+            switch (evt.type) {
+                case ColumnResizedEvent.type:
+                case ColumnMovedEvent.type:
+                    // this.updateVisibleGridColumnList();
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
     private unsubscribeToChanges() {
         this.unregisterBodySectionScrollSubscription();
         this.unregisterSectionPositionInformationMapSubscription();
-        this.unregisterColumnPositionInformationMapSubscription();
+        this.eventEmitterSubscription.unsubscribe();
     }
 
     private updateSectionPosition() {
@@ -120,7 +147,7 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
     }
 
     private updateVisibleGridColumnList() {
-        var columnList = this.columnListManager.get().filter(gc => gc.gridSectionName == this.gridSectionName);
+        var columnList = (this.columnList || []).filter(gc => gc.gridSectionName == this.gridSectionName);
         var columnToRenderIndexList = this.columnToRenderIndexListGetter.update(this.gridSectionName, this.el.nativeElement.scrollLeft);
         this.visibleGridColumnList = this.gridColumnListGetter.get(columnList).filter(gc => columnToRenderIndexList.indexOf(gc.index) >= 0);
     }

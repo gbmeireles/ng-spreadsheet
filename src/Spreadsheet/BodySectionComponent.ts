@@ -1,4 +1,4 @@
-import { HostBinding, HostListener, Component, Input, ElementRef } from '@angular/core';
+import { HostBinding, HostListener, Component, Input, ElementRef, EventEmitter, Inject } from '@angular/core';
 import { OnInit, OnChanges, OnDestroy } from '@angular/core';
 import {
     SectionPositionInformationMapManager,
@@ -12,6 +12,15 @@ import {
     ColumnPositionInformationMapManager,
 } from '../Services/Services';
 import { Cell, SectionPositionInformationMap } from '../Model/Model';
+import {
+    EVENT_EMITTER_TOKEN,
+    EVENT_PROVIDERS,
+    Event,
+    ColumnMovedEvent,
+    ColumnResizedEvent,
+    SectionHorizontallyScrolledEvent,
+    SpreadsheetVerticallyScrolledEvent,
+} from '../Events/Events';
 
 const css = `
 :host {
@@ -52,7 +61,6 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     @Input('gridSectionName') gridSectionName: string;
 
     private isInitialized: boolean = false;
-    private bodyScrollUnsubscriber: () => void;
     private sectionPositionInformatonMapUnsubscriber: () => void;
     private unregisterActiveCellPositionChangeSubscription: () => void;
     private _scrollTop: number;
@@ -67,15 +75,12 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         private activeCellGetter: ActiveCellGetter,
         private gridSectionListManager: GridSectionListManager,
         private activeCellManager: ActiveCellManager,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager) {
+        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
+        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
         this.sectionPositionInformatonMapUnsubscriber =
             this.sectionPositionInformationMapManager.subscribe((sectionPositionInformationMap: SectionPositionInformationMap) => {
                 this.updateSectionPosition(sectionPositionInformationMap);
             });
-
-        this.bodyScrollUnsubscriber = this.bodyScrollManager.subscribe((scrollTop) => {
-            this.scrollTop = scrollTop;
-        });
 
         this.unregisterActiveCellPositionChangeSubscription = this.activeCellManager.subscribe((gridCell) => {
             var gridSection = gridSectionListManager.get().find(gc => gc.name === this.gridSectionName);
@@ -107,12 +112,15 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         }
         return this._scrollTop;
     }
+    @Input('scrollTop')
     set scrollTop(scrollTop: number) {
         if (scrollTop < 0) {
             scrollTop = 0;
         }
         this._scrollTop = scrollTop;
-        this.bodyElement.scrollTop = this._scrollTop;
+        if (this.bodyElement.scrollTop !== scrollTop) {
+            this.bodyElement.scrollTop = this._scrollTop;
+        }
     }
 
     get scrollLeft(): number {
@@ -126,7 +134,9 @@ export class BodySectionComponent implements OnDestroy, OnInit {
             scrollLeft = 0;
         }
         this._scrollLeft = scrollLeft;
-        this.bodyElement.scrollLeft = this._scrollLeft;
+        if (this.bodyElement.scrollLeft !== scrollLeft) {
+            this.bodyElement.scrollLeft = this._scrollLeft;
+        }
     }
 
     private get bodyElement(): HTMLElement {
@@ -151,7 +161,6 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     }
 
     ngOnDestroy() {
-        this.bodyScrollUnsubscriber();
         this.sectionPositionInformatonMapUnsubscriber();
         this.unregisterActiveCellPositionChangeSubscription();
     }
@@ -250,10 +259,12 @@ export class BodySectionComponent implements OnDestroy, OnInit {
 
         if (scrollTop !== undefined) {
             this.bodyScrollManager.set(scrollTop);
+            this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
         }
         if (scrollLeft !== undefined) {
             this.scrollLeft = scrollLeft;
             this.bodySectionScrollManager.set(this.gridSectionName, scrollLeft);
+            this.eventEmitter.emit(new SectionHorizontallyScrolledEvent(this.gridSectionName, scrollLeft));
         }
     }
 
@@ -261,13 +272,21 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     onWheel(evt: WheelEvent) {
         var scrollTop = Math.min(this.scrollTop + evt.deltaY, this.bodyElement.scrollHeight);
         this.bodyScrollManager.set(scrollTop);
+        this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
     }
 
     @HostListener('scroll', ['$event'])
     onScroll() {
+        var scrollLeft = this.bodyElement.scrollLeft;
+        if (this.scrollLeft !== scrollLeft) {
+            this.scrollLeft = scrollLeft;
+            this.eventEmitter.emit(new SectionHorizontallyScrolledEvent(this.gridSectionName, scrollLeft));
+        };
         this.bodySectionScrollManager.set(this.gridSectionName, this.bodyElement.scrollLeft);
         if (this.gridSectionName === 'Scroll') {
-            this.bodyScrollManager.set(this.bodyElement.scrollTop);
+            var scrollTop = this.bodyElement.scrollTop;
+            this.bodyScrollManager.set(scrollTop);
+            this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
         }
     }
 }

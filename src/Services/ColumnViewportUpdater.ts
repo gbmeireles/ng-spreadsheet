@@ -17,10 +17,6 @@ export class ColumnViewportUpdater {
     }
 
     init() {
-        this.bodySectionScrollManager.subscribe((response: { gridSectionName: string, scrollLeft: number }) => {
-            this.update(response);
-        });
-
         this.sectionPositionInformationMapManager.subscribe((spim: SectionPositionInformationMap) => {
             Object.keys(gridSectionName => {
                 var scrollLeft = this.bodySectionScrollManager.get(gridSectionName);

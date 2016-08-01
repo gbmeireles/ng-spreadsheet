@@ -1,9 +1,6 @@
 import { Injectable, Inject, EventEmitter } from '@angular/core';
 import {
     ColumnListManager,
-    GridSectionListGetter,
-    GridSectionListManager,
-    GridDataManager,
 } from '../../Services/Services';
 import {
     ColumnMovedEvent,
@@ -19,9 +16,6 @@ export class ColumnMover {
 
     constructor(private columnListManager: ColumnListManager,
         private columnGetter: ColumnGetter,
-        private gridSectionListGetter: GridSectionListGetter,
-        private gridSectionListManager: GridSectionListManager,
-        private gridDataManager: GridDataManager,
         @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<ColumnMovedEvent>) { }
 
     moveColumn(oldColumnIndex: number, newColumnIndex: number) {
