@@ -14,14 +14,14 @@ export class DataGridRowListGetter {
 
     }
 
-    get(gridData: GridData, gridColumnList: Column[], titleRowListCount: number): GridRow[] {
+    get(gridData: GridData, columnDefinitionList: ColumnDefinition[], gridColumnList: Column[], titleRowListCount: number): GridRow[] {
         var result: GridRow[] = new Array(gridData.dataRowList.length);
         var columnListMap: { [tableSection: string]: ColumnDefinition[] } = {};
         gridColumnList.forEach(column => {
             if (!columnListMap[column.gridSectionName]) {
                 columnListMap[column.gridSectionName] = [];
             }
-            var columnDefinition = gridData.columnDefinitionList.find(cd => cd.name === column.name);
+            var columnDefinition = columnDefinitionList.find(cd => cd.name === column.name);
             columnListMap[column.gridSectionName].push(columnDefinition);
         });
 

@@ -9,7 +9,7 @@ export interface GridCell {
     rowspan: number;
     data: any;
     dataPathOnRowData?: string;
-    formattedData?: string;
+    formatData?: (data: any) => string;
     viewableComponentType?: Type;
     editableComponentType?: Type;
     rowIndex?: number;

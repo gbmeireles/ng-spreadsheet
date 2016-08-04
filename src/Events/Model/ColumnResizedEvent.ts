@@ -11,7 +11,7 @@ export class ColumnResizedEvent implements Event {
         this.type = ColumnResizedEvent.type;
         this.payload = {
             columnName: columnName,
-            columnSize: columnSize
+            columnSize: columnSize,
         };
     }
 }

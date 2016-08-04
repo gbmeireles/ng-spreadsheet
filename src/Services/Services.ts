@@ -1,6 +1,3 @@
-
-
-
 import { DataGridRowListGetter } from './DataGridRowListGetter';
 import { ColumnListGetter } from './ColumnListGetter';
 import { GridRowspanSetter } from './GridRowspanSetter';
@@ -18,8 +15,10 @@ import { GridSectionListGetter } from './GridSectionListGetter';
 import { CellNavigator } from './CellNavigator';
 import { ColumnToRenderIndexListGetter } from './ColumnToRenderIndexListGetter';
 import { RowToRenderIndexListGetter } from './RowToRenderIndexListGetter';
+import { FILTERS_PROVIDERS } from './Filters/Filters';
 
 export * from './Managers/Managers';
+export * from './Filters/Filters';
 
 export {
     ActiveCellGetter,
@@ -60,4 +59,5 @@ export const GRID_SCOPE_SERVICES: Array<any> = Managers.MANAGERS.concat([
     RowToRenderIndexListGetter,
     CellNavigator,
     ColumnToRenderIndexListGetter,
+    ...FILTERS_PROVIDERS,
 ]);

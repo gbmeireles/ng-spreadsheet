@@ -28,14 +28,26 @@ export class SectionPositionInformationMapCalculator {
 
         var keyList = Object.keys(sectionPositionInformationMap);
         var remainingWidth = bodyWidth - 40;
-        var expectedWidth = remainingWidth / keyList.length;
-        keyList.forEach(key => totalUsedWidth += sectionPositionInformationMap[key].width);
 
-        keyList.map(key => sectionPositionInformationMap[key])
-            .filter(p => p.width <= expectedWidth).forEach(p => remainingWidth = remainingWidth - p.width);
+        if (keyList.length === 1) {
+            sectionPositionInformationMap[keyList[0]].width = remainingWidth;
+        } else {
 
-        expectedWidth = remainingWidth / keyList.map(key => sectionPositionInformationMap[key]).filter(p => p.width > expectedWidth).length;
-        keyList.map(key => sectionPositionInformationMap[key]).filter(p => p.width > expectedWidth).forEach(p => p.width = expectedWidth);
+            var expectedWidth = remainingWidth / keyList.length;
+            keyList.forEach(key => totalUsedWidth += sectionPositionInformationMap[key].width);
+
+            var sectionPositionInformationList = keyList.map(key => sectionPositionInformationMap[key]);
+            sectionPositionInformationList.filter(p => p.width <= expectedWidth).forEach(p => remainingWidth = remainingWidth - p.width);
+
+            var sectionWithWidthGreaterThanExpectedList =
+                sectionPositionInformationList.filter(p => p.width > expectedWidth);
+            if (sectionWithWidthGreaterThanExpectedList.length !== 0) {
+                expectedWidth = remainingWidth / sectionWithWidthGreaterThanExpectedList.length;
+                sectionWithWidthGreaterThanExpectedList.forEach(p => p.width = expectedWidth);
+                sectionWithWidthGreaterThanExpectedList.forEach(p => remainingWidth = remainingWidth - p.width);
+                sectionWithWidthGreaterThanExpectedList[sectionWithWidthGreaterThanExpectedList.length - 1].width += remainingWidth;
+            }
+        }
 
         var currentSectionPosition = 20;
         keyList.forEach(key => {

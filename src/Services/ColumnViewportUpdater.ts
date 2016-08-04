@@ -45,8 +45,16 @@ export class ColumnViewportUpdater {
     }
 
     private getVisibleCellList(validIndexList: number[], row: GridRow) {
-        var cellToAddList = validIndexList.map(columnIndex => row.cellMap[columnIndex]);
-        cellToAddList = cellToAddList.filter(c => c != null);
+        var cellToAddList = new Array(validIndexList.length);
+        var index = 0;
+        validIndexList.forEach(columnIndex => {
+            var cell = row.cellMap[columnIndex];
+            if (cell) {
+                cellToAddList[index] = cell;
+                index++;
+            }
+        });
+        cellToAddList.length = index;
         return cellToAddList;
     }
 }

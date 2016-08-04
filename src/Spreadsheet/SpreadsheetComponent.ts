@@ -11,6 +11,7 @@ import {
     ViewChild,
     Inject,
     ApplicationRef,
+    OnChanges,
 } from '@angular/core';
 import { AfterContentInit, OnInit } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
@@ -42,6 +43,7 @@ import {
     BodyScrollManager,
     GridComponentManager,
     ColumnPositionInformationMapCalculator,
+    NumberFilter,
 } from '../Services/Services';
 import {
     ColumnPositionInformationMap,
@@ -51,6 +53,7 @@ import {
     GridCell,
     GridData,
     GridRow,
+    ColumnDefinition,
 } from '../Model/Model';
 import {
     EVENT_EMITTER_TOKEN,
@@ -60,6 +63,8 @@ import {
     ColumnResizedEvent,
     SectionHorizontallyScrolledEvent,
     SpreadsheetVerticallyScrolledEvent,
+    FilterColumnEvent,
+    UpdateColumnDefinitionListAction,
 } from '../Events/Events';
 import { GridEvent } from './Model/GridEvent';
 import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
@@ -91,14 +96,15 @@ const html = `
     selector: 'NgSpreadsheet',
     template: html,
 })
-export class SpreadsheetComponent implements OnInit, OnDestroy {
+export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('id') id: string;
+    @Input('columnDefinitionList') columnDefinitionList: ColumnDefinition[];
     @Output() onGridEvent: EventEmitter<GridEvent<any>> = new EventEmitter<GridEvent<any>>(false);
     @ViewChild(BodyComponent) body: BodyComponent;
     columnList: Column[];
     statusMessage: string;
     statusMessageTimeout: number;
-    gridSectionList: any[] = [];
+    gridSectionList: GridSection[] = [];
     numberDataRowList: GridRow[] = [];
     numberTitleRowList: GridRow[] = [];
     headerRowCount: number = 0;
@@ -129,7 +135,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>,
         private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
         private spreadsheetState: SpreadsheetState,
-        private app: ApplicationRef) {
+        private app: ApplicationRef,
+        private numberFilter: NumberFilter) {
 
         this.gridComponentManager.set(<any>this);
         this.updateGridColumnMap(this.columnListManager.get());
@@ -185,10 +192,45 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
                     this.updateGridSectionList(this.gridSectionListManager.get());
                     break;
                 }
+                case FilterColumnEvent.type: {
+                    let filterEvt = <FilterColumnEvent>evt;
+                    var gridColumn = this.gridColumnListGetter.get(this.columnList).find(gc => gc.index == filterEvt.payload.gridColumnIndex);
+                    var gridSection = this.gridSectionList.find(gs => gs.name === gridColumn.gridSectionName);
+                    var filterFn = this.numberFilter.getIsMatchFn(filterEvt.payload.expression);
+
+                    var gridData = this.gridDataManager.get();
+                    if (!gridData.originalDataRowList) {
+                        gridData.originalDataRowList = gridData.dataRowList.slice(0);
+                    }
+                    gridData.dataRowList = gridData.originalDataRowList.slice(0);
+
+                    var dataRowToRemoveList = gridSection.dataRowList
+                        .filter(dr => !filterFn(dr.cellMap[gridColumn.index].data))
+                        .map(dr => dr.rowData);
+                    dataRowToRemoveList.forEach(dr => {
+                        var index = gridData.dataRowList.indexOf(dr);
+                        if (index >= 0) {
+                            gridData.dataRowList.splice(index, 1);
+                        }
+                    });
+                    this.update(Object.assign({}, gridData));
+                }
                 default:
                     break;
             }
         });
+    }
+
+    ngOnChanges(obj) {
+        if (obj.columnDefinitionList) {
+            this.spreadsheetState = Object.assign({}, this.spreadsheetState, {
+                columnDefinitionList: this.columnDefinitionList,
+                columnList: this.columnListGetter.get(this.columnDefinitionList),
+            });
+            this.eventEmitter.emit(new UpdateColumnDefinitionListAction(this.columnDefinitionList));
+
+            this.recalculateGridData(this.columnList);
+        }
     }
 
     ngOnDestroy() {
@@ -203,10 +245,9 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         }
     }
 
-
     update(gridData: GridData) {
         this.gridDataManager.set(gridData);
-        this.columnList = this.columnListGetter.get(gridData);
+        this.columnList = this.columnListGetter.get(this.columnDefinitionList);
 
         this.recalculateGridData(this.columnList);
 
@@ -225,7 +266,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         this.statusMessageTimeout = timeout;
     }
 
-
     @HostListener('focusin', ['$event'])
     private onFocus(evt: FocusEvent) {
         evt.preventDefault();
@@ -238,7 +278,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         return 'gridSection_' + index;
     }
 
-
     private recalculateGridData(columnList: Column[]) {
         var gridData = this.gridDataManager.get();
 
@@ -250,7 +289,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
         let columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(columnList);
         this.columnPositionInformationMapManager.set(columnPositionInformationMap);
 
-        var gridSectionList = this.gridSectionListGetter.get(gridData, columnList);
+        var gridSectionList = this.gridSectionListGetter.get(gridData, this.columnDefinitionList, columnList);
         this.gridSectionListManager.set(gridSectionList);
 
         this.headerRowCount = gridSectionList[0].titleRowList.length;
@@ -281,6 +320,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
                     rowStyle: '',
                     rowType: ContentTypeEnum.Title,
                     sectionRowIndex: visibleRow.sectionRowIndex,
+                    isVisible: true,
                 };
                 this.numberTitleRowList[index] = numberTitleRow;
                 index++;
@@ -299,6 +339,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy {
                     rowStyle: '',
                     rowType: ContentTypeEnum.Data,
                     sectionRowIndex: visibleRow.sectionRowIndex,
+                    isVisible: true,
                 };
                 this.numberDataRowList[index] = numberDataRow;
                 index++;

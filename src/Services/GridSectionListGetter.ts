@@ -4,6 +4,7 @@ import {
     GridData,
     GridSection,
     Column,
+    ColumnDefinition,
 } from '../Model/Model';
 import { TitleGridRowListGetter } from '../Services/TitleGridRowListGetter';
 import { DataGridRowListGetter } from '../Services/DataGridRowListGetter';
@@ -19,7 +20,7 @@ export class GridSectionListGetter {
         private bodyScrollManager: BodyScrollManager) {
     }
 
-    get(gridData: GridData, gridColumnList: Column[]) {
+    get(gridData: GridData, columnDefinitionList: ColumnDefinition[], gridColumnList: Column[]) {
         var gridColumnListMap = {};
         gridColumnList.forEach(gridColumn => {
             if (!gridColumnListMap[gridColumn.gridSectionName]) {
@@ -52,8 +53,8 @@ export class GridSectionListGetter {
                 }
             });
 
-            var titleRowList = this.titleGridRowListGetter.get(gridData, gridSection.columnList);
-            var dataRowList = this.dataGridRowListGetter.get(gridData, gridSection.columnList, titleRowList.length);
+            var titleRowList = this.titleGridRowListGetter.get(gridData, columnDefinitionList, gridSection.columnList);
+            var dataRowList = this.dataGridRowListGetter.get(gridData, columnDefinitionList, gridSection.columnList, titleRowList.length);
 
             gridSection.titleRowList = titleRowList.map<GridRow>(row => {
                 return {
@@ -74,8 +75,18 @@ export class GridSectionListGetter {
             gridSection.dataRowMap = {};
             var counter = 0;
             dataRowList.forEach(row => {
+                var cellList = new Array(row.cellList.length);
+                var index = 0;
+                row.cellList.forEach(c => {
+                    if (gridSectionColumnIdList.indexOf(c.columnIndex) < 0) {
+                        return;
+                    }
+                    cellList[index] = c;
+                    index++;
+                });
+                cellList.length = index;
                 var gridRow = {
-                    cellList: row.cellList.filter(c => gridSectionColumnIdList.indexOf(c.columnIndex) >= 0),
+                    cellList: cellList,
                     cellMap: row.cellMap,
                     height: gridData.rowHeight,
                     rowData: row.rowData,

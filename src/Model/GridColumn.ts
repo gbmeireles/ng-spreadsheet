@@ -4,4 +4,5 @@ export interface GridColumn {
     style?: string;
     width: number;
     gridSectionName: string;
+    filterExpression: string;
 }

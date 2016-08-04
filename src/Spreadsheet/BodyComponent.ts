@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnInit, ElementRef, HostListener, Input, ViewChild, SimpleChange } from '@angular/core';
+import { Component, OnChanges, OnInit, OnDestroy, ElementRef, HostListener, Renderer, Input, ViewChild, SimpleChange } from '@angular/core';
 import {
     BodyWidthManager,
     BodyScrollManager,
@@ -41,18 +41,20 @@ const html = `
     styles: [css],
     directives: [BodySectionComponent, NumberRowListComponent, RowListComponent],
 })
-export class BodyComponent implements OnInit {
+export class BodyComponent implements OnInit, OnDestroy {
     @Input('scrollTop') scrollTop: number;
     @Input('gridSectionList') gridSectionList: GridSection[] = [];
     @Input('numberDataRowList') numberDataRowList: GridRow[] = [];
     rowHeight: number;
     private isInitialized: boolean;
+    private unregisterResizeListener: Function;
 
     constructor(private el: ElementRef,
         private bodyWidthManager: BodyWidthManager,
         private bodyScrollManager: BodyScrollManager,
         private bodyHeightManager: BodyHeightManager,
-        private rowHeightManager: RowHeightManager) {
+        private rowHeightManager: RowHeightManager,
+        private renderer: Renderer) {
         this.rowHeight = this.rowHeightManager.get();
         this.rowHeightManager.subscribe((rowHeight) => {
             this.rowHeight = rowHeight;
@@ -65,8 +67,15 @@ export class BodyComponent implements OnInit {
         }
         this.isInitialized = true;
 
-        this.bodyWidthManager.set(this.el.nativeElement.clientWidth);
-        this.bodyHeightManager.set(this.el.nativeElement.clientHeight);
+        this.updateSizeData();
+
+        this.unregisterResizeListener = this.renderer.listenGlobal('window', 'resize', () => {
+            this.updateSizeData();
+        });
+    }
+
+    ngOnDestroy() {
+        this.unregisterResizeListener();
     }
 
     gridSectionIdentity(index: number, gridSection: GridSection): any {
@@ -74,5 +83,10 @@ export class BodyComponent implements OnInit {
             return gridSection.name;
         }
         return 'gridSection_' + index;
+    }
+
+    private updateSizeData() {
+        this.bodyWidthManager.set(this.el.nativeElement.clientWidth);
+        this.bodyHeightManager.set(this.el.nativeElement.clientHeight);
     }
 }

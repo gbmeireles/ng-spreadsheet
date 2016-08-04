@@ -11,3 +11,4 @@ export * from './SectionPositionInformationMap';
 export * from './CellIndexData';
 export * from './ColumnPositionInformationMap';
 export * from './GridColumn';
+export * from './ColumnDataTypeEnum'

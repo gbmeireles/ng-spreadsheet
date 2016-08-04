@@ -7,7 +7,7 @@ export class GridColumnListGetter {
     constructor(private columnListManager: ColumnListManager) {
 
     }
-    get(columnList: Column[] = null): GridColumn[] {
+    get(columnList: Column[]): GridColumn[] {
         var lastIndex = -1;
         var result: GridColumn[] = [];
         columnList.forEach(column => {
@@ -19,6 +19,7 @@ export class GridColumnListGetter {
                     name: column.name,
                     style: column.style,
                     width: column.width,
+                    filterExpression: '',
                 });
                 columnIndex++;
             }

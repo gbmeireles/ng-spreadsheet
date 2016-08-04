@@ -61,6 +61,13 @@ export class HeaderComponent implements OnDestroy {
         this.unsubscribeToRowHeightManagerChanges();
     }
 
+    gridSectionIdentity(index: number, gridSection: GridSection): any {
+        if (gridSection) {
+            return gridSection.name;
+        }
+        return 'gridSection_' + index;
+    }
+
     private updateHeight() {
         this.height = this.rowCount * this.rowHeightManager.get() + NUMBER_ROW_HEIGHT;
     }

@@ -18,23 +18,11 @@ const css = `
     display: block;
     position: relative;
     height: 20px;
-}
-
-GgColumnCell {
-    background-color: #E6E6E6;
-    border-right: 1px inset #A3A3A3;
-    text-align: center;
-    display: inline-block;
-    height: 20px;
-    line-height: 20px;
-    vertical-align: middle;
 }`;
 
 const html = `
 <GgColumnCell *ngFor="let gridColumn of visibleGridColumnList; let columnIndex = index; trackBy:cellIndentity;" 
-    [gridColumn]="gridColumn" [index]="columnIndex">
-    <span>{{gridColumnIdentifierMap[gridColumn.index]}}</span>
-    <span><i class="fa fa-caret-square-down"></i></span>
+    [gridColumn]="gridColumn" [index]="columnIndex" [columnIdentifier]="gridColumnIdentifierMap[gridColumn.index]">
 </GgColumnCell>`;
 
 @Component({

@@ -61,10 +61,10 @@ export class DetailsBarComponent implements OnInit {
 
     ngOnInit() {
         this.activeCellManager.subscribe((activeCell) => {
-            if (activeCell.formattedData == undefined) {
+            if (activeCell.formatData == undefined) {
                 this.activeCellData = activeCell.data;
             } else {
-                this.activeCellData = activeCell.formattedData;
+                this.activeCellData = activeCell.formatData(activeCell.data);
             }
         });
     }

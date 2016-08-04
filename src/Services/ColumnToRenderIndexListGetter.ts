@@ -57,15 +57,13 @@ export class ColumnToRenderIndexListGetter {
 
         var lastVisibleCellIndex = firstVisibleCellIndex;
         var totalWidth = 0;
-        gridColumnList.filter(gc => gc.index >= firstVisibleCellIndex).forEach(gc => {
+        gridColumnList.filter(gc => gc.index > firstVisibleCellIndex).forEach(gc => {
             totalWidth += gc.width;
             if (totalWidth >= gridSectionWidth) {
                 return;
             }
             lastVisibleCellIndex++;
         });
-
-        var visibleCellCount = 3;
 
         firstVisibleCellIndex = Math.max(firstVisibleCellIndex - 1, firstGridColumn.index);
         lastVisibleCellIndex = Math.min(lastVisibleCellIndex + 1, lastGridColumn.index);

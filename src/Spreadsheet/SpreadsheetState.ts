@@ -1,13 +1,11 @@
 import { Injectable, provide, Provider } from '@angular/core';
-import { ColumnPositionInformationMap, Column, GridColumn, GridSection, Cell } from '../Model/Model';
+import { ColumnDefinition, Column, GridColumn, GridSection, Cell } from '../Model/Model';
 
 @Injectable()
 export class SpreadsheetState {
-    columnPositionInformationMap: ColumnPositionInformationMap;
+    columnDefinitionList: ColumnDefinition[];
     columnList: Column[];
     gridColumnList: GridColumn[];
-    gridSectionList: GridSection[];
-    activeCell: Cell;
 
     constructor(spreadsheetState?: SpreadsheetState) {
         if (spreadsheetState == null) {

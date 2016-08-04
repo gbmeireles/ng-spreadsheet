@@ -217,9 +217,9 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                     this.viewComponent = componentRef;
                     componentRef.instance.onRowInit(gridComponent, this.gridCell, this.rowData);
                 });
-        } else if (this.gridCell.formattedData !== undefined) {
+        } else if (this.gridCell.formatData !== undefined) {
             this.isCustom = false;
-            this.data = this.gridCell.formattedData;
+            this.data = this.gridCell.formatData(this.gridCell.data);
         } else {
             this.isCustom = false;
             this.data = this.gridCell.data;

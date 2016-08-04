@@ -1,5 +1,5 @@
 import {
-    Directive,
+    Component,
     Input,
     HostBinding,
     ElementRef,
@@ -26,13 +26,83 @@ import {
     Event,
     ColumnResizedEvent,
     ColumnMovedEvent,
+    FilterColumnEvent,
 } from '../../Events/Events';
 import { ColumnMover } from './ColumnMover';
 import { ColumnGetter } from './ColumnGetter';
 import { Subscription } from 'rxjs/Subscription';
 
-@Directive({
+const css = `
+:host {
+    background-color: #E6E6E6;
+    border-right: 1px inset #A3A3A3;
+    text-align: center;
+    display: inline-block;
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+    position: relative;
+}
+
+.filter-opener {
+    display: block;
+    position: absolute;
+    right: 4px;
+    top: 2px;
+    width: 10px;
+    height: 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.filter {
+    position: absolute;
+    left: -1px;
+    top: 20px;
+    right: -1px;
+    height: 20px;
+    background-color: white;
+    border: 1px solid #A3A3A3;
+    display: none;
+    border-top: none;
+    z-index: 1;
+}
+
+.filter.is-visible {
+    display: block;
+}
+
+.filter input {
+    border: none;
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    right: 24px;
+    bottom: 2px;
+    background-color: white;
+}
+
+.filter span {
+    border: none;
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    bottom: 2px;
+}
+`;
+
+const html = `
+    <span>{{columnIdentifier}}</span>
+    <span class="filter-opener" (click)="toggleFilter()"><i class="fa fa-caret-square-o-down"></i></span>
+    <div class="filter" [class.is-visible]="isFilterOpen">
+        <input ref-filterExpression type="text" />
+        <span (click)="filter(filterExpression.value)"><i class="fa fa-check"></i></span>
+    </div>`;
+
+@Component({
     selector: 'GgColumnCell',
+    template: html,
+    styles: [css],
 })
 export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
@@ -45,8 +115,10 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     @HostBinding('draggable') draggable: boolean = true;
     @HostBinding('style.margin-left.px') marginLeft: number = 0;
     @Input('gridColumn') gridColumn: GridColumn;
+    @Input('columnIdentifier') columnIdentifier: string;
     gridColumnIndex: number = 0;
     @Input('index') index: number;
+    isFilterOpen: boolean = false;
 
     private eventEmitterSubscription: Subscription;
 
@@ -86,6 +158,13 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
         this.eventEmitterSubscription.unsubscribe();
     }
 
+    toggleFilter() {
+        this.isFilterOpen = !this.isFilterOpen;
+    }
+
+    filter(expression: string) {
+        this.eventEmitter.emit(new FilterColumnEvent(this.gridColumnIndex, expression));
+    }
 
     @HostListener('dragstart', ['$event'])
     onDragStart(evt: DragEvent) {
