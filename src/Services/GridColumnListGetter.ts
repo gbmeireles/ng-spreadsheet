@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
-import { GridData, GridColumn, Column } from '../Model/Model';
-import { ColumnListManager } from '../Services/Managers/Managers';
+import { GridColumn, Column } from '../Model/Model';
 
 @Injectable()
 export class GridColumnListGetter {
-    constructor(private columnListManager: ColumnListManager) {
 
-    }
-    get(columnList: Column[]): GridColumn[] {
+    get(columnList: Column[], filterExpressionMap: { [gridColumnIndex: number]: string }): GridColumn[] {
         var lastIndex = -1;
         var result: GridColumn[] = [];
         columnList.forEach(column => {
@@ -19,7 +16,8 @@ export class GridColumnListGetter {
                     name: column.name,
                     style: column.style,
                     width: column.width,
-                    filterExpression: '',
+                    filterExpression: (filterExpressionMap && filterExpressionMap[columnIndex]) || '',
+                    dataType: column.dataType,
                 });
                 columnIndex++;
             }

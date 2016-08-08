@@ -1,22 +1,20 @@
 import { Injectable } from '@angular/core';
-import {
-    BodyHeightManager,
-    RowHeightManager,
-} from '../Services/Managers/Managers';
-
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 @Injectable()
 export class RowViewportVisibleRowCountGetter {
-    constructor(private bodyHeightManager: BodyHeightManager,
-        private rowHeightManager: RowHeightManager) {
+    constructor() {
 
     }
 
-    get() {
-        var bodyHeight = this.bodyHeightManager.get();
-        var rowHeight = this.rowHeightManager.get();
+    get(spreadsheetState: SpreadsheetState) {
+        var bodyHeight = spreadsheetState.bodyHeight;
+        var rowHeight = spreadsheetState.rowHeight;
 
         if (rowHeight === undefined) {
             throw 'Row height is not defined';
+        }
+        if (rowHeight === 0) {
+            return 0;
         }
 
         var visibleRowCount = Math.ceil(bodyHeight / rowHeight);

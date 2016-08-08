@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridData, Column, ColumnDefinition } from '../Model/Model';
+import { Column, ColumnDefinition } from '../Model/Model';
 
 @Injectable()
 export class ColumnListGetter {
@@ -12,6 +12,7 @@ export class ColumnListGetter {
 
             lastIndex = gridColumn.endIndex;
             gridColumn.width = gridColumn.width || gridColumn.defaultWidth;
+            gridColumn.dataType = columnDefinition.dataType;
 
             return gridColumn;
         });

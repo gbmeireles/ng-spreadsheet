@@ -3,16 +3,24 @@ import { OnChanges, SimpleChange } from '@angular/core';
 import { RowComponent } from './RowComponent';
 import { CellComponent } from './Cell/Cell';
 import {
-    RowViewportVisibleRowCountGetter,
-    BodySectionScrollManager,
-} from '../Services/Services';
-import { GridRow } from '../Model/GridRow';
-import { GridCell } from '../Model/GridCell';
+    GridRow,
+    GridCell,
+    ColumnPositionInformationMap,
+    CellLocation,
+} from '../Model/Model';
 
 const html = `
-<GgRow *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" [row]="row" [gridSectionName]="gridSectionName" [index]="i">
-    <GgCell [cell]="cell" [index]="cellIndex" [rowData]="row?.rowData" 
-        *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity">
+<GgRow *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" 
+    [row]="row" [gridSectionName]="gridSectionName" [index]="i"
+    [scrollWidth]="gridSectionScrollWidth">
+    <GgCell *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity"
+        [cell]="cell" 
+        [index]="cellIndex" 
+        [rowData]="row?.rowData" 
+        [columnPositionInformationMap]="columnPositionInformationMap"
+        [gridSectionScrollLeft]="gridSectionScrollLeft"
+        [activeCellLocation]="activeCellLocation"
+        >
     </GgCell>
 </GgRow>`;
 
@@ -25,15 +33,24 @@ const html = `
 export class RowListComponent {
     @Input('rowList') rowList: GridRow[];
     @Input('gridSectionName') gridSectionName: string;
+    @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
+    @Input('gridSectionScrollWidthMap') gridSectionScrollWidthMap: { [gridSectionName: string]: number };
+    @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
+    @Input('activeCellLocation') activeCellLocation: CellLocation;
+    gridSectionScrollWidth: number;
+    gridSectionScrollLeft: number;
 
-    constructor(private rowViewportVisibleRowCountGetter: RowViewportVisibleRowCountGetter,
-        private bodySectionScrollManager: BodySectionScrollManager,
-        private cdr: ChangeDetectorRef) {
-        this.bodySectionScrollManager.subscribe((param) => {
-            if (param.gridSectionName === this.gridSectionName) {
-                this.cdr.markForCheck();
-            }
-        });
+    constructor(private cdr: ChangeDetectorRef) {
+
+    }
+
+    ngOnChanges(obj) {
+        if (obj['gridSectionScrollWidthMap']) {
+            this.gridSectionScrollWidth = this.gridSectionScrollWidthMap ? this.gridSectionScrollWidthMap[this.gridSectionName] : 0;
+        }
+        if (obj['gridSectionScrollLeftMap']) {
+            this.gridSectionScrollLeft = this.gridSectionScrollLeftMap ? this.gridSectionScrollLeftMap[this.gridSectionName] : 0;
+        }
     }
 
     rowIndentity(index: number, row: GridRow): any {

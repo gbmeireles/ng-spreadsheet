@@ -1,5 +1,5 @@
-import { Event } from './Event';
-export class ColumnMovedEvent implements Event {
+import { Action } from './Action';
+export class MoveColumnAction implements Action {
     static type = 'ColumnMoved';
     type: string;
     payload: {
@@ -8,7 +8,7 @@ export class ColumnMovedEvent implements Event {
     };
 
     constructor(newColumnIndex: number, oldColumnIndex: number) {
-        this.type = ColumnMovedEvent.type;
+        this.type = MoveColumnAction.type;
         this.payload = {
             newColumnIndex: newColumnIndex,
             oldColumnIndex: oldColumnIndex,

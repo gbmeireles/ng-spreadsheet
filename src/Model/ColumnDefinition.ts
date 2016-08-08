@@ -1,4 +1,3 @@
-import { GridData } from './GridData';
 import { GridCell } from './GridCell';
 import { Column } from './Column';
 import { ColumnDataTypeEnum } from './ColumnDataTypeEnum';
@@ -8,9 +7,10 @@ export interface ColumnDefinition {
     description?: string;
     hide?: boolean;
     gridSection?: string;
-    dataType?: ColumnDataTypeEnum;
+    dataType: ColumnDataTypeEnum;
+    filterExpressionMap?: { [columnIndex: number]: string };
 
-    getTitleCellMatrix(gridData: GridData, gridColumn: Column): GridCell[][];
-    getDataCellMatrix(gridData: GridData, rowData: any, gridColumn: Column): GridCell[][];
+    getTitleCellMatrix(column: Column): GridCell[][];
+    getDataCellMatrix(rowData: any, column: Column): GridCell[][];
     getColumn(columnStartIndex: number): Column;
 }

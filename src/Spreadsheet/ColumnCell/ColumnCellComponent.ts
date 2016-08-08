@@ -11,10 +11,6 @@ import {
 } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import {
-    ColumnListManager,
-    ColumnPositionInformationMapManager,
-} from '../../Services/Services';
-import {
     Cell,
     GridCell,
     Column,
@@ -22,11 +18,11 @@ import {
     ColumnPositionInformationMap,
 } from '../../Model/Model';
 import {
-    EVENT_EMITTER_TOKEN,
-    Event,
-    ColumnResizedEvent,
-    ColumnMovedEvent,
-    FilterColumnEvent,
+    DISPATCHER_TOKEN,
+    Action,
+    UpdateColumnSizeAction,
+    MoveColumnAction,
+    FilterColumnAction,
 } from '../../Events/Events';
 import { ColumnMover } from './ColumnMover';
 import { ColumnGetter } from './ColumnGetter';
@@ -72,30 +68,41 @@ const css = `
     display: block;
 }
 
-.filter input {
-    border: none;
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    right: 24px;
-    bottom: 2px;
-    background-color: white;
-}
-
 .filter span {
     border: none;
     position: absolute;
     top: 2px;
     right: 4px;
     bottom: 2px;
+    cursor: pointer;
+}
+
+.filter span:hover {
+    color: black;
+}
+
+.filter-input-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 24px;
+    bottom: 0px;
+}
+
+.filter-input-container input {
+    border: none;
+    background-color: white;
 }
 `;
 
 const html = `
     <span>{{columnIdentifier}}</span>
     <span class="filter-opener" (click)="toggleFilter()"><i class="fa fa-caret-square-o-down"></i></span>
-    <div class="filter" [class.is-visible]="isFilterOpen">
-        <input ref-filterExpression type="text" />
+    <div *ngIf="isFilterOpen" class="filter" [class.is-visible]="isFilterOpen">
+        <div class="filter-input-container">
+            <input ref-filterExpression type="text" [value]="gridColumn.filterExpression" 
+                (keypress)="$event.keyCode === 13 ? filter(filterExpression.value) : true"/>
+        </div>
         <span (click)="filter(filterExpression.value)"><i class="fa fa-check"></i></span>
     </div>`;
 
@@ -108,41 +115,30 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
     private static columnToMove: Column;
 
-    gridCell: GridCell;
     @HostBinding('class.is-active') isActive: boolean = false;
     @HostBinding('style.width') width: number;
-    left: number;
     @HostBinding('draggable') draggable: boolean = true;
     @HostBinding('style.margin-left.px') marginLeft: number = 0;
     @Input('gridColumn') gridColumn: GridColumn;
     @Input('columnIdentifier') columnIdentifier: string;
-    gridColumnIndex: number = 0;
+    @Input('columnList') columnList: Column[];
+    @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
     @Input('index') index: number;
+
+    gridCell: GridCell;
+    left: number;
+    gridColumnIndex: number = 0;
     isFilterOpen: boolean = false;
 
-    private eventEmitterSubscription: Subscription;
-
     constructor(private el: ElementRef,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
-        private columnListManager: ColumnListManager,
         private renderer: Renderer,
         private columnMover: ColumnMover,
         private columnGetter: ColumnGetter,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
+        @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) {
 
     }
 
     ngOnInit() {
-        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
-            switch (evt.type) {
-                case ColumnResizedEvent.type:
-                case ColumnMovedEvent.type:
-                    this.updatePosition();
-                    break;
-                default:
-                    break;
-            }
-        });
         this.gridColumnIndex = this.gridColumn.index;
         this.updatePosition();
     }
@@ -151,11 +147,13 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
         if (changes['gridColumn']) {
             this.gridColumnIndex = this.gridColumn.index;
         }
+        if (changes['columnPositionInformationMap']) {
+
+        }
         this.updatePosition();
     }
 
     ngOnDestroy() {
-        this.eventEmitterSubscription.unsubscribe();
     }
 
     toggleFilter() {
@@ -163,12 +161,12 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     }
 
     filter(expression: string) {
-        this.eventEmitter.emit(new FilterColumnEvent(this.gridColumnIndex, expression));
+        this.eventEmitter.emit(new FilterColumnAction(this.gridColumnIndex, expression));
     }
 
     @HostListener('dragstart', ['$event'])
     onDragStart(evt: DragEvent) {
-        var columnToMove = this.columnGetter.getByGridColumnIndex(this.gridColumnIndex);
+        var columnToMove = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
         if (columnToMove.endIndex !== columnToMove.startIndex) {
             evt.preventDefault();
         }
@@ -187,13 +185,11 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
     @HostListener('drop', ['$event'])
     onDrop(evt: DragEvent) {
-        var columnList = this.columnListManager.get();
+        var currentColumn = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
+        var oldColumnIndex = this.columnList.indexOf(ColumnCellComponent.columnToMove);
+        var newColumnIndex = this.columnList.indexOf(currentColumn);
 
-        var currentColumn = this.columnGetter.getByGridColumnIndex(this.gridColumnIndex);
-        var oldColumnIndex = columnList.indexOf(ColumnCellComponent.columnToMove);
-        var newColumnIndex = columnList.indexOf(currentColumn);
-
-        this.columnMover.moveColumn(oldColumnIndex, newColumnIndex);
+        this.eventEmitter.emit(new MoveColumnAction(newColumnIndex, oldColumnIndex));
     }
 
     getScrollWidth() {
@@ -201,7 +197,10 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     }
 
     private updatePosition() {
-        var columnPositionInformation = this.columnPositionInformationMapManager.get()[this.gridColumnIndex];
+        var columnPositionInformation = this.columnPositionInformationMap && this.columnPositionInformationMap[this.gridColumnIndex];
+        if (!columnPositionInformation) {
+            return;
+        }
         if (this.index === 0) {
             this.marginLeft = columnPositionInformation.left;
         }

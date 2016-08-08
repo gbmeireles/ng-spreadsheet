@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { GridRowspanSetter } from '../Services/GridRowspanSetter';
 import {
-    GridData,
     GridRow,
     ContentTypeEnum,
     ColumnDefinition,
     Column,
+    GridSection,
 } from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class DataGridRowListGetter {
@@ -14,26 +15,26 @@ export class DataGridRowListGetter {
 
     }
 
-    get(gridData: GridData, columnDefinitionList: ColumnDefinition[], gridColumnList: Column[], titleRowListCount: number): GridRow[] {
-        var result: GridRow[] = new Array(gridData.dataRowList.length);
-        var columnListMap: { [tableSection: string]: ColumnDefinition[] } = {};
-        gridColumnList.forEach(column => {
-            if (!columnListMap[column.gridSectionName]) {
-                columnListMap[column.gridSectionName] = [];
+    get(spreadsheetState: SpreadsheetState, gridSection: GridSection, titleRowListCount: number): GridRow[] {
+        var result: GridRow[] = new Array(spreadsheetState.dataRowList.length);
+        var columnDefinitionListMap: { [tableSection: string]: ColumnDefinition[] } = {};
+        gridSection.columnList.forEach(column => {
+            if (!columnDefinitionListMap[column.gridSectionName]) {
+                columnDefinitionListMap[column.gridSectionName] = [];
             }
-            var columnDefinition = columnDefinitionList.find(cd => cd.name === column.name);
-            columnListMap[column.gridSectionName].push(columnDefinition);
+            var columnDefinition = spreadsheetState.columnDefinitionList.find(cd => cd.name === column.name);
+            columnDefinitionListMap[column.gridSectionName].push(columnDefinition);
         });
 
         var counter = 0;
         var cellCounter = 0;
-        gridData.dataRowList.forEach(rowData => {
+        spreadsheetState.dataRowList.forEach(rowData => {
             var rowDataGridRowList: GridRow[] = [];
-            gridColumnList.forEach(gridColumn => {
-                var indexOfColumn = gridColumnList.indexOf(gridColumn);
-                var column = columnListMap[gridColumn.gridSectionName][indexOfColumn];
+            gridSection.columnList.forEach(column => {
+                var indexOfColumn = gridSection.columnList.indexOf(column);
+                var columnDefinition = columnDefinitionListMap[column.gridSectionName][indexOfColumn];
 
-                var dataCellMatrix = column.getDataCellMatrix(gridData, rowData, gridColumn);
+                var dataCellMatrix = columnDefinition.getDataCellMatrix(rowData, column);
                 var lastRow: GridRow = null;
                 for (var i = 0; i < dataCellMatrix.length; i++) {
                     var row: GridRow = null;
@@ -46,8 +47,8 @@ export class DataGridRowListGetter {
                         }
                         cellCounter = 0;
                         row = {
-                            cellList: new Array(gridColumnList.length),
-                            height: gridData.rowHeight,
+                            cellList: new Array(gridSection.columnList.length),
+                            height: spreadsheetState.rowHeight,
                             rowData: rowData,
                             rowIndex: 0,
                             rowStyle: '',
@@ -86,8 +87,8 @@ export class DataGridRowListGetter {
                 row.cellMap[cell.columnIndex] = cell;
             });
 
-            if (gridData.getRowStyle) {
-                row.rowStyle = gridData.getRowStyle(row.rowData, row.rowType, row.sectionRowIndex);
+            if (spreadsheetState.getRowStyle) {
+                row.rowStyle = spreadsheetState.getRowStyle(row.rowData, row.rowType, row.sectionRowIndex);
             }
         }
 

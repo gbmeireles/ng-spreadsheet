@@ -1,33 +1,31 @@
 import { Injectable } from '@angular/core';
-import { BodyWidthManager } from '../Services/Managers/Managers';
-import { GridColumnListGetter } from '../Services/GridColumnListGetter';
-import { GridSection, SectionPositionInformationMap } from '../Model/Model';
+import { GridSection, GridSectionPositionInformationMap } from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class SectionPositionInformationMapCalculator {
-    constructor(private bodyWidthManager: BodyWidthManager,
-        private gridColumnListGetter: GridColumnListGetter) {
+    constructor() {
     }
 
-    calculate(gridSectionList: GridSection[]): SectionPositionInformationMap {
-        var sectionPositionInformationMap: SectionPositionInformationMap = {};
-        var bodyWidth = this.bodyWidthManager.get();
+    calculate(spreadsheetState: SpreadsheetState): GridSectionPositionInformationMap {
+        var sectionPositionInformationMap: GridSectionPositionInformationMap = {};
+        var spreadsheetWidth = spreadsheetState.spreadsheetWidth;
         var totalUsedWidth = 9999999999;
-        gridSectionList.forEach(gridSection => {
-            if (!sectionPositionInformationMap[gridSection.name]) {
-                sectionPositionInformationMap[gridSection.name] = {
+        spreadsheetState.gridSectionList.forEach(gs => {
+            if (!sectionPositionInformationMap[gs.name]) {
+                sectionPositionInformationMap[gs.name] = {
                     left: 0,
                     width: 0,
                 };
             }
 
-            this.gridColumnListGetter.get(gridSection.columnList).forEach(gridColumn => {
-                sectionPositionInformationMap[gridColumn.gridSectionName].width += gridColumn.width;
+            spreadsheetState.gridColumnList.filter(gc => gc.gridSectionName === gs.name).forEach(gc => {
+                sectionPositionInformationMap[gc.gridSectionName].width += gc.width;
             });
         });
 
         var keyList = Object.keys(sectionPositionInformationMap);
-        var remainingWidth = bodyWidth - 40;
+        var remainingWidth = spreadsheetWidth - 40;
 
         if (keyList.length === 1) {
             sectionPositionInformationMap[keyList[0]].width = remainingWidth;

@@ -2,15 +2,10 @@ import { Component, Input, ElementRef, HostBinding, HostListener, Renderer, Appl
 import { OnInit, OnDestroy } from '@angular/core';
 import { Inject, EventEmitter, forwardRef, Host } from '@angular/core';
 import {
-    ColumnPositionInformationMapManager,
-    ColumnPositionInformationMapCalculator,
-    RowHeightManager,
-} from '../../Services/Services';
-import {
-    EVENT_EMITTER_TOKEN,
-    Event,
-    ColumnResizedEvent,
-    ColumnMovedEvent,
+    DISPATCHER_TOKEN,
+    Action,
+    UpdateColumnSizeAction,
+    MoveColumnAction,
 } from '../../Events/Events';
 import { GridColumn, ColumnPositionInformationMap } from '../../Model/Model';
 import { ColumnTargetWidthGetter } from './ColumnTargetWidthGetter';
@@ -28,6 +23,7 @@ var css = `
     opacity: 0;
     background-color: black;
     transition: opacity 0.4s ease-out;
+    height: 20px;
 }
 
 :host:hover, :host.is-active {
@@ -44,8 +40,8 @@ var html = `<div></div>`;
 })
 export class ColumnResizeComponent implements OnInit, OnDestroy {
     @Input('gridColumn') gridColumn: GridColumn;
+    @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
     @HostBinding('class.is-active') isDragging: boolean = false;
-    @HostBinding('style.height') height: number;
     @HostBinding('style.left') left: number;
 
     private isInitialized: boolean = false;
@@ -56,55 +52,44 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
     private removeMouseMoveListener: Function;
     private removeMouseUpListener: Function;
 
-    private eventEmitterSubscription: Subscription;
-
     constructor(private el: ElementRef,
         private renderer: Renderer,
         private app: ApplicationRef,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
-        private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
-        private rowHeightManager: RowHeightManager,
         private columnTargetWidthGetter: ColumnTargetWidthGetter,
         private columnSizeUpdater: ColumnSizeUpdater,
         private mousePositionGetter: MousePositionGetter,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
+        @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) {
     }
 
     ngOnInit() {
         this.updateHandlerPosition();
-        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
-            switch (evt.type) {
-                case ColumnResizedEvent.type:
-                case ColumnMovedEvent.type:
-                    this.updateHandlerPosition();
-                    break;
-                default:
-                    break;
+    }
+
+    ngOnChanges(obj) {
+        if (obj['columnPositionInformationMap'] || obj['gridColumn']) {
+            var positionInformation = this.columnPositionInformationMap
+                && this.gridColumn
+                && this.columnPositionInformationMap[this.gridColumn.index];
+
+            if (positionInformation) {
+                this.left = positionInformation.left + positionInformation.width;
             }
-        });
-        this.height = this.rowHeightManager.get();
+        }
     }
 
     ngOnDestroy() {
-        this.eventEmitterSubscription.unsubscribe();
     }
 
     updateHandlerPosition() {
-        var columnPositionInformationMap = this.columnPositionInformationMapManager.get();
-        var columnPositionInformation = columnPositionInformationMap[this.gridColumn.index];
-        if (!columnPositionInformation) {
-            return;
-        }
-        this.left = columnPositionInformation.left + columnPositionInformation.width - Math.round(this.el.nativeElement.clientWidth / 2);
     }
 
     @HostListener('dblclick', ['$event'])
     private onDoubleClick(evt: MouseEvent) {
-        this.columnSizeUpdater.updateColumnSize(this.gridColumn.name, 50);
+        this.eventEmitter.emit(new UpdateColumnSizeAction(this.gridColumn.name, 50));
         this.app.tick();
 
-        var newColumnSize = this.columnTargetWidthGetter.getTargetWidth(this.gridColumn.name);
-        this.columnSizeUpdater.updateColumnSize(this.gridColumn.name, newColumnSize);
+        var newColumnSize = this.columnTargetWidthGetter.getTargetWidth(this.gridColumn.index);
+        this.eventEmitter.emit(new UpdateColumnSizeAction(this.gridColumn.name, newColumnSize));
     }
 
     @HostListener('mousedown', ['$event'])
@@ -147,7 +132,7 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
         this.currentPosition = this.mousePositionGetter.getPosition(evt).x;
 
         var newColumnSize = this.gridColumn.width + (this.currentPosition - this.startPosition);
-        this.columnSizeUpdater.updateColumnSize(this.gridColumn.name, newColumnSize);
+        this.eventEmitter.emit(new UpdateColumnSizeAction(this.gridColumn.name, newColumnSize));
 
         this.startPosition = 0;
         this.currentPosition = 0;

@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { GridSectionListManager } from '../Services/Managers/GridSectionListManager';
-import { RowHeightManager } from '../Services/Managers/Managers';
 import { RowViewportVisibleRowCountGetter } from '../Services/RowViewportVisibleRowCountGetter';
 import { GridSection } from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class RowToRenderIndexListGetter {
@@ -10,16 +9,18 @@ export class RowToRenderIndexListGetter {
     private previousLastVisibleRowIndex;
     private rowToRenderIndexList: number[] = [];
 
-    constructor(private gridSectionListManager: GridSectionListManager,
-        private rowHeightManager: RowHeightManager,
-        private rowViewportVisibleRowCountGetter: RowViewportVisibleRowCountGetter) {
+    constructor(private rowViewportVisibleRowCountGetter: RowViewportVisibleRowCountGetter) {
     }
 
-    getListForGridSection(gridSection: GridSection, scrollTop: number): number[] {
-        var rowHeight = this.rowHeightManager.get();
-        var visibleRowCount = this.rowViewportVisibleRowCountGetter.get();
+    getListForGridSection(spreadsheetState: SpreadsheetState, gridSection: GridSection): number[] {
+        var rowHeight = spreadsheetState.rowHeight;
+        var scrollTop = spreadsheetState.scrollTop;
+        var visibleRowCount = this.rowViewportVisibleRowCountGetter.get(spreadsheetState);
         if (scrollTop < 0) {
             return this.rowToRenderIndexList;
+        }
+        if (rowHeight === 0) {
+            return [];
         }
 
         var firstVisibleRowIndex = Math.floor(scrollTop / rowHeight) || 0;
@@ -44,12 +45,12 @@ export class RowToRenderIndexListGetter {
         return this.rowToRenderIndexList;
     }
 
-    getList(scrollTop: number): number[] {
-        var gridSection = this.gridSectionListManager.get()[0];
+    getList(spreadsheetState: SpreadsheetState): number[] {
+        var gridSection = spreadsheetState.gridSectionList[0];
         if (!gridSection) {
             return [];
         }
-        return this.getListForGridSection(gridSection, scrollTop);
+        return this.getListForGridSection(spreadsheetState, gridSection);
     }
 
     private getVisibleRowIndexList(visibleRowCount: number, firstVisibleRowIndex: number, lastVisibleRowIndex: number): number[] {

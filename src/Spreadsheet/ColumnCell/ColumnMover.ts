@@ -1,40 +1,38 @@
 import { Injectable, Inject, EventEmitter } from '@angular/core';
 import {
-    ColumnListManager,
-} from '../../Services/Services';
-import {
-    ColumnMovedEvent,
-    EVENT_EMITTER_TOKEN,
+    MoveColumnAction,
+    DISPATCHER_TOKEN,
 } from '../../Events/Events';
 import {
     Column,
 } from '../../Model/Model';
 import { ColumnGetter } from './ColumnGetter';
+import { SpreadsheetState } from '../../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class ColumnMover {
 
-    constructor(private columnListManager: ColumnListManager,
-        private columnGetter: ColumnGetter,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<ColumnMovedEvent>) { }
+    constructor(private columnGetter: ColumnGetter) { }
 
-    moveColumn(oldColumnIndex: number, newColumnIndex: number) {
+    moveColumn(spreadsheetState: SpreadsheetState, action: MoveColumnAction): Column[] {
+        var oldColumnIndex = action.payload.oldColumnIndex;
+        var newColumnIndex = action.payload.newColumnIndex;
         if (oldColumnIndex === newColumnIndex) {
-            return;
+            return spreadsheetState.columnList;
         }
 
-        var columnList = this.columnListManager.get().slice(0).map(i => <Column>Object.assign({}, i));
-        var columnToTarget = this.columnGetter.getByGridColumnIndex(newColumnIndex);
-        var columnToMove = this.columnGetter.getByGridColumnIndex(oldColumnIndex);
+        var columnList = spreadsheetState.columnList.slice(0).map(i => <Column>Object.assign({}, i));
+        var columnToTarget = this.columnGetter.getByGridColumnIndex(columnList, newColumnIndex);
+        var columnToMove = this.columnGetter.getByGridColumnIndex(columnList, oldColumnIndex);
 
         if (!columnToMove) {
-            return;
+            return spreadsheetState.columnList;
         }
         if (columnToTarget.endIndex !== columnToTarget.startIndex) {
-            return;
+            return spreadsheetState.columnList;
         }
         if (columnToMove === columnToTarget) {
-            return;
+            return spreadsheetState.columnList;
         }
 
         if (newColumnIndex > oldColumnIndex) {
@@ -55,8 +53,26 @@ export class ColumnMover {
         columnList.splice(oldColumnIndex, 1);
         columnList.splice(newColumnIndex, 0, columnToMove);
 
-        this.columnListManager.set(columnList);
+        return columnList;
+    }
 
-        this.eventEmitter.emit(new ColumnMovedEvent(newColumnIndex, oldColumnIndex));
+    moveFilterExpressionMap(filterExpressionMap: { [gridColumnIndex: number]: string }, oldColumnIndex: number, newColumnIndex: number) {
+        var originalFilterExpressionMap = Object.assign({}, filterExpressionMap);
+        var result = Object.assign({}, filterExpressionMap);
+        result[newColumnIndex] = originalFilterExpressionMap[oldColumnIndex];
+        if (oldColumnIndex > newColumnIndex) {
+            let index = newColumnIndex;
+            while (index < oldColumnIndex) {
+                result[index + 1] = originalFilterExpressionMap[index];
+                index++;
+            }
+        } else {
+            let index = oldColumnIndex;
+            while (index < newColumnIndex) {
+                result[index] = originalFilterExpressionMap[index + 1];
+                index++;
+            }
+        }
+        return result;
     }
 }

@@ -1,13 +1,23 @@
-import { Component, OnChanges, OnInit, OnDestroy, ElementRef, HostListener, Renderer, Input, ViewChild, SimpleChange } from '@angular/core';
 import {
-    BodyWidthManager,
-    BodyScrollManager,
-    BodyHeightManager,
-    RowHeightManager,
-    CellNavigator,
-} from '../Services/Services';
-import { GridSection } from '../Model/GridSection';
-import { GridRow } from '../Model/GridRow';
+    Component,
+    OnChanges,
+    OnInit,
+    OnDestroy,
+    HostBinding,
+    ElementRef,
+    HostListener,
+    Renderer,
+    Input,
+    ViewChild,
+    SimpleChange,
+} from '@angular/core';
+import {
+    GridSection,
+    GridRow,
+    ColumnPositionInformationMap,
+    GridSectionPositionInformationMap,
+    CellLocation,
+} from '../Model/Model';
 import { BodySectionComponent } from './BodySectionComponent';
 import { NumberRowListComponent } from './NumberRowListComponent';
 import { RowListComponent } from './RowListComponent';
@@ -15,8 +25,6 @@ import { RowListComponent } from './RowListComponent';
 const css = `
 :host {
     position: relative;
-    height: 400px;
-    max-height: 400px;
     overflow-y: hidden;
     display: block;
 }`;
@@ -26,10 +34,20 @@ const html = `
     <GgNumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></GgNumberRowList>
     <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
 </GgBodySection>
-<GgBodySection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity" [gridSectionName]="gridSection.name"
-    tabindex="0" [scrollTop]="scrollTop">
-    <GgRowList [rowList]="gridSection.visibleDataRowList" [gridSectionName]="gridSection.name"></GgRowList>
-    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
+<GgBodySection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity"
+    [gridSectionName]="gridSection.name"
+    [gridSectionPositionInformationMap]="gridSectionPositionInformationMap"
+    [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
+    [scrollTop]="scrollTop"
+    [activeCellLocation]="activeCellLocation"
+    tabindex="0">
+    <GgRowList [rowList]="gridSection.visibleDataRowList" 
+        [gridSectionName]="gridSection.name" 
+        [columnPositionInformationMap]="columnPositionInformationMap"
+        [gridSectionScrollWidthMap]="gridSectionScrollWidthMap"
+        [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
+        [activeCellLocation]="activeCellLocation"></GgRowList>
+    <div [style.height.px]="gridSection?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
 </GgBodySection>
 <GgBodySection gridSectionName="Scroll" [scrollTop]="scrollTop">
     <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight"></div>
@@ -45,20 +63,22 @@ export class BodyComponent implements OnInit, OnDestroy {
     @Input('scrollTop') scrollTop: number;
     @Input('gridSectionList') gridSectionList: GridSection[] = [];
     @Input('numberDataRowList') numberDataRowList: GridRow[] = [];
-    rowHeight: number;
+    @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
+    @Input('gridSectionScrollWidthMap') gridSectionScrollWidthMap: { [gridSectionName: string]: number };
+    @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
+    @Input('gridSectionPositionInformationMap') gridSectionPositionInformationMap: GridSectionPositionInformationMap;
+    @Input('rowHeight') rowHeight: number;
+    @Input('activeCellLocation') activeCellLocation: CellLocation;
+
+    @HostBinding('style.height')
+    @HostBinding('style.maxHeight')
+    @Input('height')
+    height: number = 400;
+
     private isInitialized: boolean;
-    private unregisterResizeListener: Function;
 
     constructor(private el: ElementRef,
-        private bodyWidthManager: BodyWidthManager,
-        private bodyScrollManager: BodyScrollManager,
-        private bodyHeightManager: BodyHeightManager,
-        private rowHeightManager: RowHeightManager,
         private renderer: Renderer) {
-        this.rowHeight = this.rowHeightManager.get();
-        this.rowHeightManager.subscribe((rowHeight) => {
-            this.rowHeight = rowHeight;
-        });
     }
 
     ngOnInit() {
@@ -66,16 +86,15 @@ export class BodyComponent implements OnInit, OnDestroy {
             return;
         }
         this.isInitialized = true;
+    }
 
-        this.updateSizeData();
+    ngOnChanges(obj) {
+        if (obj.columnPositionInformationMap) {
 
-        this.unregisterResizeListener = this.renderer.listenGlobal('window', 'resize', () => {
-            this.updateSizeData();
-        });
+        }
     }
 
     ngOnDestroy() {
-        this.unregisterResizeListener();
     }
 
     gridSectionIdentity(index: number, gridSection: GridSection): any {
@@ -83,10 +102,5 @@ export class BodyComponent implements OnInit, OnDestroy {
             return gridSection.name;
         }
         return 'gridSection_' + index;
-    }
-
-    private updateSizeData() {
-        this.bodyWidthManager.set(this.el.nativeElement.clientWidth);
-        this.bodyHeightManager.set(this.el.nativeElement.clientHeight);
     }
 }

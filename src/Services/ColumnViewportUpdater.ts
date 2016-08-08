@@ -1,47 +1,50 @@
 import { Injectable } from '@angular/core';
-import {
-    ColumnListManager,
-    GridSectionListManager,
-    BodySectionScrollManager,
-    SectionPositionInformationMapManager,
-} from '../Services/Managers/Managers';
 import { ColumnToRenderIndexListGetter } from '../Services/ColumnToRenderIndexListGetter';
-import { GridRow, SectionPositionInformationMap } from '../Model/Model';
+import {
+    GridRow,
+    GridSectionPositionInformationMap,
+    GridSection,
+} from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
+import { GridSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
 
 @Injectable()
 export class ColumnViewportUpdater {
-    constructor(private gridSectionListManager: GridSectionListManager,
-        private bodySectionScrollManager: BodySectionScrollManager,
-        private sectionPositionInformationMapManager: SectionPositionInformationMapManager,
-        private columnToRenderIndexListGetter: ColumnToRenderIndexListGetter) {
+    constructor(private columnToRenderIndexListGetter: ColumnToRenderIndexListGetter,
+        private gridSectionDataRowMapGetter: GridSectionDataRowMapGetter) {
     }
 
-    init() {
-        this.sectionPositionInformationMapManager.subscribe((spim: SectionPositionInformationMap) => {
-            Object.keys(gridSectionName => {
-                var scrollLeft = this.bodySectionScrollManager.get(gridSectionName);
-                this.update({ gridSectionName: gridSectionName, scrollLeft: scrollLeft });
-            });
-        });
-    }
-
-    update(response: { gridSectionName: string, scrollLeft: number }) {
-        if (response.gridSectionName === 'RowNumber' || response.gridSectionName === 'Scroll') {
+    update(spreadsheetState: SpreadsheetState, gridSectionName: string): GridSection[] {
+        if (gridSectionName === 'RowNumber' || gridSectionName === 'Scroll') {
             return;
         }
-        var gridSection = this.gridSectionListManager.get().find(ts => ts.name === response.gridSectionName);
+        var gridSectionList = spreadsheetState.gridSectionList.slice(0);
+        var gridSection = gridSectionList.find(ts => ts.name === gridSectionName);
         if (!gridSection) {
             return;
         }
-        var validIndexList: number[] = this.columnToRenderIndexListGetter.update(response.gridSectionName, response.scrollLeft);
+        var gridSectionIndex = gridSectionList.indexOf(gridSection);
+        gridSection = <GridSection>Object.assign({}, gridSection);
 
-        gridSection.titleRowList.forEach(row => {
-            row.visibleCellList = this.getVisibleCellList(validIndexList, row);
+        var validIndexList: number[] =
+            this.columnToRenderIndexListGetter.update(spreadsheetState, gridSectionName);
+
+        gridSection.titleRowList = gridSection.titleRowList.map(row => {
+            var result = Object.assign({}, row);
+            result.visibleCellList = this.getVisibleCellList(validIndexList, result);
+            return result;
         });
 
-        gridSection.dataRowList.forEach(row => {
-            row.visibleCellList = this.getVisibleCellList(validIndexList, row);
+        gridSection.dataRowList = gridSection.dataRowList.map(row => {
+            var result = Object.assign({}, row);
+            result.visibleCellList = this.getVisibleCellList(validIndexList, result);
+            return result;
         });
+
+        gridSectionList.splice(gridSectionIndex, 1);
+        gridSectionList.splice(gridSectionIndex, 0, this.gridSectionDataRowMapGetter.get(gridSection));
+
+        return gridSectionList;
     }
 
     private getVisibleCellList(validIndexList: number[], row: GridRow) {

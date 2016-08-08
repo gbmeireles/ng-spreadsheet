@@ -1,43 +1,31 @@
 import { Injectable } from '@angular/core';
-import {
-    BodySectionWidthManager,
-    ColumnListManager,
-    GridSectionListManager,
-    BodySectionScrollManager,
-    BodyWidthManager,
-    SectionPositionInformationMapManager,
-} from '../Services/Managers/Managers';
-import { GridColumnListGetter } from '../Services/GridColumnListGetter';
 import { GridRow } from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class ColumnToRenderIndexListGetter {
     private firstVisibleCellIndex: number = 0;
     private lastVisibleCellIndex: number = 0;
-    constructor(private bodySectionWidthManager: BodySectionWidthManager,
-        private columnListManager: ColumnListManager,
-        private gridColumnListGetter: GridColumnListGetter,
-        private gridSectionListManager: GridSectionListManager,
-        private bodySectionScrollManager: BodySectionScrollManager,
-        private bodyWidthManager: BodyWidthManager,
-        private sectionPositionInformationMapManager: SectionPositionInformationMapManager) {
+    constructor() {
     }
 
-    update(gridSectionName: string, scrollLeft: number) {
+    update(spreadsheetState: SpreadsheetState, gridSectionName: string): number[] {
         if (gridSectionName === 'RowNumber' || gridSectionName === 'Scroll') {
             return this.getValidIndexList();
         }
-        var gridSectionWidth = this.sectionPositionInformationMapManager.get()[gridSectionName].width;
+        var gridSectionWidth = spreadsheetState.gridSectionPositionInformationMap
+            && spreadsheetState.gridSectionPositionInformationMap[gridSectionName]
+            && spreadsheetState.gridSectionPositionInformationMap[gridSectionName].width;
         if (!gridSectionWidth) {
-            throw 'Grid section width not available';
+            console.error('Grid section width not available');
+            return [];
         }
-        var gridSection = this.gridSectionListManager.get().find(ts => ts.name === gridSectionName);
+        var gridSection = spreadsheetState.gridSectionList.find(ts => ts.name === gridSectionName);
         if (!gridSection) {
             return this.getValidIndexList();
         }
 
-        var gridColumnList = this.gridColumnListGetter.get(this.columnListManager.get())
-            .filter(gc => gc.gridSectionName === gridSectionName);
+        var gridColumnList = spreadsheetState.gridColumnList.filter(gc => gc.gridSectionName === gridSectionName);
         if (gridColumnList.length === 0) {
             return this.getValidIndexList();
         }
@@ -47,6 +35,7 @@ export class ColumnToRenderIndexListGetter {
 
         var firstVisibleCellIndex = firstGridColumn.index;
         var totalLeft = 0;
+        var scrollLeft = spreadsheetState.gridSectionScrollLeftMap && spreadsheetState.gridSectionScrollLeftMap[gridSectionName];
         gridColumnList.forEach(gc => {
             totalLeft += gc.width;
             if (totalLeft >= scrollLeft) {

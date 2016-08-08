@@ -1,5 +1,5 @@
-import { Event } from './Event';
-export class SectionHorizontallyScrolledEvent implements Event {
+import { Action } from './Action';
+export class ScrollGridSectionAction implements Action {
     static type = 'SectionHorizontallyScrolled';
     type: string;
     payload: {
@@ -8,7 +8,7 @@ export class SectionHorizontallyScrolledEvent implements Event {
     };
 
     constructor(sectionName: string, scrollLeft: number) {
-        this.type = SectionHorizontallyScrolledEvent.type;
+        this.type = ScrollGridSectionAction.type;
         this.payload = {
             sectionName: sectionName,
             scrollLeft: scrollLeft,

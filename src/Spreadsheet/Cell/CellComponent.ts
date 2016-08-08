@@ -1,6 +1,7 @@
 import {
     Component,
     ComponentRef,
+    forwardRef,
     DynamicComponentLoader,
     Input,
     ElementRef,
@@ -16,28 +17,26 @@ import {
     ViewContainerRef,
     Inject,
     EventEmitter,
+    OnInit,
+    OnDestroy,
 } from '@angular/core';
-import { OnInit, OnDestroy } from '@angular/core';
 import {
     Cell,
     GridCell,
+    ColumnPositionInformationMap,
     ContentTypeEnum,
+    CellLocation,
 } from '../../Model/Model';
 import {
-    EVENT_EMITTER_TOKEN,
-    Event,
-    ColumnResizedEvent,
-    ColumnMovedEvent,
+    DISPATCHER_TOKEN,
+    Action,
+    UpdateColumnSizeAction,
+    MoveColumnAction,
+    GoToCellLocationAction,
 } from '../../Events/Events';
 import {
-    GridDataManager,
-    ColumnPositionInformationMapManager,
-    ActiveCellManager,
-    ColumnDefinitionListManager,
     CellPositionUpdater,
-    CellListMapManager,
-    CellNavigator,
-    GridComponentManager,
+    CellManager,
 } from '../../Services/Services';
 import {
     EditableComponent,
@@ -46,6 +45,7 @@ import {
 import { Subscription } from 'rxjs/Subscription';
 
 import { IsCellActiveChecker } from './IsCellActiveChecker';
+import { SpreadsheetState } from '../SpreadsheetState';
 
 const css = `
 :host {
@@ -77,6 +77,9 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('cell') gridCell: GridCell;
     @Input('rowData') rowData: any;
     @Input('index') index: number;
+    @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
+    @Input('gridSectionScrollLeft') gridSectionScrollLeft: number;
+    @Input('activeCellLocation') activeCellLocation: CellLocation;
     @HostBinding('style.width') width: number;
     @HostBinding('style.margin-left.px') marginLeft: number;
     @HostBinding('class.is-active') isActive: boolean = false;
@@ -90,34 +93,26 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     private viewComponent: ComponentRef<ViewableComponent>;
     private editComponent: ComponentRef<EditableComponent>;
 
-    private unregisterActiveCellSubscription: () => void;
-    private unregisterEditableComponentActiveCellSubscription: () => void;
-    private eventEmitterSubscription: Subscription;
-
     constructor(private dcl: DynamicComponentLoader,
         private el: ElementRef,
         private app: ApplicationRef,
-        private gridDataManager: GridDataManager,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
         private cellPositionUpdater: CellPositionUpdater,
-        private cellListMapManager: CellListMapManager,
-        private cellNavigationManager: CellNavigator,
-        private activeCellManager: ActiveCellManager,
         private cdr: ChangeDetectorRef,
         private viewContainerRef: ViewContainerRef,
-        private gridComponentManager: GridComponentManager,
         private isCellActiveChecker: IsCellActiveChecker,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
+        private cellManager: CellManager,
+        private spreadsheetState: SpreadsheetState,
+        @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) {
     }
 
     @HostListener('click', ['$event'])
     onClick(evt) {
-        this.cellNavigationManager.goTo(this.gridCell.rowIndex, this.gridCell.columnIndex);
+        this.eventEmitter.emit(new GoToCellLocationAction(this.gridCell.rowIndex, this.gridCell.columnIndex, true));
     }
 
     @HostListener('dblclick', ['$event'])
     onDoubleClick(evt) {
-        this.cellNavigationManager.goTo(this.gridCell.rowIndex, this.gridCell.columnIndex);
+        this.eventEmitter.emit(new GoToCellLocationAction(this.gridCell.rowIndex, this.gridCell.columnIndex, true));
         this.goToEditMode();
     }
 
@@ -125,31 +120,37 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         if (changes['gridCell']) {
             this.initCell(this.gridCell);
         }
+        if (changes['rowData'] || changes['gridSectionScrollLeft'] || changes['columnPositionInformationMap']) {
+            if (this.columnPositionInformationMap) {
+                this.width = 0;
+                var index = 0;
+                while (index < this.gridCell.colspan) {
+                    let columnPositionInformation = this.columnPositionInformationMap[this.gridColumnIndex + index];
+                    this.width += columnPositionInformation ? columnPositionInformation.width : 0;
+                    index++;
+                }
+
+                if (this.index === 0) {
+                    let columnPositionInformation = this.columnPositionInformationMap[this.gridColumnIndex];
+                    this.marginLeft = columnPositionInformation ? columnPositionInformation.left : 0;
+                }
+            }
+        }
+        if (changes['activeCellLocation']) {
+            this.isActive = this.isCellActiveChecker.check(this.gridCell, this.activeCellLocation);
+            if (this.editComponent && !this.isActive) {
+                this.editComponent.instance.onEditDone(this.rowData);
+                this.goToViewMode();
+            }
+        }
     }
 
     ngOnInit() {
-        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
-            switch (evt.type) {
-                case ColumnResizedEvent.type:
-                case ColumnMovedEvent.type:
-                    this.cellPositionUpdater.update(this, this.columnPositionInformationMapManager.get());
-                    break;
-                default:
-                    break;
-            }
-        });
-        this.unregisterActiveCellSubscription = this.activeCellManager.subscribe((activeCell) => {
-            this.isActive = this.isCellActiveChecker.check(this.gridCell);
-        });
     }
 
     ngAfterViewInit() {
+        this.cellManager.addCell(this);
         this.initCell(this.gridCell);
-        this.cellListMapManager.addCell(this);
-
-        if (this.gridCell.cellType === ContentTypeEnum.Title) {
-            return;
-        }
     }
 
     goToEditMode() {
@@ -158,31 +159,12 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             this.cdr.markForCheck();
             this.isEditing = true;
             this.clear();
-            var gridData = this.gridDataManager.get();
-            var gridComponent = this.gridComponentManager.get();
-            this.dcl.loadNextToLocation(this.gridCell.editableComponentType, this.cellViewContainer,
-                ReflectiveInjector.resolve(gridData.providerList || [])).then((componentRef: ComponentRef<EditableComponent>) => {
+            this.dcl.loadNextToLocation(this.gridCell.editableComponentType, this.cellViewContainer)
+                .then((componentRef: ComponentRef<EditableComponent>) => {
                     this.editComponent = componentRef;
-                    componentRef.instance.onEditStarted(gridComponent, this.gridCell, this.rowData);
-                    this.unregisterEditableComponentActiveCellSubscription = this.activeCellManager.subscribe(() => {
-                        this.unregisterEditableComponentActiveCellSubscription();
-                        componentRef.instance.onEditDone(gridComponent, this.gridCell, this.rowData);
-                        this.goToViewMode();
-                    });
+                    componentRef.instance.onEditStarted(this.rowData);
                     componentRef.onDestroy(() => {
-                        gridComponent.onGridEvent.emit({
-                            eventType: 'EditDone',
-                            eventData: {
-                                gridComponent: gridComponent,
-                                gridData: gridData,
-                                rowData: this.rowData,
-                                gridCell: this.gridCell,
-                            },
-                        });
                         this.isEditing = false;
-                        if (this.unregisterEditableComponentActiveCellSubscription) {
-                            this.unregisterEditableComponentActiveCellSubscription();
-                        }
                     });
                 });
         } else {
@@ -193,8 +175,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     cancelEdit() {
         if (this.editComponent) {
             var editableComponent = <EditableComponent>this.editComponent.instance;
-            var gridComponent = this.gridComponentManager.get();
-            editableComponent.onCancelEdit(gridComponent, this.gridCell, this.rowData);
+            editableComponent.onCancelEdit(this.rowData);
             this.goToViewMode();
         }
     }
@@ -207,15 +188,13 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             }
             this.isCustom = true;
             this.cdr.markForCheck();
-            var gridData = this.gridDataManager.get();
-            var gridComponent = this.gridComponentManager.get();
-            this.dcl.loadNextToLocation(this.gridCell.viewableComponentType, this.cellViewContainer,
-                ReflectiveInjector.resolve(gridData.providerList)).then((componentRef: ComponentRef<ViewableComponent>) => {
+            this.dcl.loadNextToLocation(this.gridCell.viewableComponentType, this.cellViewContainer)
+                .then((componentRef: ComponentRef<ViewableComponent>) => {
                     if (this.viewComponent) {
                         this.viewComponent.destroy();
                     }
                     this.viewComponent = componentRef;
-                    componentRef.instance.onRowInit(gridComponent, this.gridCell, this.rowData);
+                    componentRef.instance.onRowInit(this.rowData);
                 });
         } else if (this.gridCell.formatData !== undefined) {
             this.isCustom = false;
@@ -231,32 +210,27 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     }
 
     ngOnDestroy() {
-        this.cellListMapManager.removeCell(this);
-        this.eventEmitterSubscription.unsubscribe();
-        this.unregisterActiveCellSubscription();
+        this.cellManager.removeCell(this);
     }
 
     private initCell(gridCell: GridCell) {
         this.gridColumnIndex = gridCell.columnIndex;
         this.style = gridCell.cellStyle;
-        var columnPositionInformationMap = this.columnPositionInformationMapManager.get();
-        this.cellPositionUpdater.update(this, columnPositionInformationMap);
+
         if (gridCell.isEditing) {
             this.goToEditMode();
         } else {
             this.goToViewMode();
         }
-        if (this.index === 0 && columnPositionInformationMap && columnPositionInformationMap[this.gridColumnIndex]) {
-            this.marginLeft = columnPositionInformationMap[this.gridColumnIndex].left;
+
+        this.isActive = this.isCellActiveChecker.check(gridCell, this.activeCellLocation);
+        if (this.isActive && this.style) {
+            this.style += ' is-active';
         }
-        this.isActive = this.isCellActiveChecker.check(gridCell);
     }
 
     private clear() {
         this.data = null;
-        if (this.unregisterEditableComponentActiveCellSubscription) {
-            this.unregisterEditableComponentActiveCellSubscription();
-        }
         if (this.viewComponent) {
             this.viewComponent.destroy();
         }

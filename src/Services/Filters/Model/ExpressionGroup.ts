@@ -1,7 +1,8 @@
 import { NumberExpression } from './NumberExpression';
+import { TextExpression } from './TextExpression';
 
 export class ExpressionGroup {
-    expressionList: Array<NumberExpression | ExpressionGroup>;
+    expressionList: Array<TextExpression | NumberExpression | ExpressionGroup>;
 
     constructor() {
         this.expressionList = [];

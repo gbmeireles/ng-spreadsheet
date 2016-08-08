@@ -15,9 +15,6 @@ import { TemplateRef, ViewContainerRef } from '@angular/core';
 import { ElementRef, Host, Inject, forwardRef } from '@angular/core';
 import { GridRow } from '../Model/GridRow';
 import { ContentTypeEnum } from '../Model/ContentTypeEnum';
-import {
-    BodySectionScrollWidthManager,
-} from '../Services/Services';
 
 const css = `:host {
     display: block;
@@ -35,17 +32,14 @@ export class RowComponent implements OnInit, OnDestroy {
     @Input('row') row: GridRow;
     @Input('gridSectionName') gridSectionName: string;
 
+    @Input('scrollWidth')
+    @HostBinding('style.minWidth')
+    scrollWidth: number;
+
     private isInitialized: boolean;
-    private unregisterScrollWidthSubscription: () => void;
 
     constructor(private el: ElementRef,
-        private bodySectionScrollWidthManager: BodySectionScrollWidthManager,
         private renderer: Renderer) {
-        this.unregisterScrollWidthSubscription = this.bodySectionScrollWidthManager.subscribe((response) => {
-            if (response.gridSectionName === this.gridSectionName) {
-                this.renderer.setElementStyle(this.el.nativeElement, 'minWidth', `${response.width}px`);
-            }
-        });
     }
 
     ngOnChanges(changes: { [key: string]: SimpleChange }) {
@@ -63,13 +57,10 @@ export class RowComponent implements OnInit, OnDestroy {
             return;
         }
         var height = this.row.height;
-        var width = this.bodySectionScrollWidthManager.get(this.gridSectionName);
-        this.renderer.setElementStyle(this.el.nativeElement, 'minWidth', `${width}px`);
         this.renderer.setElementStyle(this.el.nativeElement, 'height', `${height}px`);
     }
 
     ngOnDestroy() {
-        this.unregisterScrollWidthSubscription();
     }
 
     private updateRow(row: GridRow) {

@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { GridRowspanSetter } from '../Services/GridRowspanSetter';
 import {
-    GridData,
     GridRow,
     ColumnDefinition,
     ContentTypeEnum,
     Column,
+    GridSection,
 } from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class TitleGridRowListGetter {
@@ -14,22 +15,22 @@ export class TitleGridRowListGetter {
 
     }
 
-    get(gridData: GridData, columnDefinitionList: ColumnDefinition[], gridColumnList: Column[]): GridRow[] {
+    get(spreadsheetState: SpreadsheetState, gridSection: GridSection): GridRow[] {
         var result: GridRow[] = [];
         var columnListMap: { [tableSection: string]: ColumnDefinition[] } = {};
-        gridColumnList.forEach(column => {
+        gridSection.columnList.forEach(column => {
             if (!columnListMap[column.gridSectionName]) {
                 columnListMap[column.gridSectionName] = [];
             }
-            var columnDefinition = columnDefinitionList.find(cd => cd.name === column.name);
+            var columnDefinition = spreadsheetState.columnDefinitionList.find(cd => cd.name === column.name);
             columnListMap[column.gridSectionName].push(columnDefinition);
         });
 
-        gridColumnList.forEach(gridColumn => {
-            var indexOfColumn = gridColumnList.indexOf(gridColumn);
-            var column = columnListMap[gridColumn.gridSectionName][indexOfColumn];
+        gridSection.columnList.forEach(column => {
+            var indexOfColumn = gridSection.columnList.indexOf(column);
+            var columnDefinition = columnListMap[column.gridSectionName][indexOfColumn];
 
-            var titleCellMatrix = column.getTitleCellMatrix(gridData, gridColumn);
+            var titleCellMatrix = columnDefinition.getTitleCellMatrix(column);
             for (var i = 0; i < titleCellMatrix.length; i++) {
                 var row: GridRow = null;
                 if (result.length >= i + 1) {
@@ -38,7 +39,7 @@ export class TitleGridRowListGetter {
                 if (row == null) {
                     row = {
                         cellList: [],
-                        height: gridData.rowHeight,
+                        height: spreadsheetState.rowHeight,
                         rowData: null,
                         rowIndex: i,
                         rowStyle: '',
@@ -67,8 +68,8 @@ export class TitleGridRowListGetter {
                 cell.cellType = row.rowType;
                 row.cellMap[cell.columnIndex] = cell;
             });
-            if (gridData.getRowStyle) {
-                row.rowStyle = gridData.getRowStyle(row.rowData, row.rowType, row.sectionRowIndex);
+            if (spreadsheetState.getRowStyle) {
+                row.rowStyle = spreadsheetState.getRowStyle(row.rowData, row.rowType, row.sectionRowIndex);
             }
         }
 

@@ -1,4 +1,4 @@
-export interface Event {
+export interface Action {
     type: string;
     payload?: any;
 }

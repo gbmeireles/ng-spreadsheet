@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
-import { GridSectionListManager } from '../Services/Managers/GridSectionListManager';
 import { RowToRenderIndexListGetter } from '../Services/RowToRenderIndexListGetter';
 import { GridSection } from '../Model/Model';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class RowViewportUpdater {
-    constructor(private gridSectionListManager: GridSectionListManager,
-        private rowToRenderIndexListGetter: RowToRenderIndexListGetter) {
+    constructor(private rowToRenderIndexListGetter: RowToRenderIndexListGetter) {
     }
 
-    update(scrollTop: number) {
-        var visibleRowIndexList = this.rowToRenderIndexListGetter.getList(scrollTop);
+    update(spreadsheetState: SpreadsheetState): GridSection[] {
+        var visibleRowIndexList = this.rowToRenderIndexListGetter.getList(spreadsheetState);
 
-        this.gridSectionListManager.get().forEach(gridSection => {
+        return spreadsheetState.gridSectionList.map(gridSection => {
+            gridSection = <GridSection>Object.assign({}, gridSection);
             var rowToAddList = visibleRowIndexList.map(sectionRowIndex => gridSection.dataRowMap[sectionRowIndex]).filter(c => c != null);
 
             gridSection.visibleDataRowList = new Array(Math.min(visibleRowIndexList.length, rowToAddList.length));
@@ -21,6 +21,8 @@ export class RowViewportUpdater {
                 gridSection.visibleDataRowList[counter] = rowToAdd;
                 counter++;
             });
+
+            return gridSection;
         });
     }
 }

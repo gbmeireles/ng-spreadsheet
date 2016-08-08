@@ -1,6 +1,8 @@
 import { EventEmitter, OpaqueToken, provide, Provider } from '@angular/core';
-import { Event } from './Model/Model';
+import { Action } from './Model/Model';
 
 export * from './Model/Model';
-export const EVENT_EMITTER_TOKEN = new OpaqueToken('Event Emitter');
-export const EVENT_PROVIDERS = [provide(EVENT_EMITTER_TOKEN, { useFactory: () => { return new EventEmitter<Event>(false); } })];
+export const DISPATCHER_TOKEN = new OpaqueToken('Dispatcher');
+export const DISPATCHER_PROVIDERS = [
+    provide(DISPATCHER_TOKEN, { useFactory: () => { return new EventEmitter<Action>(false); } }),
+];

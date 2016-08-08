@@ -5,10 +5,10 @@ export * from './ContentTypeEnum';
 export * from './ColumnDefinition';
 export * from './GridRowListMap';
 export * from './GridSection';
-export * from './GridData';
 export * from './Column';
 export * from './SectionPositionInformationMap';
 export * from './CellIndexData';
 export * from './ColumnPositionInformationMap';
 export * from './GridColumn';
-export * from './ColumnDataTypeEnum'
+export * from './ColumnDataTypeEnum';
+export * from './CellLocation';

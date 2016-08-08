@@ -1,6 +1,6 @@
-import { Event } from './Event';
-import { ColumnDefinition } from '../../Model/Model'
-export class UpdateColumnDefinitionListAction implements Event {
+import { Action } from './Action';
+import { ColumnDefinition } from '../../Model/Model';
+export class UpdateColumnDefinitionListAction implements Action {
     static type = 'UpdateColumnDefinitionList';
     type: string;
     payload: {

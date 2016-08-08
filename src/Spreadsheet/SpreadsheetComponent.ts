@@ -12,38 +12,21 @@ import {
     Inject,
     ApplicationRef,
     OnChanges,
+    Optional,
+    Host,
+    Renderer,
 } from '@angular/core';
 import { AfterContentInit, OnInit } from '@angular/core';
-import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import { HeaderComponent } from './HeaderComponent';
 import { BodyComponent } from './BodyComponent';
-import { RowComponent } from './RowComponent';
-import { CellComponent, CELL_PROVIDERS } from './Cell/Cell';
+import { CELL_PROVIDERS } from './Cell/Cell';
 import { COLUMN_CELL_PROVIDERS } from './ColumnCell/ColumnCell';
 import { DetailsBarComponent } from './DetailsBarComponent';
 import { StatusBarComponent } from './StatusBarComponent';
 import { COLUMN_RESIZE_PROVIDERS } from './ColumnResize/ColumnResize';
 import {
     GRID_SCOPE_SERVICES,
-    GridDataManager,
-    ColumnListGetter,
-    SectionPositionInformationMapUpdater,
-    GridSectionListGetter,
-    ColumnListManager,
-    ColumnViewportUpdater,
-    GridSectionListManager,
-    RowViewportUpdater,
-    RowHeightManager,
-    CellListMapManager,
-    SectionPositionInformationMapManager,
-    ColumnPositionInformationMapManager,
-    GridColumnListGetter,
-    BodySectionScrollWidthManager,
-    BodySectionScrollManager,
-    BodyScrollManager,
-    GridComponentManager,
-    ColumnPositionInformationMapCalculator,
-    NumberFilter,
+    SpreadsheetEventEmitter,
 } from '../Services/Services';
 import {
     ColumnPositionInformationMap,
@@ -51,30 +34,53 @@ import {
     ContentTypeEnum,
     GridSection,
     GridCell,
-    GridData,
     GridRow,
     ColumnDefinition,
 } from '../Model/Model';
 import {
-    EVENT_EMITTER_TOKEN,
-    EVENT_PROVIDERS,
-    Event,
-    ColumnMovedEvent,
-    ColumnResizedEvent,
-    SectionHorizontallyScrolledEvent,
-    SpreadsheetVerticallyScrolledEvent,
-    FilterColumnEvent,
+    DISPATCHER_TOKEN,
+    DISPATCHER_PROVIDERS,
+    Action,
+    MoveColumnAction,
+    UpdateColumnSizeAction,
+    ScrollGridSectionAction,
+    ScrollSpreadsheetAction,
+    FilterColumnAction,
     UpdateColumnDefinitionListAction,
+    UpdateDataRowListAction,
+    InitializeSpreadsheetSizeAction,
+    UpdateSpreadsheetRowHeightAction,
+    UpdateSpreadsheetSizeAction,
+    UpdateSpreadsheetGetRowStyleFnAction,
+    GoToCellLocationAction,
 } from '../Events/Events';
 import { GridEvent } from './Model/GridEvent';
 import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
+import { SpreadsheetStore } from './SpreadsheetStore';
 import { Subscription } from 'rxjs/Subscription';
 
 const html = `
-<GgDetailsBar></GgDetailsBar>
-<GgHeader [rowCount]="headerRowCount" [numberTitleRowList]="numberTitleRowList" 
-    [gridSectionList]="gridSectionList" [columnList]="columnList"></GgHeader>
-<GgBody [numberDataRowList]="numberDataRowList" [gridSectionList]="gridSectionList" [scrollTop]="scrollTop"></GgBody>
+<GgDetailsBar [activeCellLocation]="spreadsheetState?.activeCellLocation"></GgDetailsBar>
+<GgHeader [rowHeight]="spreadsheetState?.rowHeight" 
+    [numberTitleRowList]="spreadsheetState?.numberTitleRowList"
+    [gridSectionList]="spreadsheetState?.gridSectionList" 
+    [columnList]="spreadsheetState?.columnList"
+    [gridColumnList]="spreadsheetState?.gridColumnList"
+    [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
+    [gridSectionScrollWidthMap]="spreadsheetState?.gridSectionScrollWidthMap"
+    [gridSectionScrollLeftMap]="spreadsheetState?.gridSectionScrollLeftMap"
+    [gridSectionPositionInformationMap]="spreadsheetState?.gridSectionPositionInformationMap"
+    [gridSectionColumnToRendexIndexListMap]="spreadsheetState?.gridSectionColumnToRendexIndexListMap"></GgHeader>
+<GgBody [height]="spreadsheetState?.bodyHeight" 
+    [rowHeight]="spreadsheetState?.rowHeight" 
+    [numberDataRowList]="spreadsheetState?.numberDataRowList" 
+    [gridSectionList]="spreadsheetState?.gridSectionList" 
+    [scrollTop]="spreadsheetState?.scrollTop" 
+    [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
+    [gridSectionScrollWidthMap]="spreadsheetState?.gridSectionScrollWidthMap"
+    [gridSectionScrollLeftMap]="spreadsheetState?.gridSectionScrollLeftMap"
+    [gridSectionPositionInformationMap]="spreadsheetState?.gridSectionPositionInformationMap"
+    [activeCellLocation]="spreadsheetState?.activeCellLocation"></GgBody>
 <GgStatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></GgStatusBar>`;
 
 @Component({
@@ -90,180 +96,101 @@ const html = `
         COLUMN_RESIZE_PROVIDERS,
         COLUMN_CELL_PROVIDERS,
         CELL_PROVIDERS,
-        EVENT_PROVIDERS,
+        DISPATCHER_PROVIDERS,
         SPREADSHEET_STATE_PROVIDERS,
+        SpreadsheetStore,
     ],
     selector: 'NgSpreadsheet',
     template: html,
+    styles: [`
+    :host() {
+        display: block;
+    }
+    `],
 })
 export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('id') id: string;
     @Input('columnDefinitionList') columnDefinitionList: ColumnDefinition[];
-    @Output() onGridEvent: EventEmitter<GridEvent<any>> = new EventEmitter<GridEvent<any>>(false);
+    @Input('dataRowList') dataRowList: any[];
+    @Input('rowHeight') rowHeight: number;
+    @Input('height') height: number;
+    @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
+    @Output('event') onSpreadsheetEvent: EventEmitter<GridEvent<any>> = new EventEmitter<any>(false);
     @ViewChild(BodyComponent) body: BodyComponent;
-    columnList: Column[];
     statusMessage: string;
     statusMessageTimeout: number;
-    gridSectionList: GridSection[] = [];
-    numberDataRowList: GridRow[] = [];
-    numberTitleRowList: GridRow[] = [];
-    headerRowCount: number = 0;
-    rowHeight: number = 20;
-    scrollTop: number = 0;
-    unsubscribeGridSectionListChanges: () => void;
 
+    get firstDataRowRowNumber() {
+        return this.spreadsheetState.numberTitleRowList.length + 1;
+    }
+
+    private spreadsheetState: SpreadsheetState;
     private eventEmitterSubscription: Subscription;
+    private windowResizeUnregisterFn: Function;
 
     constructor(private el: ElementRef,
-        private columnListGetter: ColumnListGetter,
-        private sectionPositionInformationMapUpdater: SectionPositionInformationMapUpdater,
-        private gridDataManager: GridDataManager,
-        private gridSectionListGetter: GridSectionListGetter,
-        private columnListManager: ColumnListManager,
-        private columnViewportUpdater: ColumnViewportUpdater,
-        private rowViewportUpdater: RowViewportUpdater,
-        private gridSectionListManager: GridSectionListManager,
-        private rowHeightManager: RowHeightManager,
-        private cellListMapManager: CellListMapManager,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
-        private gridColumnListGetter: GridColumnListGetter,
-        private bodySectionScrollWidthManager: BodySectionScrollWidthManager,
         private cdr: ChangeDetectorRef,
-        private bodyScrollManager: BodyScrollManager,
-        private bodySectionScrollManager: BodySectionScrollManager,
-        private gridComponentManager: GridComponentManager,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>,
-        private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
-        private spreadsheetState: SpreadsheetState,
+        @Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<Action>,
+        private eventEmitter: SpreadsheetEventEmitter,
         private app: ApplicationRef,
-        private numberFilter: NumberFilter) {
-
-        this.gridComponentManager.set(<any>this);
-        this.updateGridColumnMap(this.columnListManager.get());
-
-        this.sectionPositionInformationMapUpdater.init();
-        this.columnViewportUpdater.init();
-        this.unsubscribeGridSectionListChanges = this.gridSectionListManager.subscribe((gridSectionList) => {
-            this.updateGridSectionList(gridSectionList);
+        private renderer: Renderer,
+        private spreadsheetStateGlobal: SpreadsheetState,
+        private spreadsheetStore: SpreadsheetStore) {
+        this.eventEmitterSubscription = this.eventEmitter.subscribe(data => this.onSpreadsheetEvent.emit(data));
+        this.spreadsheetStore.onChanged.subscribe((changedSpreadsheet) => {
+            this.spreadsheetState = changedSpreadsheet;
+            Object.assign(this.spreadsheetStateGlobal, changedSpreadsheet);
         });
     }
 
     ngOnInit() {
-        this.eventEmitterSubscription = this.eventEmitter.subscribe((evt: Event) => {
-            switch (evt.type) {
-                case ColumnMovedEvent.type: {
-                    let columnList = this.columnListManager.get();
-                    this.columnList = columnList;
-
-                    this.updateGridColumnMap(columnList);
-
-                    this.recalculateGridData(columnList);
-                    break;
-                }
-                case ColumnResizedEvent.type: {
-                    let columnList = this.columnListManager.get();
-                    this.columnList = columnList;
-
-                    this.updateGridColumnMap(columnList);
-
-                    let columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(columnList);
-                    this.columnPositionInformationMapManager.set(columnPositionInformationMap);
-
-                    this.updateBodySectionScrollWidth(columnPositionInformationMap);
-                    this.gridSectionList.forEach(gc => this.columnViewportUpdater.update({
-                        gridSectionName: gc.name,
-                        scrollLeft: this.bodySectionScrollManager.get(gc.name),
-                    }));
-
-                    this.spreadsheetState = Object.assign({}, this.spreadsheetState, {
-                        columnPositionInformationMap: columnPositionInformationMap,
-                    });
-                    break;
-                }
-                case SectionHorizontallyScrolledEvent.type: {
-                    let scrollEvt = <SectionHorizontallyScrolledEvent>evt;
-                    this.columnViewportUpdater.update({ gridSectionName: scrollEvt.payload.sectionName, scrollLeft: scrollEvt.payload.scrollLeft });
-                    break;
-                }
-                case SpreadsheetVerticallyScrolledEvent.type: {
-                    let scrollEvt = <SpreadsheetVerticallyScrolledEvent>evt;
-                    this.scrollTop = scrollEvt.payload;
-                    this.rowViewportUpdater.update(scrollEvt.payload);
-                    this.updateGridSectionList(this.gridSectionListManager.get());
-                    break;
-                }
-                case FilterColumnEvent.type: {
-                    let filterEvt = <FilterColumnEvent>evt;
-                    var gridColumn = this.gridColumnListGetter.get(this.columnList).find(gc => gc.index == filterEvt.payload.gridColumnIndex);
-                    var gridSection = this.gridSectionList.find(gs => gs.name === gridColumn.gridSectionName);
-                    var filterFn = this.numberFilter.getIsMatchFn(filterEvt.payload.expression);
-
-                    var gridData = this.gridDataManager.get();
-                    if (!gridData.originalDataRowList) {
-                        gridData.originalDataRowList = gridData.dataRowList.slice(0);
-                    }
-                    gridData.dataRowList = gridData.originalDataRowList.slice(0);
-
-                    var dataRowToRemoveList = gridSection.dataRowList
-                        .filter(dr => !filterFn(dr.cellMap[gridColumn.index].data))
-                        .map(dr => dr.rowData);
-                    dataRowToRemoveList.forEach(dr => {
-                        var index = gridData.dataRowList.indexOf(dr);
-                        if (index >= 0) {
-                            gridData.dataRowList.splice(index, 1);
-                        }
-                    });
-                    this.update(Object.assign({}, gridData));
-                }
-                default:
-                    break;
-            }
+        var style = window.getComputedStyle(this.el.nativeElement);
+        this.dispatcher.emit(new InitializeSpreadsheetSizeAction(this.height || parseInt(style.height, 10), parseInt(style.width, 10)));
+        this.windowResizeUnregisterFn = this.renderer.listenGlobal('window', 'resize', () => {
+            style = window.getComputedStyle(this.el.nativeElement);
+            this.dispatcher.emit(new UpdateSpreadsheetSizeAction(this.height, parseInt(style.width, 10)));
         });
     }
 
     ngOnChanges(obj) {
+        var changedFieldsCount = Object.keys(obj).length;
         if (obj.columnDefinitionList) {
-            this.spreadsheetState = Object.assign({}, this.spreadsheetState, {
-                columnDefinitionList: this.columnDefinitionList,
-                columnList: this.columnListGetter.get(this.columnDefinitionList),
-            });
-            this.eventEmitter.emit(new UpdateColumnDefinitionListAction(this.columnDefinitionList));
-
-            this.recalculateGridData(this.columnList);
+            this.dispatcher.emit(new UpdateColumnDefinitionListAction((this.columnDefinitionList || [])));
+        }
+        if (obj.dataRowList) {
+            this.dispatcher.emit(new UpdateDataRowListAction(this.dataRowList));
+        }
+        if (obj.rowHeight) {
+            this.dispatcher.emit(new UpdateSpreadsheetRowHeightAction(this.rowHeight));
+        }
+        if (obj.height) {
+            var style = window.getComputedStyle(this.el.nativeElement);
+            this.dispatcher.emit(new UpdateSpreadsheetSizeAction(this.height, parseInt(style.width, 10)));
+        }
+        if (obj.rowClassGetter) {
+            this.dispatcher.emit(new UpdateSpreadsheetGetRowStyleFnAction(this.rowClassGetter));
         }
     }
 
     ngOnDestroy() {
         this.eventEmitterSubscription.unsubscribe();
-        this.unsubscribeGridSectionListChanges();
+        this.windowResizeUnregisterFn();
     }
 
     goToRow(rowNumber: number) {
-        if (rowNumber > this.headerRowCount) {
-            var scrollTop = this.rowHeight * (rowNumber - 1) - this.headerRowCount * this.rowHeight;
-            this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
+        if (rowNumber >= this.firstDataRowRowNumber) {
+            var rowIndex = (rowNumber - 1);
+            var gridColumnIndex = this.spreadsheetState.activeCellLocation.gridColumnIndex;
+            this.dispatcher.emit(new GoToCellLocationAction(rowIndex, gridColumnIndex, false));
+            this.cdr.markForCheck();
         }
     }
 
-    update(gridData: GridData) {
-        this.gridDataManager.set(gridData);
-        this.columnList = this.columnListGetter.get(this.columnDefinitionList);
-
-        this.recalculateGridData(this.columnList);
-
-        this.columnListManager.set(this.columnList);
-
-        var scrollTop = this.scrollTop;
-        this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop - 1));
-
-        this.app.tick();
-
-        this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
-    }
-
     updateStatusMessage(message: string, timeout?: number) {
-        this.statusMessage = message;
-        this.statusMessageTimeout = timeout;
+        setTimeout(() => {
+            this.statusMessage = message;
+            this.statusMessageTimeout = timeout;
+        }, 100);
     }
 
     @HostListener('focusin', ['$event'])
@@ -276,88 +203,5 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
             return gridSection.name;
         }
         return 'gridSection_' + index;
-    }
-
-    private recalculateGridData(columnList: Column[]) {
-        var gridData = this.gridDataManager.get();
-
-        this.rowHeight = gridData.rowHeight || this.rowHeight;
-        this.rowHeightManager.set(this.rowHeight);
-
-        this.updateGridColumnMap(columnList);
-
-        let columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(columnList);
-        this.columnPositionInformationMapManager.set(columnPositionInformationMap);
-
-        var gridSectionList = this.gridSectionListGetter.get(gridData, this.columnDefinitionList, columnList);
-        this.gridSectionListManager.set(gridSectionList);
-
-        this.headerRowCount = gridSectionList[0].titleRowList.length;
-        this.columnListManager.set(columnList);
-
-        this.updateBodySectionScrollWidth(this.columnPositionInformationMapManager.get());
-        this.cdr.markForCheck();
-    }
-
-    private updateGridColumnMap(columnList: Column[]) {
-        var gridColumnMap = {};
-        this.gridColumnListGetter.get(columnList).forEach(gc => gridColumnMap[gc.index] = gc);
-        this.cellListMapManager.updateGridColumnMap(gridColumnMap);
-    }
-
-    private updateGridSectionList(gridSectionList: GridSection[]) {
-        this.gridSectionList = gridSectionList.map((gridSection) => {
-            var index = 0;
-            this.numberTitleRowList = new Array(gridSection.titleRowList.length);
-            while (index < gridSection.titleRowList.length) {
-                let visibleRow = gridSection.titleRowList[index];
-                let numberTitleRow = {
-                    cellList: [],
-                    height: this.rowHeight,
-                    rowData: null,
-                    rowIndex: visibleRow.rowIndex,
-                    rowNumber: visibleRow.rowIndex + 1,
-                    rowStyle: '',
-                    rowType: ContentTypeEnum.Title,
-                    sectionRowIndex: visibleRow.sectionRowIndex,
-                    isVisible: true,
-                };
-                this.numberTitleRowList[index] = numberTitleRow;
-                index++;
-            }
-
-            index = 0;
-            this.numberDataRowList = new Array(gridSection.visibleDataRowList.length);
-            while (index < gridSection.visibleDataRowList.length) {
-                let visibleRow = gridSection.visibleDataRowList[index];
-                let numberDataRow = {
-                    cellList: [],
-                    height: this.rowHeight,
-                    rowData: null,
-                    rowIndex: visibleRow.rowIndex,
-                    rowNumber: visibleRow.rowIndex + 1,
-                    rowStyle: '',
-                    rowType: ContentTypeEnum.Data,
-                    sectionRowIndex: visibleRow.sectionRowIndex,
-                    isVisible: true,
-                };
-                this.numberDataRowList[index] = numberDataRow;
-                index++;
-            }
-
-            gridSection['dataRowListLength'] = gridSection.dataRowList.length;
-
-            return gridSection;
-        });
-    }
-
-    private updateBodySectionScrollWidth(cpim: ColumnPositionInformationMap) {
-        var gridSectionList = this.gridSectionListManager.get();
-        gridSectionList.forEach(gridSection => {
-            var scrollWidth = 0;
-            this.gridColumnListGetter.get(gridSection.columnList).forEach(gc => scrollWidth += cpim[gc.index].width);
-
-            this.bodySectionScrollWidthManager.set(gridSection.name, scrollWidth);
-        });
     }
 }

@@ -1,5 +1,5 @@
-import { Event } from './Event';
-export class FilterColumnEvent implements Event {
+import { Action } from './Action';
+export class FilterColumnAction implements Action {
     static type = 'FilterColumn';
     type: string;
     payload: {
@@ -8,7 +8,7 @@ export class FilterColumnEvent implements Event {
     };
 
     constructor(gridColumnIndex: number, expression: string) {
-        this.type = FilterColumnEvent.type;
+        this.type = FilterColumnAction.type;
         this.payload = {
             gridColumnIndex: gridColumnIndex,
             expression: expression,

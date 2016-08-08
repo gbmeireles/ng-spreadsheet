@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { ActiveCellManager } from '../Services/Managers/ActiveCellManager';
-
+import { Component, OnInit, Input } from '@angular/core';
+import { CellManager } from '../Services/Services';
+import { CellLocation } from '../Model/Model';
 const html = `
 <div>
     <i class="icon-logo"></i>
@@ -56,17 +56,27 @@ span {
     styles: [css],
 })
 export class DetailsBarComponent implements OnInit {
+    @Input('activeCellLocation') activeCellLocation: CellLocation;
+
     private activeCellData: string = 'Selecione uma célula';
-    constructor(private activeCellManager: ActiveCellManager) { }
+
+    constructor(private cellManager: CellManager) { }
 
     ngOnInit() {
-        this.activeCellManager.subscribe((activeCell) => {
-            if (activeCell.formatData == undefined) {
-                this.activeCellData = activeCell.data;
-            } else {
-                this.activeCellData = activeCell.formatData(activeCell.data);
-            }
-        });
+    }
+
+    ngOnChanges() {
+        var activeCell = this.cellManager.getCellListByGridColumnIndex(this.activeCellLocation.gridColumnIndex)
+            .find(cell => cell.gridCell.rowIndex === this.activeCellLocation.rowIndex);
+        if (!activeCell) {
+            return;
+        }
+        var gridCell = activeCell.gridCell;
+        if (gridCell.formatData == undefined) {
+            this.activeCellData = gridCell.data;
+        } else {
+            this.activeCellData = gridCell.formatData(gridCell.data);
+        }
     }
 
 }

@@ -1,3 +1,5 @@
+import { ColumnDataTypeEnum } from './ColumnDataTypeEnum';
+
 export interface Column {
     startIndex: number;
     endIndex: number;
@@ -6,4 +8,5 @@ export interface Column {
     gridSectionName: string;
     defaultWidth: number;
     name?: string;
+    dataType?: ColumnDataTypeEnum;
 }

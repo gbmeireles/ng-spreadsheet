@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
-import {
-    CellListMapManager,
-} from '../../Services/Services';
+import { CellManager } from '../../Services/Services';
 
 @Injectable()
 export class ColumnTargetWidthGetter {
 
-    constructor(private cellListMapManager: CellListMapManager) { }
+    constructor(private cellManager:CellManager) { }
 
-    getTargetWidth(columnName: string): number {
-        return this.cellListMapManager.getCellList(columnName).reduce((targetWidth, cell) => {
+    getTargetWidth(gridColumnIndex: number): number {
+        return this.cellManager.getCellListByGridColumnIndex(gridColumnIndex).reduce((targetWidth, cell) => {
             return Math.max(cell.getScrollWidth(), targetWidth);
         }, 50) + 5;
     }

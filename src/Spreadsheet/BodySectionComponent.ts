@@ -1,26 +1,25 @@
 import { HostBinding, HostListener, Component, Input, ElementRef, EventEmitter, Inject } from '@angular/core';
 import { OnInit, OnChanges, OnDestroy } from '@angular/core';
 import {
-    SectionPositionInformationMapManager,
-    BodyScrollManager,
-    BodySectionScrollManager,
-    CellNavigator,
-    RowHeightManager,
-    ActiveCellGetter,
-    GridSectionListManager,
-    ActiveCellManager,
-    ColumnPositionInformationMapManager,
-} from '../Services/Services';
-import { Cell, SectionPositionInformationMap } from '../Model/Model';
+    Cell,
+    GridSectionPositionInformationMap,
+    CellLocation,
+} from '../Model/Model';
 import {
-    EVENT_EMITTER_TOKEN,
-    EVENT_PROVIDERS,
-    Event,
-    ColumnMovedEvent,
-    ColumnResizedEvent,
-    SectionHorizontallyScrolledEvent,
-    SpreadsheetVerticallyScrolledEvent,
+    CellGetter,
+    CellLocationRelativeToViewportGetter,
+} from '../Services/Services';
+import {
+    DISPATCHER_TOKEN,
+    DISPATCHER_PROVIDERS,
+    Action,
+    MoveColumnAction,
+    UpdateColumnSizeAction,
+    ScrollGridSectionAction,
+    ScrollSpreadsheetAction,
+    GoToCellLocationAction,
 } from '../Events/Events';
+import { SpreadsheetState } from './SpreadsheetState';
 
 const css = `
 :host {
@@ -59,51 +58,20 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;
     @HostBinding('style.width') width: number;
     @Input('gridSectionName') gridSectionName: string;
+    @Input('gridSectionPositionInformationMap') gridSectionPositionInformationMap: GridSectionPositionInformationMap;
+    @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
+    @Input('activeCellLocation') activeCellLocation: CellLocation;
 
     private isInitialized: boolean = false;
-    private sectionPositionInformatonMapUnsubscriber: () => void;
     private unregisterActiveCellPositionChangeSubscription: () => void;
     private _scrollTop: number;
     private _scrollLeft: number;
 
     constructor(private el: ElementRef,
-        private bodyScrollManager: BodyScrollManager,
-        private bodySectionScrollManager: BodySectionScrollManager,
-        private sectionPositionInformationMapManager: SectionPositionInformationMapManager,
-        private cellNavigationManager: CellNavigator,
-        private rowHeightManager: RowHeightManager,
-        private activeCellGetter: ActiveCellGetter,
-        private gridSectionListManager: GridSectionListManager,
-        private activeCellManager: ActiveCellManager,
-        private columnPositionInformationMapManager: ColumnPositionInformationMapManager,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<Event>) {
-        this.sectionPositionInformatonMapUnsubscriber =
-            this.sectionPositionInformationMapManager.subscribe((sectionPositionInformationMap: SectionPositionInformationMap) => {
-                this.updateSectionPosition(sectionPositionInformationMap);
-            });
-
-        this.unregisterActiveCellPositionChangeSubscription = this.activeCellManager.subscribe((gridCell) => {
-            var gridSection = gridSectionListManager.get().find(gc => gc.name === this.gridSectionName);
-            if (!gridSection) {
-                return;
-            }
-            var visibleGridRow = gridSection.visibleDataRowList.find(row => row.rowIndex === gridCell.rowIndex);
-            if (!visibleGridRow) {
-                return;
-            }
-            var visibleGridCell = visibleGridRow.cellList.find(cell => cell.columnIndex === gridCell.columnIndex);
-            if (visibleGridCell) {
-                this.bodyElement.focus();
-                var visibleGridCellPosition = this.columnPositionInformationMapManager.get()[visibleGridCell.columnIndex];
-                if (this.bodyElement.scrollLeft > visibleGridCellPosition.left) {
-                    this.bodyElement.scrollLeft = visibleGridCellPosition.left;
-                }
-            }
-        });
-    }
-
-    updateScrollTop(): void {
-        this._scrollTop = this.bodyElement.scrollTop;
+        @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>,
+        private cellGetter: CellGetter,
+        private cellLocationRelativeToViewportGetter: CellLocationRelativeToViewportGetter,
+        private spreadsheetState: SpreadsheetState) {
     }
 
     get scrollTop(): number {
@@ -117,10 +85,10 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         if (scrollTop < 0) {
             scrollTop = 0;
         }
-        this._scrollTop = scrollTop;
-        if (this.bodyElement.scrollTop !== scrollTop) {
-            this.bodyElement.scrollTop = this._scrollTop;
+        if (this._scrollTop !== scrollTop) {
+            this.bodyElement.scrollTop = scrollTop;
         }
+        this._scrollTop = scrollTop;
     }
 
     get scrollLeft(): number {
@@ -143,7 +111,35 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         return this.el.nativeElement;
     }
 
-    updateSectionPosition(sectionPositionInformationMap: SectionPositionInformationMap) {
+    ngOnInit() {
+        if (this.isInitialized) {
+            return;
+        }
+        this.isInitialized = true;
+    }
+
+    ngOnChanges(obj) {
+        if (obj['gridSectionPositionInformationMap']) {
+            var gridSectionPositionInformation =
+                this.gridSectionPositionInformationMap && this.gridSectionPositionInformationMap[this.gridSectionName];
+            if (gridSectionPositionInformation) {
+                this.left = gridSectionPositionInformation.left;
+                this.width = gridSectionPositionInformation.width;
+            }
+        }
+        if (obj['gridSectionScrollLeftMap']) {
+            this.el.nativeElement.scrollLeft = this.gridSectionScrollLeftMap && this.gridSectionScrollLeftMap[this.gridSectionName];
+        }
+        if (obj['gridSectionPositionInformationMap']) {
+            this.updateSectionPosition(this.gridSectionPositionInformationMap);
+        }
+    }
+
+    ngOnDestroy() {
+
+    }
+
+    updateSectionPosition(sectionPositionInformationMap: GridSectionPositionInformationMap) {
         var sectionPositionInformation = sectionPositionInformationMap[this.gridSectionName];
         if (!sectionPositionInformation) {
             return;
@@ -152,36 +148,25 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         this.width = sectionPositionInformation.width;
     }
 
-    ngOnInit() {
-        if (this.isInitialized) {
-            return;
-        }
-        this.isInitialized = true;
-        this.updateSectionPosition(this.sectionPositionInformationMapManager.get());
-    }
-
-    ngOnDestroy() {
-        this.sectionPositionInformatonMapUnsubscriber();
-        this.unregisterActiveCellPositionChangeSubscription();
-    }
-
     @HostListener('keydown', ['$event'])
     onKeyUp(evt: KeyboardEvent) {
         var scrollTop;
         var scrollLeft;
-        var sourceActiveCell = this.activeCellGetter.get();
+        var sourceActiveCell = this.cellGetter.get(this.activeCellLocation);
         var targetActiveCell: Cell;
         switch (evt.keyCode) {
             case 27://Esc
-                sourceActiveCell.cancelEdit();
-                this.bodyElement.focus();
+                if (sourceActiveCell) {
+                    sourceActiveCell.cancelEdit();
+                    this.bodyElement.focus();
+                }
                 break;
             case 33://Page Up
-                scrollTop = this.scrollTop - this.bodyElement.clientHeight;
+                scrollTop = Math.min(this.scrollTop - this.bodyElement.clientHeight, 0);
                 evt.preventDefault();
                 break;
             case 34://Page Down
-                scrollTop = this.scrollTop + this.bodyElement.clientHeight;
+                scrollTop = Math.min(this.scrollTop + this.bodyElement.clientHeight, this.bodyElement.scrollHeight);
                 evt.preventDefault();
                 break;
             case 35://End
@@ -194,62 +179,47 @@ export class BodySectionComponent implements OnDestroy, OnInit {
                 scrollTop = 0;
                 evt.preventDefault();
                 break;
-            case 37://Arrow Left
-                if (!this.cellNavigationManager.goLeft()) {
-                    evt.preventDefault();
-                    return;
-                }
-                targetActiveCell = this.activeCellGetter.get();
-                if (sourceActiveCell && sourceActiveCell.sectionColumnIndex === 0) {
-                    break;
-                }
-                scrollLeft = targetActiveCell.left;
+            case 37: {//Arrow Left
+                this.eventEmitter.emit(
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex - 1, true));
                 break;
+            }
             case 38://Arrow Up
-                if (!this.cellNavigationManager.goUp()) {
-                    return;
-                }
-                scrollTop = this.scrollTop - this.rowHeightManager.get();
+                this.eventEmitter.emit(
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex - 1, this.activeCellLocation.gridColumnIndex, true));
                 break;
-            case 39://Arrow Right
-                if (!this.cellNavigationManager.goRight()) {
-                    evt.preventDefault();
-                    return;
-                }
-                targetActiveCell = this.activeCellGetter.get();
-                scrollLeft = this.scrollLeft + sourceActiveCell.width;
+            case 39: {//Arrow right
+                this.eventEmitter.emit(
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex + 1, true));
                 break;
+            }
             case 9://Tab
                 evt.preventDefault();
                 var isEditing = (sourceActiveCell == null) ? false : sourceActiveCell.isEditing;
                 if (evt.shiftKey) {
-                    if (this.cellNavigationManager.goLeft()) {
-                        scrollLeft = targetActiveCell.left;
-                    }
+                    this.eventEmitter.emit(
+                        new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex - 1, true));
                 } else {
-                    if (this.cellNavigationManager.goRight()) {
-                        scrollLeft = this.scrollLeft + sourceActiveCell.width;
-                    }
+                    this.eventEmitter.emit(
+                        new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex + 1, true));
                 }
 
                 setTimeout(() => {
-                    targetActiveCell = this.activeCellGetter.get();
-                    if (targetActiveCell && isEditing) {
+                    targetActiveCell = this.cellGetter.get(this.activeCellLocation);
+                    if (sourceActiveCell && isEditing) {
                         targetActiveCell.goToEditMode();
                     }
                 });
                 break;
             case 13://Enter
-            case 40://Arrow Down
-                if (!this.cellNavigationManager.goDown()) {
-                    return;
-                }
-                scrollTop = this.scrollTop + this.rowHeightManager.get();
+            case 40: {//Arrow Down
+                this.eventEmitter.emit(
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex + 1, this.activeCellLocation.gridColumnIndex, true));
                 break;
+            }
             case 113://F2
-                var activeCell = this.activeCellGetter.get();
-                if (activeCell) {
-                    activeCell.goToEditMode();
+                if (sourceActiveCell) {
+                    sourceActiveCell.goToEditMode();
                 }
                 break;
             default:
@@ -258,21 +228,17 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         evt.preventDefault();
 
         if (scrollTop !== undefined) {
-            this.bodyScrollManager.set(scrollTop);
-            this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
+            this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
         }
         if (scrollLeft !== undefined) {
-            this.scrollLeft = scrollLeft;
-            this.bodySectionScrollManager.set(this.gridSectionName, scrollLeft);
-            this.eventEmitter.emit(new SectionHorizontallyScrolledEvent(this.gridSectionName, scrollLeft));
+            this.eventEmitter.emit(new ScrollGridSectionAction(this.gridSectionName, scrollLeft));
         }
     }
 
     @HostListener('wheel', ['$event'])
     onWheel(evt: WheelEvent) {
         var scrollTop = Math.min(this.scrollTop + evt.deltaY, this.bodyElement.scrollHeight);
-        this.bodyScrollManager.set(scrollTop);
-        this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
+        this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
     }
 
     @HostListener('scroll', ['$event'])
@@ -280,13 +246,11 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         var scrollLeft = this.bodyElement.scrollLeft;
         if (this.scrollLeft !== scrollLeft) {
             this.scrollLeft = scrollLeft;
-            this.eventEmitter.emit(new SectionHorizontallyScrolledEvent(this.gridSectionName, scrollLeft));
+            this.eventEmitter.emit(new ScrollGridSectionAction(this.gridSectionName, scrollLeft));
         };
-        this.bodySectionScrollManager.set(this.gridSectionName, this.bodyElement.scrollLeft);
         if (this.gridSectionName === 'Scroll') {
             var scrollTop = this.bodyElement.scrollTop;
-            this.bodyScrollManager.set(scrollTop);
-            this.eventEmitter.emit(new SpreadsheetVerticallyScrolledEvent(scrollTop));
+            this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
         }
     }
 }

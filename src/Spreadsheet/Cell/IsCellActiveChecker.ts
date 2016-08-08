@@ -1,23 +1,20 @@
 import { Injectable } from '@angular/core';
 import {
     GridCell,
+    CellLocation,
 } from '../../Model/Model';
-import {
-    ActiveCellManager,
-} from '../../Services/Services';
 
 @Injectable()
 export class IsCellActiveChecker {
 
-    constructor(private activeCellManager: ActiveCellManager) { }
+    constructor() { }
 
-    check(gridCell: GridCell) {
-        var activeCell = this.activeCellManager.get();
-        if (!gridCell || activeCell == null) {
+    check(gridCell: GridCell, activeCellLocation: CellLocation): boolean {
+        if (!gridCell || activeCellLocation == null) {
             return false;
-        } else if (activeCell.rowIndex !== gridCell.rowIndex) {
+        } else if (activeCellLocation.rowIndex !== gridCell.rowIndex) {
             return false;
-        } else if (activeCell.columnIndex !== gridCell.columnIndex) {
+        } else if (activeCellLocation.gridColumnIndex !== gridCell.columnIndex) {
             return false;
         } else {
             return true;

@@ -1,3 +1,5 @@
+import { ColumnDataTypeEnum } from './ColumnDataTypeEnum';
+
 export interface GridColumn {
     name: string;
     index: number;
@@ -5,4 +7,5 @@ export interface GridColumn {
     width: number;
     gridSectionName: string;
     filterExpression: string;
+    dataType: ColumnDataTypeEnum;
 }

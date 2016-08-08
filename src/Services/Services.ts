@@ -7,21 +7,24 @@ import { CellPositionUpdater } from './CellPositionUpdater';
 import { SectionPositionInformationMapCalculator } from './SectionPositionInformationMapCalculator';
 import { ColumnViewportUpdater } from './ColumnViewportUpdater';
 import { RowViewportUpdater } from './RowViewportUpdater';
-import { SectionPositionInformationMapUpdater } from './SectionPositionInformationMapUpdater';
 import { RowViewportVisibleRowCountGetter } from './RowViewportVisibleRowCountGetter';
 import { GridColumnListGetter } from './GridColumnListGetter';
-import { ActiveCellGetter } from './ActiveCellGetter';
 import { GridSectionListGetter } from './GridSectionListGetter';
-import { CellNavigator } from './CellNavigator';
 import { ColumnToRenderIndexListGetter } from './ColumnToRenderIndexListGetter';
 import { RowToRenderIndexListGetter } from './RowToRenderIndexListGetter';
+import { GridSectionScrollWidthMapCalculator } from './GridSectionScrollWidthMapCalculator';
+import { NumberTitleRowListGetter } from './NumberTitleRowListGetter';
+import { NumberDataRowListGetter } from './NumberDataRowListGetter';
+import { GridSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
+import { SpreadsheetEventEmitter } from './SpreadsheetEventEmitter';
+import { CellManager } from './CellManager';
+import { CellLocationRelativeToViewportGetter } from './CellLocationRelativeToViewportGetter';
+import { CellGetter } from './CellGetter';
 import { FILTERS_PROVIDERS } from './Filters/Filters';
 
-export * from './Managers/Managers';
 export * from './Filters/Filters';
 
 export {
-    ActiveCellGetter,
     ColumnPositionInformationMapCalculator,
     DataGridRowListGetter,
     ColumnListGetter,
@@ -32,17 +35,21 @@ export {
     SectionPositionInformationMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
-    SectionPositionInformationMapUpdater,
     RowViewportVisibleRowCountGetter,
     GridColumnListGetter,
     RowToRenderIndexListGetter,
-    CellNavigator,
+    CellLocationRelativeToViewportGetter,
     ColumnToRenderIndexListGetter,
+    GridSectionScrollWidthMapCalculator,
+    NumberTitleRowListGetter,
+    NumberDataRowListGetter,
+    GridSectionDataRowMapGetter,
+    SpreadsheetEventEmitter,
+    CellManager,
+    CellGetter,
 }
 
-import * as Managers from './Managers/Managers';
-export const GRID_SCOPE_SERVICES: Array<any> = Managers.MANAGERS.concat([
-    ActiveCellGetter,
+export const GRID_SCOPE_SERVICES: Array<any> = [
     ColumnPositionInformationMapCalculator,
     DataGridRowListGetter,
     ColumnListGetter,
@@ -53,11 +60,17 @@ export const GRID_SCOPE_SERVICES: Array<any> = Managers.MANAGERS.concat([
     SectionPositionInformationMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
-    SectionPositionInformationMapUpdater,
     RowViewportVisibleRowCountGetter,
     GridColumnListGetter,
     RowToRenderIndexListGetter,
-    CellNavigator,
+    CellLocationRelativeToViewportGetter,
     ColumnToRenderIndexListGetter,
     ...FILTERS_PROVIDERS,
-]);
+    GridSectionScrollWidthMapCalculator,
+    NumberTitleRowListGetter,
+    NumberDataRowListGetter,
+    GridSectionDataRowMapGetter,
+    SpreadsheetEventEmitter,
+    CellManager,
+    CellGetter,
+];

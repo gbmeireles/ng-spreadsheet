@@ -53,7 +53,7 @@ export class StatusBarComponent implements OnInit, OnChanges {
         }
         if (changes['timeout']) {
             clearTimeout(this.timeoutId);
-            if (changes['timeout'].currentValue !== undefined) {
+            if (changes['timeout'].currentValue != null) {
                 this.timeoutId = setTimeout(() => {
                     this.isVisible = false;
                     this.timeout = undefined;

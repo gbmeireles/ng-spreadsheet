@@ -10,4 +10,5 @@ export interface GridSection {
     visibleDataRowList?: GridRow[];
     width?: number;
     defaultWidth?: number;
+    dataRowListLength: number;
 }

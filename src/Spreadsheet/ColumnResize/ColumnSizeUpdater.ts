@@ -1,34 +1,30 @@
 import { Injectable, Inject, EventEmitter } from '@angular/core';
 import {
-    ColumnListManager,
     ColumnPositionInformationMapCalculator,
-    ColumnPositionInformationMapManager,
 } from '../../Services/Services';
 import {
     Column,
 } from '../../Model/Model';
 
 import {
-    ColumnResizedEvent,
-    EVENT_EMITTER_TOKEN,
+    UpdateColumnSizeAction,
 } from '../../Events/Events';
+import { SpreadsheetState } from '../SpreadsheetState';
 
 @Injectable()
 export class ColumnSizeUpdater {
 
-    constructor(private columnListManager: ColumnListManager,
-        @Inject(EVENT_EMITTER_TOKEN) private eventEmitter: EventEmitter<ColumnResizedEvent>) { }
+    constructor() { }
 
-    updateColumnSize(columnName: string, newColumnSize: number) {
-        var columnList = this.columnListManager.get().slice(0).map(i => <Column>Object.assign({}, i));
-        var column = columnList.find(c => c.name === columnName);
+    columnSizeUpdater(spreadsheetState: SpreadsheetState, action: UpdateColumnSizeAction): Column[] {
+        var columnList = spreadsheetState.columnList.slice(0).map(i => <Column>Object.assign({}, i));
+        var column = columnList.find(c => c.name === action.payload.columnName);
         if (!column) {
             return;
         }
 
-        column.width = newColumnSize;
-        this.columnListManager.set(columnList);
+        column.width = action.payload.columnSize;
 
-        this.eventEmitter.emit(new ColumnResizedEvent(columnName, newColumnSize));
+        return columnList;
     }
 }

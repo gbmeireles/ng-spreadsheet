@@ -1,32 +1,30 @@
 import { Injectable } from '@angular/core';
 import {
     GridRow,
-    GridData,
     GridSection,
     Column,
     ColumnDefinition,
+    ColumnPositionInformationMap,
 } from '../Model/Model';
 import { TitleGridRowListGetter } from '../Services/TitleGridRowListGetter';
 import { DataGridRowListGetter } from '../Services/DataGridRowListGetter';
-import { RowViewportVisibleRowCountGetter } from '../Services/RowViewportVisibleRowCountGetter';
 import { RowToRenderIndexListGetter } from '../Services/RowToRenderIndexListGetter';
-import { BodyScrollManager } from '../Services/Managers/BodyScrollManager';
+import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class GridSectionListGetter {
     constructor(private titleGridRowListGetter: TitleGridRowListGetter,
         private dataGridRowListGetter: DataGridRowListGetter,
-        private rowToRenderIndexListGetter: RowToRenderIndexListGetter,
-        private bodyScrollManager: BodyScrollManager) {
+        private rowToRenderIndexListGetter: RowToRenderIndexListGetter) {
     }
 
-    get(gridData: GridData, columnDefinitionList: ColumnDefinition[], gridColumnList: Column[]) {
-        var gridColumnListMap = {};
-        gridColumnList.forEach(gridColumn => {
-            if (!gridColumnListMap[gridColumn.gridSectionName]) {
-                gridColumnListMap[gridColumn.gridSectionName] = [];
+    get(spreadsheetState: SpreadsheetState) {
+        var gridColumnListMap: { [gridSectionName: string]: Column[] } = {};
+        spreadsheetState.columnList.forEach(column => {
+            if (!gridColumnListMap[column.gridSectionName]) {
+                gridColumnListMap[column.gridSectionName] = [];
             }
-            gridColumnListMap[gridColumn.gridSectionName].push(gridColumn);
+            gridColumnListMap[column.gridSectionName].push(column);
         });
 
         var gridSectionList: GridSection[] = [];
@@ -38,6 +36,7 @@ export class GridSectionListGetter {
                 dataRowMap: {},
                 name: tableSectionName,
                 titleRowList: [],
+                dataRowListLength: 0,
             });
         });
 
@@ -45,22 +44,22 @@ export class GridSectionListGetter {
             gridSection.columnList = gridSection.columnList.filter(gc => gc.gridSectionName === gridSection.name);
 
             var gridSectionColumnIdList: Array<number> = [];
-            gridSection.columnList.forEach(gridColumn => {
-                var columnIndex = gridColumn.startIndex;
-                while (columnIndex <= gridColumn.endIndex) {
+            gridSection.columnList.forEach(column => {
+                var columnIndex = column.startIndex;
+                while (columnIndex <= column.endIndex) {
                     gridSectionColumnIdList.push(columnIndex);
                     columnIndex++;
                 }
             });
 
-            var titleRowList = this.titleGridRowListGetter.get(gridData, columnDefinitionList, gridSection.columnList);
-            var dataRowList = this.dataGridRowListGetter.get(gridData, columnDefinitionList, gridSection.columnList, titleRowList.length);
+            var titleRowList = this.titleGridRowListGetter.get(spreadsheetState, gridSection);
+            var dataRowList = this.dataGridRowListGetter.get(spreadsheetState, gridSection, titleRowList.length);
 
             gridSection.titleRowList = titleRowList.map<GridRow>(row => {
                 return {
                     cellList: row.cellList.filter(c => gridSectionColumnIdList.indexOf(c.columnIndex) >= 0),
                     cellMap: row.cellMap,
-                    height: gridData.rowHeight,
+                    height: spreadsheetState.rowHeight,
                     rowData: row.rowData,
                     rowIndex: row.rowIndex,
                     rowStyle: row.rowStyle,
@@ -88,7 +87,7 @@ export class GridSectionListGetter {
                 var gridRow = {
                     cellList: cellList,
                     cellMap: row.cellMap,
-                    height: gridData.rowHeight,
+                    height: spreadsheetState.rowHeight,
                     rowData: row.rowData,
                     rowIndex: row.rowIndex,
                     rowStyle: row.rowStyle,
@@ -101,8 +100,9 @@ export class GridSectionListGetter {
                 counter++;
             });
             var lastRow = gridSection.dataRowList[gridSection.dataRowList.length - 1];
-            var rowToRenderIndexList = this.rowToRenderIndexListGetter.getListForGridSection(gridSection, this.bodyScrollManager.get());
+            var rowToRenderIndexList = this.rowToRenderIndexListGetter.getListForGridSection(spreadsheetState, gridSection);
             gridSection.visibleDataRowList = rowToRenderIndexList.map(index => gridSection.dataRowList[index]).filter(row => row != null);
+            gridSection.dataRowListLength = gridSection.dataRowList.length;
         });
 
         return gridSectionList;

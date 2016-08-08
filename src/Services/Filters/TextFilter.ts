@@ -1,20 +1,16 @@
 import { Injectable } from '@angular/core';
-import { NumberExpression, ExpressionGroup, ComparissonTypeEnum } from './Model/Model';
-enum NumberFilterTokenEnum {
-    Greater,
-    Equal,
-    Less,
-    GreaterOrEqual,
-    LessOrEqual,
+import { TextExpression, ExpressionGroup } from './Model/Model';
+enum TextFilterTokenEnum {
+    Wildcard,
     And,
     Or,
     OpenParenthesis,
     CloseParenthesis,
-    Number,
+    Text,
 }
 
 @Injectable()
-export class NumberFilter {
+export class TextFilter {
     private expressionToExpressionGroupListMap: { [expression: string]: ExpressionGroup[] } = {};
 
     constructor() { }
@@ -34,10 +30,7 @@ export class NumberFilter {
             expressionGroupList = this.expressionToExpressionGroupListMap[expression];
         } else {
             try {
-                var tokenList = this.getNumberFilterTokenList(expression);
-                if (tokenList.length === 1 && typeof tokenList[0] === 'string') {
-                    tokenList.unshift(NumberFilterTokenEnum.Equal);
-                }
+                var tokenList = this.getTextFilterTokenList(expression);
                 expressionGroupList = this.getExpressionGroupList(tokenList);
             } catch (err) {
                 console.warn('Invalid expression:');
@@ -54,19 +47,19 @@ export class NumberFilter {
         };
     }
 
-    private getExpressionGroupList(tokenList: Array<NumberFilterTokenEnum | string>): ExpressionGroup[] {
+    private getExpressionGroupList(tokenList: Array<TextFilterTokenEnum | string>): ExpressionGroup[] {
         var index = 0;
         var length = tokenList.length;
         var expressionGroupList: ExpressionGroup[] = [];
         var currentExpressionGroup: ExpressionGroup = new ExpressionGroup();
-        var currentExpression: NumberExpression;
+        var currentExpression: TextExpression;
         while (index < length) {
             var token = tokenList[index];
             switch (token) {
-                case NumberFilterTokenEnum.OpenParenthesis:
+                case TextFilterTokenEnum.OpenParenthesis:
                     var subGroupTokenList = this.getSubgroupTokenList(tokenList, index);
                     var subGroupExpressionList = this.getExpressionGroupList(subGroupTokenList);
-                    if (index > 0 && tokenList[index - 1] === NumberFilterTokenEnum.Or) {
+                    if (index > 0 && tokenList[index - 1] === TextFilterTokenEnum.Or) {
                         expressionGroupList = expressionGroupList.concat(subGroupExpressionList);
                     } else {
                         if (expressionGroupList.length === 0) {
@@ -86,48 +79,20 @@ export class NumberFilter {
                     }
                     index += subGroupTokenList.length;
                     break;
-                case NumberFilterTokenEnum.And:
-                case NumberFilterTokenEnum.CloseParenthesis:
+                case TextFilterTokenEnum.And:
+                    currentExpression = null;
                     break;
-                case NumberFilterTokenEnum.Equal:
-                case NumberFilterTokenEnum.Greater:
-                case NumberFilterTokenEnum.GreaterOrEqual:
-                case NumberFilterTokenEnum.Less:
-                case NumberFilterTokenEnum.LessOrEqual:
-                    if (currentExpression != null) {
-                        if (currentExpressionGroup.expressionList.indexOf(currentExpression) < 0) {
-                            currentExpressionGroup.expressionList.push(currentExpression);
-                        } else if (tokenList[index - 1] !== NumberFilterTokenEnum.And) {
-                            console.error('Invalid Token: ' + token);
-                        }
-                    }
-                    currentExpression = new NumberExpression();
-                    switch (token) {
-                        case NumberFilterTokenEnum.Equal:
-                            currentExpression.comparissonType = ComparissonTypeEnum.Equal;
-                            break;
-                        case NumberFilterTokenEnum.Greater:
-                            currentExpression.comparissonType = ComparissonTypeEnum.Greater;
-                            break;
-                        case NumberFilterTokenEnum.GreaterOrEqual:
-                            currentExpression.comparissonType = ComparissonTypeEnum.GreaterOrEqual;
-                            break;
-                        case NumberFilterTokenEnum.Less:
-                            currentExpression.comparissonType = ComparissonTypeEnum.Less;
-                            break;
-                        case NumberFilterTokenEnum.LessOrEqual:
-                            currentExpression.comparissonType = ComparissonTypeEnum.LessOrEqual;
-                            break;
-                    }
+                case TextFilterTokenEnum.CloseParenthesis:
                     break;
-                case NumberFilterTokenEnum.Or:
+                case TextFilterTokenEnum.Or:
                     currentExpressionGroup = new ExpressionGroup();
+                    currentExpression = null;
                     break;
                 default:
                     if (currentExpression == null) {
-                        console.error('Invalid Token: ' + token);
+                        currentExpression = new TextExpression();
                     }
-                    currentExpression.data = parseFloat(<string>token);
+                    currentExpression.data = <string>token;
                     currentExpressionGroup.expressionList.push(currentExpression);
                     if (expressionGroupList.indexOf(currentExpressionGroup) < 0) {
                         expressionGroupList.push(currentExpressionGroup);
@@ -140,16 +105,16 @@ export class NumberFilter {
         return expressionGroupList;
     }
 
-    private getSubgroupTokenList(tokenList: Array<NumberFilterTokenEnum | string>, openParenthesisIndex: number) {
+    private getSubgroupTokenList(tokenList: Array<TextFilterTokenEnum | string>, openParenthesisIndex: number) {
         var index = openParenthesisIndex + 1;
         var length = tokenList.length;
         var openParenthesisCount = 1;
         while (index < length) {
             var token = tokenList[index];
-            if (token === NumberFilterTokenEnum.OpenParenthesis) {
+            if (token === TextFilterTokenEnum.OpenParenthesis) {
                 openParenthesisCount++;
             }
-            if (token === NumberFilterTokenEnum.CloseParenthesis) {
+            if (token === TextFilterTokenEnum.CloseParenthesis) {
                 openParenthesisCount--;
             }
             if (openParenthesisCount === 0) {
@@ -163,53 +128,39 @@ export class NumberFilter {
         return tokenList.slice(0);
     }
 
-    private getNumberFilterTokenList(expression: string) {
-        var charList = expression.replace(new RegExp(' ', 'g'), '').split('');
+    private getTextFilterTokenList(expression: string) {
+        var charList = expression.split('');
         var index = 0;
         var length = charList.length;
-        var tokenList: Array<NumberFilterTokenEnum | string> = [];
-        var lastToken: NumberFilterTokenEnum;
+        var tokenList: Array<TextFilterTokenEnum | string> = [];
+        var lastToken: TextFilterTokenEnum;
         var data: string = '';
         while (index < length) {
             var char = charList[index];
-            var wasNumber = lastToken === NumberFilterTokenEnum.Number;
-            let token: NumberFilterTokenEnum;
+            var wasText = lastToken === TextFilterTokenEnum.Text;
+            let token: TextFilterTokenEnum;
+            let removePreviousSpace: boolean = true;
             switch (char) {
-                case '>':
-                    token = NumberFilterTokenEnum.Greater;
-                    break;
-                case '<':
-                    token = NumberFilterTokenEnum.Less;
-                    break;
-                case '=':
-                    if (lastToken === NumberFilterTokenEnum.Greater) {
-                        tokenList.pop();
-                        token = NumberFilterTokenEnum.GreaterOrEqual;
-                    } else if (lastToken === NumberFilterTokenEnum.Less) {
-                        tokenList.pop();
-                        token = NumberFilterTokenEnum.LessOrEqual;
-                    } else {
-                        token = NumberFilterTokenEnum.Equal;
-                    }
-                    break;
                 case '+':
-                    token = NumberFilterTokenEnum.Or;
+                    token = TextFilterTokenEnum.Or;
                     break;
                 case '&':
-                    token = NumberFilterTokenEnum.And;
+                    token = TextFilterTokenEnum.And;
                     break;
                 case '(':
-                    token = NumberFilterTokenEnum.OpenParenthesis;
+                    token = TextFilterTokenEnum.OpenParenthesis;
                     break;
                 case ')':
-                    token = NumberFilterTokenEnum.CloseParenthesis;
+                    token = TextFilterTokenEnum.CloseParenthesis;
                     break;
                 default:
+                    removePreviousSpace = false;
                     data += char;
-                    token = NumberFilterTokenEnum.Number;
+                    token = TextFilterTokenEnum.Text;
             }
-            if (token !== NumberFilterTokenEnum.Number) {
-                if (wasNumber) {
+            if (token !== TextFilterTokenEnum.Text) {
+                data = (data || '').trim();
+                if (wasText && data.length > 0) {
                     tokenList.push(data);
                     data = '';
                 }
@@ -220,10 +171,17 @@ export class NumberFilter {
 
             index++;
         }
-        if (lastToken === NumberFilterTokenEnum.Number) {
-            tokenList.push(data);
+        if (lastToken === TextFilterTokenEnum.Text) {
+            data = (data || '').trim();
+            if (data.length > 0) {
+                tokenList.push(data);
+            }
         }
 
         return tokenList;
+    }
+
+    private escapeRegExp(str: string) {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
     }
 }

@@ -1,5 +1,5 @@
-import { Event } from './Event';
-export class ColumnResizedEvent implements Event {
+import { Action } from './Action';
+export class UpdateColumnSizeAction implements Action {
     static type = 'ColumnResized';
     type: string;
     payload: {
@@ -8,7 +8,7 @@ export class ColumnResizedEvent implements Event {
     };
 
     constructor(columnName: string, columnSize: number) {
-        this.type = ColumnResizedEvent.type;
+        this.type = UpdateColumnSizeAction.type;
         this.payload = {
             columnName: columnName,
             columnSize: columnSize,
