@@ -70,7 +70,7 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
             tensCount = Math.floor(gc.index / columnUnitList.length);
             var columnIdentifier = '';
             if (tensCount > 0) {
-                columnIdentifier = columnUnitList[tensCount];
+                columnIdentifier = columnUnitList[tensCount - 1];
             }
             columnIdentifier = columnIdentifier + columnUnitList[unitCount];
             this.gridColumnIdentifierMap[gc.index] = columnIdentifier;

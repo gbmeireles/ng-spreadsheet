@@ -73,12 +73,12 @@ export class DataGridRowListGetter {
             });
         });
 
+        var columnToRenderIndex = spreadsheetState.gridSectionColumnToRendexIndexListMap[gridSection.name];
         var lastIndex = result.length;
         for (var i = 0; i < lastIndex; i++) {
             var row = result[i];
             row.rowIndex = i + titleRowListCount;
             row.sectionRowIndex = i;
-            row.visibleCellList = row.cellList.slice(0, 20);
             row.cellMap = {};
             row.cellList.forEach(cell => {
                 cell.rowIndex = row.rowIndex;
@@ -86,6 +86,7 @@ export class DataGridRowListGetter {
                 cell.cellType = row.rowType;
                 row.cellMap[cell.columnIndex] = cell;
             });
+            row.visibleCellList = columnToRenderIndex ? columnToRenderIndex.map(cri => row.cellMap[cri]) : row.cellList.slice(0, 20);
 
             if (spreadsheetState.getRowStyle) {
                 row.rowStyle = spreadsheetState.getRowStyle(row.rowData, row.rowType, row.sectionRowIndex);

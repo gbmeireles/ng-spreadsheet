@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, HostBinding } from '@angular/core';
 import { OnChanges, SimpleChange } from '@angular/core';
 import { RowComponent } from './RowComponent';
 import { CellComponent } from './Cell/Cell';
@@ -12,7 +12,8 @@ import {
 const html = `
 <GgRow *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" 
     [row]="row" [gridSectionName]="gridSectionName" [index]="i"
-    [scrollWidth]="gridSectionScrollWidth">
+    [scrollWidth]="gridSectionScrollWidth"
+    [activeCellLocation]="activeCellLocation">
     <GgCell *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity"
         [cell]="cell" 
         [index]="cellIndex" 
@@ -29,6 +30,11 @@ const html = `
     directives: [RowComponent, CellComponent],
     selector: `GgRowList`,
     template: html,
+    styles: [`
+    :host() {
+        display:block;
+        min-height: 20px; 
+    }`],
 })
 export class RowListComponent {
     @Input('rowList') rowList: GridRow[];
@@ -37,7 +43,7 @@ export class RowListComponent {
     @Input('gridSectionScrollWidthMap') gridSectionScrollWidthMap: { [gridSectionName: string]: number };
     @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
     @Input('activeCellLocation') activeCellLocation: CellLocation;
-    gridSectionScrollWidth: number;
+    @HostBinding('style.minWidth') gridSectionScrollWidth: number;
     gridSectionScrollLeft: number;
 
     constructor(private cdr: ChangeDetectorRef) {

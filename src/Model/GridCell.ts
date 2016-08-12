@@ -8,11 +8,11 @@ export interface GridCell {
     columnIndex: number;
     rowspan: number;
     data: any;
-    dataPathOnRowData?: string;
     formatData?: (data: any) => string;
     viewableComponentType?: Type;
     editableComponentType?: Type;
     rowIndex?: number;
     sectionRowIndex?: number;
     isEditing?: boolean;
+    customOptions?: any;
 }

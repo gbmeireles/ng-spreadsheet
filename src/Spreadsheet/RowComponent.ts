@@ -12,9 +12,12 @@ import {
 } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import { TemplateRef, ViewContainerRef } from '@angular/core';
-import { ElementRef, Host, Inject, forwardRef } from '@angular/core';
-import { GridRow } from '../Model/GridRow';
-import { ContentTypeEnum } from '../Model/ContentTypeEnum';
+import { ElementRef, Host, Inject } from '@angular/core';
+import {
+    GridRow,
+    CellLocation,
+    ContentTypeEnum,
+} from '../Model/Model';
 
 const css = `:host {
     display: block;
@@ -31,10 +34,11 @@ export class RowComponent implements OnInit, OnDestroy {
     @Input('index') index: number;
     @Input('row') row: GridRow;
     @Input('gridSectionName') gridSectionName: string;
+    @Input('activeCellLocation') activeCellLocation: CellLocation;
 
     @Input('scrollWidth')
-    @HostBinding('style.minWidth')
-    scrollWidth: number;
+    @HostBinding('style.minWidth') scrollWidth: number;
+    @HostBinding('class.is-active') isActive: boolean = false;
 
     private isInitialized: boolean;
 
@@ -45,6 +49,9 @@ export class RowComponent implements OnInit, OnDestroy {
     ngOnChanges(changes: { [key: string]: SimpleChange }) {
         if (changes['row']) {
             this.updateRow(changes['row'].currentValue);
+        }
+        if (changes['activeCellLocation'] && this.activeCellLocation) {
+            this.isActive = this.activeCellLocation.rowIndex === this.row.rowIndex;
         }
     }
 
@@ -75,14 +82,18 @@ export class RowComponent implements OnInit, OnDestroy {
         } else {
             top = row.sectionRowIndex * height;
         }
+
         if (this.index === 0 && row.rowType === ContentTypeEnum.Data) {
             this.renderer.setElementStyle(this.el.nativeElement, 'marginTop', `${top}px`);
-        } else if (row.rowType === ContentTypeEnum.Title) {
-            // this.renderer.setElementStyle(this.el.nativeElement, 'top', `${top}px`);
         }
 
         var style = row.rowStyle;
+        if (this.activeCellLocation) {
+            this.isActive = this.activeCellLocation.rowIndex === this.row.rowIndex;
+        }
+        if (this.isActive) {
+            style = style + ' is-active';
+        }
         this.renderer.setElementProperty(this.el.nativeElement, 'className', style);
-        // this.renderer.setElementClass(this.el.nativeElement, style, false);
     }
 }

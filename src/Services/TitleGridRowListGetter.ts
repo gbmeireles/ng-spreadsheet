@@ -52,15 +52,12 @@ export class TitleGridRowListGetter {
             }
         });
 
+        var columnToRenderIndex = spreadsheetState.gridSectionColumnToRendexIndexListMap[gridSection.name];
         for (var i = 0; i < result.length; i++) {
             var row = result[i];
             row.rowIndex = i;
             row.sectionRowIndex = i;
-            row.visibleCellList = row.cellList.slice(0, 20);
             var lastCell = row.cellList[row.cellList.length - 1];
-            if (row.visibleCellList.indexOf(lastCell) < 0) {
-                row.visibleCellList.push(lastCell);
-            }
             row.cellMap = {};
             row.cellList.forEach(cell => {
                 cell.rowIndex = row.rowIndex;
@@ -68,6 +65,7 @@ export class TitleGridRowListGetter {
                 cell.cellType = row.rowType;
                 row.cellMap[cell.columnIndex] = cell;
             });
+            row.visibleCellList = columnToRenderIndex ? columnToRenderIndex.map(cri => row.cellMap[cri]) : row.cellList.slice(0, 20);
             if (spreadsheetState.getRowStyle) {
                 row.rowStyle = spreadsheetState.getRowStyle(row.rowData, row.rowType, row.sectionRowIndex);
             }

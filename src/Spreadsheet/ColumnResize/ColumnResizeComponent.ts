@@ -1,6 +1,6 @@
 import { Component, Input, ElementRef, HostBinding, HostListener, Renderer, ApplicationRef } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
-import { Inject, EventEmitter, forwardRef, Host } from '@angular/core';
+import { Inject, EventEmitter, Host } from '@angular/core';
 import {
     DISPATCHER_TOKEN,
     Action,
@@ -72,7 +72,7 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
                 && this.columnPositionInformationMap[this.gridColumn.index];
 
             if (positionInformation) {
-                this.left = positionInformation.left + positionInformation.width;
+                this.left = positionInformation.left + positionInformation.width - 2;
             }
         }
     }

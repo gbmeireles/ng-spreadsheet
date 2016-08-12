@@ -33,6 +33,7 @@ import {
     UpdateSpreadsheetSizeAction,
     UpdateSpreadsheetGetRowStyleFnAction,
     GoToCellLocationAction,
+    ClearFilterAction,
 } from '../Events/Events';
 import { ColumnMover } from './ColumnCell/ColumnMover';
 import { ColumnSizeUpdater } from './ColumnResize/ColumnSizeUpdater';
@@ -62,6 +63,8 @@ export class SpreadsheetStore {
     ) {
         this.spreadsheetState = new SpreadsheetState();
         this.dispatcher.subscribe((action: Action) => {
+            console.time('SpreadsheetAction');
+            console.log(`Action requested: ${action.type}`);
             switch (action.type) {
                 case UpdateColumnDefinitionListAction.type: {
                     this.spreadsheetState = this.updateColumnDefinitionList(<UpdateColumnDefinitionListAction>action);
@@ -105,15 +108,19 @@ export class SpreadsheetStore {
                 }
                 case FilterColumnAction.type: {
                     this.spreadsheetState = this.filterSpreadsheetData(<FilterColumnAction>action);
-
                     break;
                 }
                 case GoToCellLocationAction.type: {
                     this.spreadsheetState = this.goToCellLocation(<GoToCellLocationAction>action);
-
+                    break;
+                }
+                case ClearFilterAction.type: {
+                    this.spreadsheetState = this.clearFilter(<ClearFilterAction>action);
                     break;
                 }
             }
+            console.log(`Action executed: ${action.type}`);
+            console.timeEnd('SpreadsheetAction');
             this.onChanged.emit(this.spreadsheetState);
         });
     }
@@ -139,15 +146,18 @@ export class SpreadsheetStore {
         var relative = this.cellLocationRelativeToViewportGetter.get(spreadsheetState, spreadsheetState.activeCellLocation);
         if (relative.isOutsideViewport) {
             var targetGridColumn = spreadsheetState.gridColumnList.find(gc => gc.index === action.payload.gridColumnIndex);
-            var targetScrollTop = action.payload.isToUseMinimunScroll ?
-                spreadsheetState.scrollTop + (relative.top <= 0 ? relative.top : relative.bottom) :
-                action.payload.rowIndex * spreadsheetState.rowHeight;
-            var targetScrollLeft = action.payload.isToUseMinimunScroll ?
-                spreadsheetState.gridSectionScrollLeftMap[targetGridColumn.gridSectionName] + (relative.left <= 0 ? relative.left : relative.right) :
-                spreadsheetState.columnPositionInformationMap[targetGridColumn.index].left;
 
-            spreadsheetState.scrollTop = Math.max(targetScrollTop, 0);
+            if (relative.isOutsideViewportVertically) {
+                var targetScrollTop = action.payload.isToUseMinimunScroll ?
+                    spreadsheetState.scrollTop + (relative.top <= 0 ? relative.top : relative.bottom) :
+                    action.payload.rowIndex * spreadsheetState.rowHeight;
+                spreadsheetState.scrollTop = Math.max(targetScrollTop, 0);
+            }
             if (relative.isOutsideViewportHorizontally) {
+                var targetScrollLeft = action.payload.isToUseMinimunScroll ?
+                    spreadsheetState.gridSectionScrollLeftMap[targetGridColumn.gridSectionName] +
+                    (relative.left <= 0 ? relative.left : relative.right) :
+                    spreadsheetState.columnPositionInformationMap[targetGridColumn.index].left;
                 spreadsheetState.gridSectionScrollLeftMap = Object.assign({}, spreadsheetState.gridSectionScrollLeftMap);
                 spreadsheetState.gridSectionScrollLeftMap[targetGridColumn.gridSectionName] = Math.max(targetScrollLeft, 0);
                 spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, targetGridColumn.gridSectionName);
@@ -192,6 +202,22 @@ export class SpreadsheetStore {
         spreadsheetState.gridColumnList.splice(gridColumnIndex, 1, gridColumn);
 
         spreadsheetState.filterExpressionMap[action.payload.gridColumnIndex] = action.payload.expression;
+        spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
+
+        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
+        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
+        spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
+
+        return spreadsheetState;
+    }
+
+    private clearFilter(action: ClearFilterAction) {
+        var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
+        spreadsheetState.dataRowList = spreadsheetState.originalDataRowList.slice(0);
+
+        spreadsheetState.filterExpressionMap = {};
+        spreadsheetState.gridColumnList = this.gridColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
         spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
 
         spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
@@ -252,7 +278,10 @@ export class SpreadsheetStore {
 
     private scrollSpreadsheet(action: ScrollSpreadsheetAction): SpreadsheetState {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
-        spreadsheetState.scrollTop = Math.max(action.payload, 0);
+        var maxScrollTop = spreadsheetState.gridSectionList.length > 0 ?
+            ((spreadsheetState.gridSectionList[0].dataRowListLength + 1) * spreadsheetState.rowHeight - spreadsheetState.bodyHeight)
+            : 999999999;
+        spreadsheetState.scrollTop = Math.min(Math.max(action.payload, 0), Math.max(maxScrollTop, 0));
         spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
@@ -289,7 +318,6 @@ export class SpreadsheetStore {
         var gridColumn = spreadsheetState.gridColumnList.find(gc => gc.index === action.payload.newColumnIndex);
 
         spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
-        spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gridColumn.gridSectionName);
         spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
         spreadsheetState.gridSectionList.forEach(gs => {
             spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
@@ -312,9 +340,9 @@ export class SpreadsheetStore {
             this.columnPositionInformationMapCalculator.calculate(spreadsheetState.gridColumnList);
         spreadsheetState.gridSectionScrollWidthMap = this.gridSectionScrollWidthMapCalculator.calculate(spreadsheetState);
 
-        var column = spreadsheetState.columnList.find(c => c.name === action.payload.columnName);
-
-        spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, column.gridSectionName);
+        spreadsheetState.gridSectionList.map(gs => gs.name).forEach(gridSectionName => {
+            spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gridSectionName);
+        });
         spreadsheetState.gridSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
         spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
         spreadsheetState.gridSectionList.forEach(gs => {
@@ -359,7 +387,6 @@ export class SpreadsheetStore {
         spreadsheetState.dataRowList = action.payload.newDataRowList || [];
         spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
         spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 

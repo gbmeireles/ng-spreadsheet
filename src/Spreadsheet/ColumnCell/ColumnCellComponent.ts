@@ -92,18 +92,24 @@ const css = `
 .filter-input-container input {
     border: none;
     background-color: white;
+    width: 100%;
+    height: 100%;
 }
 `;
 
 const html = `
     <span>{{columnIdentifier}}</span>
-    <span class="filter-opener" (click)="toggleFilter()"><i class="fa fa-caret-square-o-down"></i></span>
+    <span [class.is-filtered]="isFiltered" class="filter-opener" (click)="toggleFilter()">
+        <i class="filter-opener-icon"></i>
+    </span>
     <div *ngIf="isFilterOpen" class="filter" [class.is-visible]="isFilterOpen">
         <div class="filter-input-container">
             <input ref-filterExpression type="text" [value]="gridColumn.filterExpression" 
                 (keypress)="$event.keyCode === 13 ? filter(filterExpression.value) : true"/>
         </div>
-        <span (click)="filter(filterExpression.value)"><i class="fa fa-check"></i></span>
+        <span (click)="filter(filterExpression.value)">
+            <i class="filter-check-icon"></i>
+        </span>
     </div>`;
 
 @Component({
@@ -129,6 +135,7 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     left: number;
     gridColumnIndex: number = 0;
     isFilterOpen: boolean = false;
+    isFiltered: boolean = false;
 
     constructor(private el: ElementRef,
         private renderer: Renderer,
@@ -146,6 +153,7 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     ngOnChanges(changes: { [key: string]: SimpleChange }) {
         if (changes['gridColumn']) {
             this.gridColumnIndex = this.gridColumn.index;
+            this.isFiltered = this.gridColumn.filterExpression && this.gridColumn.filterExpression.length > 0;
         }
         if (changes['columnPositionInformationMap']) {
 
@@ -180,7 +188,10 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
     @HostListener('dragover', ['$event'])
     onDragOver(evt: DragEvent) {
-        evt.preventDefault();
+        var currentColumn = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
+        if (currentColumn.gridSectionName === ColumnCellComponent.columnToMove.gridSectionName) {
+            evt.preventDefault();
+        };
     }
 
     @HostListener('drop', ['$event'])

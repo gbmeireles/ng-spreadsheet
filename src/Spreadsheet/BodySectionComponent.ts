@@ -111,6 +111,10 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         return this.el.nativeElement;
     }
 
+    focus() {
+        this.el.nativeElement.focus();
+    }
+
     ngOnInit() {
         if (this.isInitialized) {
             return;
@@ -154,6 +158,8 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         var scrollLeft;
         var sourceActiveCell = this.cellGetter.get(this.activeCellLocation);
         var targetActiveCell: Cell;
+        var keyCode = evt.keyCode;
+
         switch (evt.keyCode) {
             case 27://Esc
                 if (sourceActiveCell) {

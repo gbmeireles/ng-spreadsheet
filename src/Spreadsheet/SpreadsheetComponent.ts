@@ -53,6 +53,7 @@ import {
     UpdateSpreadsheetSizeAction,
     UpdateSpreadsheetGetRowStyleFnAction,
     GoToCellLocationAction,
+    ClearFilterAction,
 } from '../Events/Events';
 import { GridEvent } from './Model/GridEvent';
 import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
@@ -159,6 +160,9 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         }
         if (obj.dataRowList) {
             this.dispatcher.emit(new UpdateDataRowListAction(this.dataRowList));
+            //Possible fix to angular 2 render issue
+            // setTimeout(() => this.dispatcher.emit(new ScrollSpreadsheetAction(this.spreadsheetState.scrollTop - 1)), 100);
+            // setTimeout(() => this.dispatcher.emit(new ScrollSpreadsheetAction(this.spreadsheetState.scrollTop - 1)), 200);
         }
         if (obj.rowHeight) {
             this.dispatcher.emit(new UpdateSpreadsheetRowHeightAction(this.rowHeight));
@@ -170,6 +174,46 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         if (obj.rowClassGetter) {
             this.dispatcher.emit(new UpdateSpreadsheetGetRowStyleFnAction(this.rowClassGetter));
         }
+    }
+
+    exportToCsv() {
+        var rowList: string[][] = new Array(this.spreadsheetState.gridSectionList[0].dataRowList.length);
+        var columnListLength = this.spreadsheetState.gridColumnList.length;
+        this.spreadsheetState.gridSectionList.forEach(gridSection => {
+            gridSection.titleRowList.forEach(tr => {
+                if (!rowList[tr.rowIndex]) {
+                    rowList[tr.rowIndex] = new Array(columnListLength);
+                }
+                tr.cellList.forEach(cell => {
+                    rowList[tr.rowIndex][cell.columnIndex] = cell.formatData ? cell.formatData(rowList) : (cell.data == null ? '' : ('' + cell.data));
+                });
+            });
+            gridSection.dataRowList.forEach(tr => {
+                if (!rowList[tr.rowIndex]) {
+                    rowList[tr.rowIndex] = new Array(columnListLength);
+                }
+                tr.cellList.forEach(cell => {
+                    rowList[tr.rowIndex][cell.columnIndex] = cell.formatData ? cell.formatData(rowList) : (cell.data == null ? '' : ('' + cell.data));
+                });
+            });
+        });
+
+        var rowListLength = rowList.length;
+        var rowIndex = 0;
+        while (rowIndex <= rowListLength) {
+            rowList[rowIndex] = rowList[rowIndex] || new Array(columnListLength);
+            var colIndex = 0;
+            while (colIndex < columnListLength) {
+                rowList[rowIndex][colIndex] = rowList[rowIndex][colIndex] == null ? '' : rowList[rowIndex][colIndex];
+                colIndex++;
+            }
+            rowIndex++;
+        }
+
+        var csvContent = 'data:text/csv;charset=ansi,' + rowList.map(row => row.join(';')).join('\n');
+        var textEncoder = new TextEncoder('windows-1252');
+        var encodedUri = textEncoder.encode(csvContent);
+        window.open(csvContent);
     }
 
     ngOnDestroy() {
@@ -184,6 +228,11 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
             this.dispatcher.emit(new GoToCellLocationAction(rowIndex, gridColumnIndex, false));
             this.cdr.markForCheck();
         }
+    }
+
+    clearFilter() {
+        this.dispatcher.emit(new ClearFilterAction());
+        this.cdr.markForCheck();
     }
 
     updateStatusMessage(message: string, timeout?: number) {

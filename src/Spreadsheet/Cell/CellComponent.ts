@@ -19,6 +19,7 @@ import {
     EventEmitter,
     OnInit,
     OnDestroy,
+    Optional,
 } from '@angular/core';
 import {
     Cell,
@@ -46,6 +47,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { IsCellActiveChecker } from './IsCellActiveChecker';
 import { SpreadsheetState } from '../SpreadsheetState';
+import { BodySectionComponent } from '../BodySectionComponent';
 
 const css = `
 :host {
@@ -102,7 +104,8 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         private isCellActiveChecker: IsCellActiveChecker,
         private cellManager: CellManager,
         private spreadsheetState: SpreadsheetState,
-        @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) {
+        @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>,
+        @Optional() @Inject(forwardRef(() => BodySectionComponent)) private bodySectionComponent: BodySectionComponent) {
     }
 
     @HostListener('click', ['$event'])
@@ -165,6 +168,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                     componentRef.instance.onEditStarted(this.rowData);
                     componentRef.onDestroy(() => {
                         this.isEditing = false;
+                        this.bodySectionComponent.focus();
                     });
                 });
         } else {
@@ -236,6 +240,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         }
         if (this.editComponent) {
             this.editComponent.destroy();
+            this.editComponent = null;
         }
         if (this.cellViewContainer) {
             this.cellViewContainer.clear();
