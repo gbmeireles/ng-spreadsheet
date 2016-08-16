@@ -7,6 +7,9 @@ import {
     GridColumn,
     ColumnPositionInformationMap,
 } from '../Model/Model';
+import {
+    ColumnIdentifierMapGetter,
+} from '../Services/Services';
 
 const columnUnitList: string[] =
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -19,17 +22,17 @@ const css = `
 }`;
 
 const html = `
-<GgColumnCell *ngFor="let gridColumn of visibleGridColumnList; let columnIndex = index; trackBy:cellIndentity;" 
+<ColumnCell *ngFor="let gridColumn of visibleGridColumnList; let columnIndex = index; trackBy:cellIndentity;" 
     [gridColumn]="gridColumn"
     [columnList]="columnList"
     [index]="columnIndex" 
     [columnIdentifier]="gridColumnIdentifierMap[gridColumn.index]"
     [columnPositionInformationMap]="columnPositionInformationMap">
-</GgColumnCell>`;
+</ColumnCell>`;
 
 @Component({
     directives: [ColumnCellComponent, NgFor],
-    selector: 'GgColumnRow',
+    selector: 'ColumnRow',
     template: html,
     styles: [css],
 })
@@ -48,7 +51,8 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     gridColumnIdentifierMap: { [columnIndex: number]: string } = {};
 
     constructor(private el: ElementRef,
-        private renderer: Renderer) {
+        private renderer: Renderer,
+        private columnIdentifierMapGetter:ColumnIdentifierMapGetter) {
     }
 
     cellIndentity(index: number, cell): any {
@@ -56,25 +60,7 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     updateColumnIdentifierList() {
-        this.gridColumnIdentifierMap = {};
-
-        if (!this.gridColumnList) {
-            return;
-        }
-
-        var tensCount = 0;
-        var unitCount = 0;
-
-        this.gridColumnList.forEach(gc => {
-            unitCount = gc.index % columnUnitList.length;
-            tensCount = Math.floor(gc.index / columnUnitList.length);
-            var columnIdentifier = '';
-            if (tensCount > 0) {
-                columnIdentifier = columnUnitList[tensCount - 1];
-            }
-            columnIdentifier = columnIdentifier + columnUnitList[unitCount];
-            this.gridColumnIdentifierMap[gc.index] = columnIdentifier;
-        });
+        this.gridColumnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.gridColumnList);
     }
 
     ngOnInit() {

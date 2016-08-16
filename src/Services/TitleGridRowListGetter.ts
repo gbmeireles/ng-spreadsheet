@@ -17,18 +17,18 @@ export class TitleGridRowListGetter {
 
     get(spreadsheetState: SpreadsheetState, gridSection: GridSection): GridRow[] {
         var result: GridRow[] = [];
-        var columnListMap: { [tableSection: string]: ColumnDefinition[] } = {};
+        var columnDefinitionListMap: { [tableSection: string]: ColumnDefinition[] } = {};
         gridSection.columnList.forEach(column => {
-            if (!columnListMap[column.gridSectionName]) {
-                columnListMap[column.gridSectionName] = [];
+            if (!columnDefinitionListMap[column.gridSectionName]) {
+                columnDefinitionListMap[column.gridSectionName] = [];
             }
             var columnDefinition = spreadsheetState.columnDefinitionList.find(cd => cd.name === column.name);
-            columnListMap[column.gridSectionName].push(columnDefinition);
+            columnDefinitionListMap[column.gridSectionName].push(columnDefinition);
         });
 
         gridSection.columnList.forEach(column => {
             var indexOfColumn = gridSection.columnList.indexOf(column);
-            var columnDefinition = columnListMap[column.gridSectionName][indexOfColumn];
+            var columnDefinition = columnDefinitionListMap[column.gridSectionName][indexOfColumn];
 
             var titleCellMatrix = columnDefinition.getTitleCellMatrix(column);
             for (var i = 0; i < titleCellMatrix.length; i++) {

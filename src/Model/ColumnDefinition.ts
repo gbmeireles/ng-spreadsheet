@@ -5,7 +5,7 @@ import { ColumnDataTypeEnum } from './ColumnDataTypeEnum';
 export interface ColumnDefinition {
     name: string;
     description?: string;
-    hide?: boolean;
+    isHidden?: boolean;
     gridSection?: string;
     dataType: ColumnDataTypeEnum;
     filterExpressionMap?: { [columnIndex: number]: string };

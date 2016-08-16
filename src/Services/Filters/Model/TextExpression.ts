@@ -8,7 +8,7 @@ export class TextExpression {
         escapedData = (value || '').replace(new RegExp('\\*', 'g'), '.*');
 
         var rule = '^' + escapedData + '$';
-        this._regex = new RegExp(rule, 'gi');
+        this._regex = new RegExp(rule, 'i');
     }
     get data() {
         return this._data;

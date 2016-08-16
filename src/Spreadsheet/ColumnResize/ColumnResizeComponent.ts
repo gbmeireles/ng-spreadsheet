@@ -5,7 +5,6 @@ import {
     DISPATCHER_TOKEN,
     Action,
     UpdateColumnSizeAction,
-    MoveColumnAction,
 } from '../../Events/Events';
 import { GridColumn, ColumnPositionInformationMap } from '../../Model/Model';
 import { ColumnTargetWidthGetter } from './ColumnTargetWidthGetter';
@@ -34,7 +33,7 @@ var css = `
 var html = `<div></div>`;
 
 @Component({
-    selector: 'GgColumnResize',
+    selector: 'ColumnResize',
     styles: [css],
     template: html,
 })

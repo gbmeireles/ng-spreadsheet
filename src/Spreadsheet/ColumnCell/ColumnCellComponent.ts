@@ -22,6 +22,7 @@ import {
     Action,
     UpdateColumnSizeAction,
     MoveColumnAction,
+    MoveColumnTypeEnum,
     FilterColumnAction,
 } from '../../Events/Events';
 import { ColumnMover } from './ColumnMover';
@@ -113,7 +114,7 @@ const html = `
     </div>`;
 
 @Component({
-    selector: 'GgColumnCell',
+    selector: 'ColumnCell',
     template: html,
     styles: [css],
 })
@@ -196,11 +197,13 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
     @HostListener('drop', ['$event'])
     onDrop(evt: DragEvent) {
+        var columnToMove = ColumnCellComponent.columnToMove;
         var currentColumn = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
-        var oldColumnIndex = this.columnList.indexOf(ColumnCellComponent.columnToMove);
+        var oldColumnIndex = this.columnList.indexOf(columnToMove);
         var newColumnIndex = this.columnList.indexOf(currentColumn);
+        var moveType = newColumnIndex < oldColumnIndex ? MoveColumnTypeEnum.BeforeReferenceColumn : MoveColumnTypeEnum.AfterReferenceColumn;
 
-        this.eventEmitter.emit(new MoveColumnAction(newColumnIndex, oldColumnIndex));
+        this.eventEmitter.emit(new MoveColumnAction(newColumnIndex, oldColumnIndex, columnToMove.name, currentColumn.name, moveType));
     }
 
     getScrollWidth() {

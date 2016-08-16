@@ -30,7 +30,7 @@ const html = `
 </div>`;
 
 @Component({
-    selector: 'GgStatusBar',
+    selector: 'StatusBar',
     template: html,
     styles: [css],
 })

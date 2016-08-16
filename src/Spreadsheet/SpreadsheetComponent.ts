@@ -26,7 +26,6 @@ import { StatusBarComponent } from './StatusBarComponent';
 import { COLUMN_RESIZE_PROVIDERS } from './ColumnResize/ColumnResize';
 import {
     GRID_SCOPE_SERVICES,
-    SpreadsheetEventEmitter,
 } from '../Services/Services';
 import {
     ColumnPositionInformationMap,
@@ -36,12 +35,13 @@ import {
     GridCell,
     GridRow,
     ColumnDefinition,
+    GridColumn,
+    ColumnDataTypeEnum,
 } from '../Model/Model';
 import {
     DISPATCHER_TOKEN,
     DISPATCHER_PROVIDERS,
     Action,
-    MoveColumnAction,
     UpdateColumnSizeAction,
     ScrollGridSectionAction,
     ScrollSpreadsheetAction,
@@ -61,8 +61,11 @@ import { SpreadsheetStore } from './SpreadsheetStore';
 import { Subscription } from 'rxjs/Subscription';
 
 const html = `
-<GgDetailsBar [activeCellLocation]="spreadsheetState?.activeCellLocation"></GgDetailsBar>
-<GgHeader [rowHeight]="spreadsheetState?.rowHeight" 
+<DetailsBar 
+    [activeCellLocation]="spreadsheetState?.activeCellLocation"
+    [gridColumnList]="spreadsheetState?.gridColumnList" 
+    (download)="onDownload.emit(exportData())"></DetailsBar>
+<Header [rowHeight]="spreadsheetState?.rowHeight" 
     [numberTitleRowList]="spreadsheetState?.numberTitleRowList"
     [gridSectionList]="spreadsheetState?.gridSectionList" 
     [columnList]="spreadsheetState?.columnList"
@@ -71,8 +74,8 @@ const html = `
     [gridSectionScrollWidthMap]="spreadsheetState?.gridSectionScrollWidthMap"
     [gridSectionScrollLeftMap]="spreadsheetState?.gridSectionScrollLeftMap"
     [gridSectionPositionInformationMap]="spreadsheetState?.gridSectionPositionInformationMap"
-    [gridSectionColumnToRendexIndexListMap]="spreadsheetState?.gridSectionColumnToRendexIndexListMap"></GgHeader>
-<GgBody [height]="spreadsheetState?.bodyHeight" 
+    [gridSectionColumnToRendexIndexListMap]="spreadsheetState?.gridSectionColumnToRendexIndexListMap"></Header>
+<Body [height]="spreadsheetState?.bodyHeight" 
     [rowHeight]="spreadsheetState?.rowHeight" 
     [numberDataRowList]="spreadsheetState?.numberDataRowList" 
     [gridSectionList]="spreadsheetState?.gridSectionList" 
@@ -81,8 +84,8 @@ const html = `
     [gridSectionScrollWidthMap]="spreadsheetState?.gridSectionScrollWidthMap"
     [gridSectionScrollLeftMap]="spreadsheetState?.gridSectionScrollLeftMap"
     [gridSectionPositionInformationMap]="spreadsheetState?.gridSectionPositionInformationMap"
-    [activeCellLocation]="spreadsheetState?.activeCellLocation"></GgBody>
-<GgStatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></GgStatusBar>`;
+    [activeCellLocation]="spreadsheetState?.activeCellLocation"></Body>
+<StatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></StatusBar>`;
 
 @Component({
     changeDetection: ChangeDetectionStrategy.Default,
@@ -106,8 +109,7 @@ const html = `
     styles: [`
     :host() {
         display: block;
-    }
-    `],
+    }`],
 })
 export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('id') id: string;
@@ -117,6 +119,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('height') height: number;
     @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
     @Output('event') onSpreadsheetEvent: EventEmitter<GridEvent<any>> = new EventEmitter<any>(false);
+    @Output('download') onDownload: EventEmitter<void> = new EventEmitter<void>(false);
     @ViewChild(BodyComponent) body: BodyComponent;
     statusMessage: string;
     statusMessageTimeout: number;
@@ -132,12 +135,16 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     constructor(private el: ElementRef,
         private cdr: ChangeDetectorRef,
         @Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<Action>,
-        private eventEmitter: SpreadsheetEventEmitter,
         private app: ApplicationRef,
         private renderer: Renderer,
         private spreadsheetStateGlobal: SpreadsheetState,
         private spreadsheetStore: SpreadsheetStore) {
-        this.eventEmitterSubscription = this.eventEmitter.subscribe(data => this.onSpreadsheetEvent.emit(data));
+        this.eventEmitterSubscription = this.dispatcher.subscribe((data: Action) => {
+            this.onSpreadsheetEvent.emit({
+                eventData: data,
+                eventType: 'Action',
+            });
+        });
         this.spreadsheetStore.onChanged.subscribe((changedSpreadsheet) => {
             this.spreadsheetState = changedSpreadsheet;
             Object.assign(this.spreadsheetStateGlobal, changedSpreadsheet);
@@ -176,16 +183,24 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         }
     }
 
-    exportToCsv() {
-        var rowList: string[][] = new Array(this.spreadsheetState.gridSectionList[0].dataRowList.length);
+    ngOnDestroy() {
+        this.eventEmitterSubscription.unsubscribe();
+        this.windowResizeUnregisterFn();
+    }
+
+    exportData() {
+        var rowList: GridCell[][] = new Array(this.spreadsheetState.gridSectionList[0].dataRowList.length);
         var columnListLength = this.spreadsheetState.gridColumnList.length;
+        var gridColumnMap: { [index: number]: GridColumn } = {};
+        this.spreadsheetState.gridColumnList.forEach(gc => gridColumnMap[gc.index] = gc);
         this.spreadsheetState.gridSectionList.forEach(gridSection => {
             gridSection.titleRowList.forEach(tr => {
                 if (!rowList[tr.rowIndex]) {
                     rowList[tr.rowIndex] = new Array(columnListLength);
                 }
                 tr.cellList.forEach(cell => {
-                    rowList[tr.rowIndex][cell.columnIndex] = cell.formatData ? cell.formatData(rowList) : (cell.data == null ? '' : ('' + cell.data));
+                    var gridColumn = gridColumnMap[cell.columnIndex];
+                    rowList[tr.rowIndex][cell.columnIndex] = cell;
                 });
             });
             gridSection.dataRowList.forEach(tr => {
@@ -193,7 +208,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
                     rowList[tr.rowIndex] = new Array(columnListLength);
                 }
                 tr.cellList.forEach(cell => {
-                    rowList[tr.rowIndex][cell.columnIndex] = cell.formatData ? cell.formatData(rowList) : (cell.data == null ? '' : ('' + cell.data));
+                    var gridColumn = gridColumnMap[cell.columnIndex];
+                    rowList[tr.rowIndex][cell.columnIndex] = cell;
                 });
             });
         });
@@ -204,21 +220,13 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
             rowList[rowIndex] = rowList[rowIndex] || new Array(columnListLength);
             var colIndex = 0;
             while (colIndex < columnListLength) {
-                rowList[rowIndex][colIndex] = rowList[rowIndex][colIndex] == null ? '' : rowList[rowIndex][colIndex];
+                rowList[rowIndex][colIndex] = rowList[rowIndex][colIndex] == null ? null : rowList[rowIndex][colIndex];
                 colIndex++;
             }
             rowIndex++;
         }
 
-        var csvContent = 'data:text/csv;charset=ansi,' + rowList.map(row => row.join(';')).join('\n');
-        var textEncoder = new TextEncoder('windows-1252');
-        var encodedUri = textEncoder.encode(csvContent);
-        window.open(csvContent);
-    }
-
-    ngOnDestroy() {
-        this.eventEmitterSubscription.unsubscribe();
-        this.windowResizeUnregisterFn();
+        return rowList;
     }
 
     goToRow(rowNumber: number) {

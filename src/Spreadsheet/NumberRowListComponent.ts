@@ -3,7 +3,7 @@ import { RowComponent } from './RowComponent';
 import { GridRow } from '../Model/GridRow';
 
 const css = `
-GgRowHandlerCell {
+RowHandlerCell {
     display: inline-block;
     position: absolute;
     width: 20px;
@@ -16,15 +16,15 @@ GgRowHandlerCell {
 }`;
 
 const html = `
-<GgRow *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" gridSectionName="RowNumber"
+<Row *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" gridSectionName="RowNumber"
     [index]="i">
-    <GgRowHandlerCell [style.lineHeight.px]="rowHeight">{{numberRow.rowNumber}}</GgRowHandlerCell>
-</GgRow>`;
+    <RowHandlerCell [style.lineHeight.px]="rowHeight">{{numberRow.rowNumber}}</RowHandlerCell>
+</Row>`;
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     directives: [RowComponent],
-    selector: `GgNumberRowList`,
+    selector: `NumberRowList`,
     template: html,
     styles: [css],
 })

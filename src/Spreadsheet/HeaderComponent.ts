@@ -13,11 +13,12 @@ import {
 } from '../Model/Model';
 
 const html = `
-<GgHeaderSection gridSectionName="RowNumber" 
-    [columnList]="columnList">
-    <GgNumberRowList [numberRowList]="numberTitleRowList" [rowHeight]="rowHeight"></GgNumberRowList>
-</GgHeaderSection>
-<GgHeaderSection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity"
+<HeaderSection gridSectionName="RowNumber" 
+    [columnList]="columnList"
+    [gridColumnList]="gridColumnList">
+    <NumberRowList [numberRowList]="numberTitleRowList" [rowHeight]="rowHeight"></NumberRowList>
+</HeaderSection>
+<HeaderSection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity"
     [gridSectionScrollWidthMap]="gridSectionScrollWidthMap"
     [gridSectionName]="gridSection.name"
     [gridSectionPositionInformationMap]="gridSectionPositionInformationMap" 
@@ -26,14 +27,14 @@ const html = `
     [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
     [gridSectionColumnToRendexIndexListMap]="gridSectionColumnToRendexIndexListMap"
     [columnPositionInformationMap]="columnPositionInformationMap">
-    <GgRowList [rowList]="gridSection.titleRowList" 
+    <RowList [rowList]="gridSection.titleRowList" 
         [gridSectionName]="gridSection.name"
         [columnPositionInformationMap]="columnPositionInformationMap"
         [gridSectionScrollWidthMap]="gridSectionScrollWidthMap"
-        [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"></GgRowList>
-</GgHeaderSection>
-<GgHeaderSection gridSectionName="Scroll" [columnList]="columnList">
-</GgHeaderSection>`;
+        [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"></RowList>
+</HeaderSection>
+<HeaderSection gridSectionName="Scroll" [columnList]="columnList">
+</HeaderSection>`;
 
 const css = `
 :host {
@@ -46,7 +47,7 @@ const css = `
 const NUMBER_ROW_HEIGHT: number = 20;
 
 @Component({
-    selector: 'GgHeader',
+    selector: 'Header',
     template: html,
     styles: [css],
     directives: [NumberRowListComponent, HeaderSectionComponent, RowListComponent],

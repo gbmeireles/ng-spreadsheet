@@ -7,11 +7,12 @@ import {
     DISPATCHER_TOKEN,
     Action,
     UpdateColumnSizeAction,
-    MoveColumnAction,
+    ClearFilterAction,
 } from '../Events/Events';
 
 import { ColumnRowComponent } from './ColumnRowComponent';
 import { ColumnResizeComponent } from './ColumnResize/ColumnResize';
+import { ColumnCornerCellComponent } from './ColumnCornerCellComponent';
 import {
     GridSectionPositionInformationMap,
     GridColumn,
@@ -33,34 +34,25 @@ const css = `
 
 :host([gridSectionName="RowNumber"]) {
     width: 20px;
-}
-
-GgColumnCornerCell {
-    display: block;
-    position: absolute;
-    width: 20px;
-    background-color: #E6E6E6;
-    height: 20px;
-    border-bottom: 1px inset #A3A3A3;
-    border-right: 1px inset #A3A3A3;
 }`;
 
 const html = `
-<GgColumnCornerCell *ngIf="gridSectionName === 'RowNumber'"></GgColumnCornerCell>
-<GgColumnRow [gridSectionName]="gridSectionName" 
+<ColumnCornerCell *ngIf="gridSectionName === 'RowNumber'" [isFiltered]="isFiltered">
+</ColumnCornerCell>
+<ColumnRow [gridSectionName]="gridSectionName" 
     [scrollWidth]="scrollWidth"
     [visibleGridColumnList]="visibleGridColumnList" 
     [columnList]="columnList"
     [gridColumnList]="gridColumnList"
-    [columnPositionInformationMap]="columnPositionInformationMap"></GgColumnRow>
-<GgColumnResize *ngFor="let gridColumn of visibleGridColumnList"
+    [columnPositionInformationMap]="columnPositionInformationMap"></ColumnRow>
+<ColumnResize *ngFor="let gridColumn of visibleGridColumnList"
     [gridColumn]="gridColumn"
-    [columnPositionInformationMap]="columnPositionInformationMap"></GgColumnResize>
+    [columnPositionInformationMap]="columnPositionInformationMap"></ColumnResize>
 <ng-content></ng-content>`;
 
 @Component({
-    directives: [ColumnRowComponent, ColumnResizeComponent],
-    selector: 'GgHeaderSection',
+    directives: [ColumnRowComponent, ColumnResizeComponent, ColumnCornerCellComponent],
+    selector: 'HeaderSection',
     template: html,
     styles: [css],
 })
@@ -79,6 +71,7 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
 
     scrollWidth: number;
     visibleGridColumnList: GridColumn[];
+    isFiltered: boolean = false;
 
     constructor(private el: ElementRef,
         @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) {
@@ -108,6 +101,9 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
         }
         if (obj['gridSectionScrollLeftMap']) {
             this.el.nativeElement.scrollLeft = this.gridSectionScrollLeftMap && this.gridSectionScrollLeftMap[this.gridSectionName];
+        }
+        if (obj['gridColumnList']) {
+            this.isFiltered = this.gridColumnList.some(gc => gc.filterExpression && gc.filterExpression.length > 0);
         }
     }
 

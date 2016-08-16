@@ -13,7 +13,6 @@ import {
     DISPATCHER_TOKEN,
     DISPATCHER_PROVIDERS,
     Action,
-    MoveColumnAction,
     UpdateColumnSizeAction,
     ScrollGridSectionAction,
     ScrollSpreadsheetAction,
@@ -39,7 +38,7 @@ const css = `
     overflow-y: scroll;
 }
 
-:host[gridSectionName="Scroll"] GgRow {
+:host[gridSectionName="Scroll"] Row {
     visibility: hidden;
 }
 
@@ -50,7 +49,7 @@ const css = `
 `;
 
 @Component({
-    selector: 'GgBodySection',
+    selector: 'BodySection',
     styles: [css],
     template: '<ng-content></ng-content>',
 })

@@ -369,6 +369,10 @@ export class SpreadsheetStore {
         spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
         spreadsheetState.gridSectionScrollLeftMap = Object.assign({}, spreadsheetState.gridSectionScrollLeftMap);
         spreadsheetState.gridSectionList.forEach(gs => {
+            spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gs.name);
+        });
+        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.gridSectionList.forEach(gs => {
             if (!spreadsheetState.gridSectionScrollLeftMap[gs.name]) {
                 spreadsheetState.gridSectionScrollLeftMap[gs.name] = 0;
             }

@@ -32,7 +32,6 @@ import {
     DISPATCHER_TOKEN,
     Action,
     UpdateColumnSizeAction,
-    MoveColumnAction,
     GoToCellLocationAction,
 } from '../../Events/Events';
 import {
@@ -61,18 +60,18 @@ const css = `
     position: relative;
 }
 
-GgCellComponent {
+CellComponent {
     padding: 2px;
 }
 
-:host.is-custom GgCellComponent {
+:host.is-custom CellComponent {
     padding: 0px;
 }
 `;
 
 @Component({
-    selector: 'GgCell',
-    template: '<GgCellComponent ref-cellComponent>{{data}}</GgCellComponent>',
+    selector: 'Cell',
+    template: '<CellComponent ref-cellComponent>{{data}}</CellComponent>',
     styles: [css],
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
@@ -120,6 +119,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     }
 
     ngOnChanges(changes: { [key: string]: SimpleChange }) {
+        if (!this.gridCell) {
+            console.warn('GridCell not defined');
+            return;
+        }
         if (changes['gridCell']) {
             this.initCell(this.gridCell);
         }

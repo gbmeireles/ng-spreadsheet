@@ -5,7 +5,7 @@ import { Column, ColumnDefinition } from '../Model/Model';
 export class ColumnListGetter {
     get(columnDefinitionList: ColumnDefinition[]): Column[] {
         var lastIndex = -1;
-        return columnDefinitionList.filter(c => !c.hide).map(columnDefinition => {
+        return columnDefinitionList.filter(c => !c.isHidden).map(columnDefinition => {
             var gridColumn = columnDefinition.getColumn(lastIndex + 1);
 
             gridColumn.name = columnDefinition.name;
@@ -13,6 +13,7 @@ export class ColumnListGetter {
             lastIndex = gridColumn.endIndex;
             gridColumn.width = gridColumn.width || gridColumn.defaultWidth;
             gridColumn.dataType = columnDefinition.dataType;
+            gridColumn.gridSectionName = columnDefinition.gridSection;
 
             return gridColumn;
         });

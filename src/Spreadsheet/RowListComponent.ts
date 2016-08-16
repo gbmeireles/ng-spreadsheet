@@ -10,11 +10,11 @@ import {
 } from '../Model/Model';
 
 const html = `
-<GgRow *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" 
+<Row *ngFor="let row of rowList; trackBy:rowIndentity; let i = index" 
     [row]="row" [gridSectionName]="gridSectionName" [index]="i"
     [scrollWidth]="gridSectionScrollWidth"
     [activeCellLocation]="activeCellLocation">
-    <GgCell *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity"
+    <Cell *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity"
         [cell]="cell" 
         [index]="cellIndex" 
         [rowData]="row?.rowData" 
@@ -22,13 +22,13 @@ const html = `
         [gridSectionScrollLeft]="gridSectionScrollLeft"
         [activeCellLocation]="activeCellLocation"
         >
-    </GgCell>
-</GgRow>`;
+    </Cell>
+</Row>`;
 
 @Component({
     changeDetection: ChangeDetectionStrategy.Default,
     directives: [RowComponent, CellComponent],
-    selector: `GgRowList`,
+    selector: `RowList`,
     template: html,
     styles: [`
     :host() {

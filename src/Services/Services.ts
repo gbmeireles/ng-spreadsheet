@@ -16,11 +16,11 @@ import { GridSectionScrollWidthMapCalculator } from './GridSectionScrollWidthMap
 import { NumberTitleRowListGetter } from './NumberTitleRowListGetter';
 import { NumberDataRowListGetter } from './NumberDataRowListGetter';
 import { GridSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
-import { SpreadsheetEventEmitter } from './SpreadsheetEventEmitter';
 import { CellManager } from './CellManager';
 import { CellLocationRelativeToViewportGetter } from './CellLocationRelativeToViewportGetter';
 import { CellGetter } from './CellGetter';
 import { FILTERS_PROVIDERS } from './Filters/Filters';
+import { ColumnIdentifierMapGetter } from './ColumnIdentifierMapGetter';
 
 export * from './Filters/Filters';
 
@@ -44,9 +44,9 @@ export {
     NumberTitleRowListGetter,
     NumberDataRowListGetter,
     GridSectionDataRowMapGetter,
-    SpreadsheetEventEmitter,
     CellManager,
     CellGetter,
+    ColumnIdentifierMapGetter,
 }
 
 export const GRID_SCOPE_SERVICES: Array<any> = [
@@ -70,7 +70,7 @@ export const GRID_SCOPE_SERVICES: Array<any> = [
     NumberTitleRowListGetter,
     NumberDataRowListGetter,
     GridSectionDataRowMapGetter,
-    SpreadsheetEventEmitter,
     CellManager,
     CellGetter,
+    ColumnIdentifierMapGetter,
 ];

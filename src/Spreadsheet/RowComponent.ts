@@ -26,7 +26,7 @@ const css = `:host {
 }`;
 
 @Component({
-    selector: 'GgRow',
+    selector: 'Row',
     template: '<ng-content></ng-content>',
     styles: [css],
 })
