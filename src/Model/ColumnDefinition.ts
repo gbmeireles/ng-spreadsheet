@@ -9,6 +9,7 @@ export interface ColumnDefinition {
     gridSection?: string;
     dataType: ColumnDataTypeEnum;
     filterExpressionMap?: { [columnIndex: number]: string };
+    isExportable?: boolean;
 
     getTitleCellMatrix(column: Column): GridCell[][];
     getDataCellMatrix(rowData: any, column: Column): GridCell[][];

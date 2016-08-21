@@ -26,7 +26,8 @@ const html = `
     [gridColumnList]="gridColumnList"
     [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
     [gridSectionColumnToRendexIndexListMap]="gridSectionColumnToRendexIndexListMap"
-    [columnPositionInformationMap]="columnPositionInformationMap">
+    [columnPositionInformationMap]="columnPositionInformationMap"
+    [class.is-separating-section]="gridSection !== gridSectionList[gridSectionList.length - 1]">
     <RowList [rowList]="gridSection.titleRowList" 
         [gridSectionName]="gridSection.name"
         [columnPositionInformationMap]="columnPositionInformationMap"

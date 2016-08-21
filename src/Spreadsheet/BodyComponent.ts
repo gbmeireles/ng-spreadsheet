@@ -40,6 +40,7 @@ const html = `
     [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
     [scrollTop]="scrollTop"
     [activeCellLocation]="activeCellLocation"
+    [class.is-separating-section]="gridSection !== gridSectionList[gridSectionList.length - 1]"
     tabindex="0">
     <RowList [rowList]="gridSection.visibleDataRowList" 
         [gridSectionName]="gridSection.name" 

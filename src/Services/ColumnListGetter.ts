@@ -14,6 +14,7 @@ export class ColumnListGetter {
             gridColumn.width = gridColumn.width || gridColumn.defaultWidth;
             gridColumn.dataType = columnDefinition.dataType;
             gridColumn.gridSectionName = columnDefinition.gridSection;
+            gridColumn.isExportable = columnDefinition.isExportable;
 
             return gridColumn;
         });

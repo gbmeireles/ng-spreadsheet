@@ -37,6 +37,7 @@ import {
     ColumnDefinition,
     GridColumn,
     ColumnDataTypeEnum,
+    ExportData,
 } from '../Model/Model';
 import {
     DISPATCHER_TOKEN,
@@ -188,45 +189,42 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         this.windowResizeUnregisterFn();
     }
 
-    exportData() {
-        var rowList: GridCell[][] = new Array(this.spreadsheetState.gridSectionList[0].dataRowList.length);
+    getActiveCell() {
+        var cellLocation = this.spreadsheetState.activeCellLocation;
+        var gridColumn = this.spreadsheetState.gridColumnList.find(gc => gc.index === cellLocation.gridColumnIndex);
+        var gridSection = this.spreadsheetState.gridSectionList.find(gs => gs.name === gridColumn.name);
+        var gridRow = gridSection.dataRowList.find(dr => dr.rowIndex === cellLocation.rowIndex);
+        var gridCell = gridRow.cellList.find(c => c.columnIndex === gridColumn.index);
+        return gridCell;
+    }
+
+    exportData(): ExportData {
+        var rowList: GridRow[] = new Array(this.spreadsheetState.gridSectionList[0].dataRowList.length);
         var columnListLength = this.spreadsheetState.gridColumnList.length;
         var gridColumnMap: { [index: number]: GridColumn } = {};
         this.spreadsheetState.gridColumnList.forEach(gc => gridColumnMap[gc.index] = gc);
         this.spreadsheetState.gridSectionList.forEach(gridSection => {
             gridSection.titleRowList.forEach(tr => {
                 if (!rowList[tr.rowIndex]) {
-                    rowList[tr.rowIndex] = new Array(columnListLength);
+                    rowList[tr.rowIndex] = tr;
                 }
-                tr.cellList.forEach(cell => {
-                    var gridColumn = gridColumnMap[cell.columnIndex];
-                    rowList[tr.rowIndex][cell.columnIndex] = cell;
-                });
+                if (tr !== rowList[tr.rowIndex]) {
+                    rowList[tr.rowIndex].cellList = rowList[tr.rowIndex].cellList.concat(tr.cellList);
+                }
             });
             gridSection.dataRowList.forEach(tr => {
                 if (!rowList[tr.rowIndex]) {
-                    rowList[tr.rowIndex] = new Array(columnListLength);
+                    rowList[tr.rowIndex] = tr;
                 }
-                tr.cellList.forEach(cell => {
-                    var gridColumn = gridColumnMap[cell.columnIndex];
-                    rowList[tr.rowIndex][cell.columnIndex] = cell;
-                });
+                if (tr !== rowList[tr.rowIndex]) {
+                    rowList[tr.rowIndex].cellList = rowList[tr.rowIndex].cellList.concat(tr.cellList);
+                }
             });
         });
-
-        var rowListLength = rowList.length;
-        var rowIndex = 0;
-        while (rowIndex <= rowListLength) {
-            rowList[rowIndex] = rowList[rowIndex] || new Array(columnListLength);
-            var colIndex = 0;
-            while (colIndex < columnListLength) {
-                rowList[rowIndex][colIndex] = rowList[rowIndex][colIndex] == null ? null : rowList[rowIndex][colIndex];
-                colIndex++;
-            }
-            rowIndex++;
-        }
-
-        return rowList;
+        return {
+            rowList: rowList,
+            columnList: this.spreadsheetState.columnList,
+        };
     }
 
     goToRow(rowNumber: number) {

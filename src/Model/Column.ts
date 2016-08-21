@@ -9,4 +9,5 @@ export interface Column {
     defaultWidth: number;
     name?: string;
     dataType?: ColumnDataTypeEnum;
+    isExportable?: boolean;
 }

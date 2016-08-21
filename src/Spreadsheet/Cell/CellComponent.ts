@@ -107,7 +107,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         @Optional() @Inject(forwardRef(() => BodySectionComponent)) private bodySectionComponent: BodySectionComponent) {
     }
 
-    @HostListener('click', ['$event'])
+    @HostListener('mousedown', ['$event'])
     onClick(evt) {
         this.eventEmitter.emit(new GoToCellLocationAction(this.gridCell.rowIndex, this.gridCell.columnIndex, true));
     }

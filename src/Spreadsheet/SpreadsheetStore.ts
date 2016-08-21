@@ -339,11 +339,12 @@ export class SpreadsheetStore {
         spreadsheetState.columnPositionInformationMap =
             this.columnPositionInformationMapCalculator.calculate(spreadsheetState.gridColumnList);
         spreadsheetState.gridSectionScrollWidthMap = this.gridSectionScrollWidthMapCalculator.calculate(spreadsheetState);
+        spreadsheetState.gridSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
 
         spreadsheetState.gridSectionList.map(gs => gs.name).forEach(gridSectionName => {
             spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gridSectionName);
         });
-        spreadsheetState.gridSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
+
         spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
         spreadsheetState.gridSectionList.forEach(gs => {
             spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =

@@ -12,3 +12,4 @@ export * from './ColumnPositionInformationMap';
 export * from './GridColumn';
 export * from './ColumnDataTypeEnum';
 export * from './CellLocation';
+export * from './ExportData';
