@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { NumberFilter } from './NumberFilter';
 import { TextFilter } from './TextFilter';
 import { ColumnDataTypeEnum } from '../../Model/Model';
-import { GridSectionListGetter } from '../GridSectionListGetter';
+import { SpreadsheetSectionListGetter } from '../GridSectionListGetter';
 import { SpreadsheetState } from '../../SpreadSheet/SpreadsheetState';
 @Injectable()
 export class FilteredDataRowListGetter {
 
-    constructor(private gridSectionListGetter: GridSectionListGetter,
+    constructor(private gridSectionListGetter: SpreadsheetSectionListGetter,
         private numberFilter: NumberFilter,
         private textFilter: TextFilter) { }
 

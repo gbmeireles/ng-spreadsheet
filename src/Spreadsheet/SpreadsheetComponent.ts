@@ -17,15 +17,12 @@ import {
     Renderer,
 } from '@angular/core';
 import { AfterContentInit, OnInit } from '@angular/core';
-import { HeaderComponent } from './HeaderComponent';
 import { BodyComponent } from './BodyComponent';
 import { CELL_PROVIDERS } from './Cell/Cell';
 import { COLUMN_CELL_PROVIDERS } from './ColumnCell/ColumnCell';
-import { DetailsBarComponent } from './DetailsBarComponent';
-import { StatusBarComponent } from './StatusBarComponent';
 import { COLUMN_RESIZE_PROVIDERS } from './ColumnResize/ColumnResize';
 import {
-    GRID_SCOPE_SERVICES,
+    SPREADSHEET_SCOPE_PROVIDERS,
 } from '../Services/Services';
 import {
     ColumnPositionInformationMap,
@@ -44,7 +41,7 @@ import {
     DISPATCHER_PROVIDERS,
     Action,
     UpdateColumnSizeAction,
-    ScrollGridSectionAction,
+    ScrollSpreadsheetSectionAction,
     ScrollSpreadsheetAction,
     FilterColumnAction,
     UpdateColumnDefinitionListAction,
@@ -56,7 +53,7 @@ import {
     GoToCellLocationAction,
     ClearFilterAction,
 } from '../Events/Events';
-import { GridEvent } from './Model/GridEvent';
+import { SpreadsheetEvent } from './Model/GridEvent';
 import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
 import { SpreadsheetStore } from './SpreadsheetStore';
 import { Subscription } from 'rxjs/Subscription';
@@ -90,14 +87,8 @@ const html = `
 
 @Component({
     changeDetection: ChangeDetectionStrategy.Default,
-    directives: [
-        DetailsBarComponent,
-        HeaderComponent,
-        BodyComponent,
-        StatusBarComponent,
-    ],
     providers: [
-        GRID_SCOPE_SERVICES,
+        SPREADSHEET_SCOPE_PROVIDERS,
         COLUMN_RESIZE_PROVIDERS,
         COLUMN_CELL_PROVIDERS,
         CELL_PROVIDERS,
@@ -119,7 +110,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('rowHeight') rowHeight: number;
     @Input('height') height: number;
     @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
-    @Output('event') onSpreadsheetEvent: EventEmitter<GridEvent<any>> = new EventEmitter<any>(false);
+    @Output('event') onSpreadsheetEvent: EventEmitter<SpreadsheetEvent<any>> = new EventEmitter<any>(false);
     @Output('download') onDownload: EventEmitter<void> = new EventEmitter<void>(false);
     @ViewChild(BodyComponent) body: BodyComponent;
     statusMessage: string;

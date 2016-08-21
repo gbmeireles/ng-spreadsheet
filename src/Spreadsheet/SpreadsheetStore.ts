@@ -2,17 +2,17 @@ import { Injectable, Inject, EventEmitter } from '@angular/core';
 import { SpreadsheetState } from './SpreadsheetState';
 import {
     ColumnListGetter,
-    GridSectionListGetter,
-    GridColumnListGetter,
+    SpreadsheetSectionListGetter,
+    SpreadsheetColumnListGetter,
     ColumnPositionInformationMapCalculator,
-    GridSectionScrollWidthMapCalculator,
+    SpreadsheetSectionScrollWidthMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
     SectionPositionInformationMapCalculator,
     NumberTitleRowListGetter,
     NumberDataRowListGetter,
     ColumnToRenderIndexListGetter,
-    GridSectionDataRowMapGetter,
+    SpreadsheetSectionDataRowMapGetter,
     NumberFilter,
     FilteredDataRowListGetter,
     CellLocationRelativeToViewportGetter,
@@ -23,7 +23,7 @@ import {
     Action,
     MoveColumnAction,
     UpdateColumnSizeAction,
-    ScrollGridSectionAction,
+    ScrollSpreadsheetSectionAction,
     ScrollSpreadsheetAction,
     FilterColumnAction,
     UpdateColumnDefinitionListAction,
@@ -44,10 +44,10 @@ export class SpreadsheetStore {
 
     constructor( @Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<any>,
         private columnListGetter: ColumnListGetter,
-        private gridSectionListGetter: GridSectionListGetter,
-        private gridColumnListGetter: GridColumnListGetter,
+        private gridSectionListGetter: SpreadsheetSectionListGetter,
+        private gridColumnListGetter: SpreadsheetColumnListGetter,
         private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
-        private gridSectionScrollWidthMapCalculator: GridSectionScrollWidthMapCalculator,
+        private gridSectionScrollWidthMapCalculator: SpreadsheetSectionScrollWidthMapCalculator,
         private columnViewportUpdater: ColumnViewportUpdater,
         private columnMover: ColumnMover,
         private rowViewportUpdater: RowViewportUpdater,
@@ -56,7 +56,7 @@ export class SpreadsheetStore {
         private numberTitleRowListGetter: NumberTitleRowListGetter,
         private numberDataRowListGetter: NumberDataRowListGetter,
         private columnToRenderIndexListGetter: ColumnToRenderIndexListGetter,
-        private gridSectionDataRowMapGetter: GridSectionDataRowMapGetter,
+        private gridSectionDataRowMapGetter: SpreadsheetSectionDataRowMapGetter,
         private numberFilter: NumberFilter,
         private filteredDataRowListGetter: FilteredDataRowListGetter,
         private cellLocationRelativeToViewportGetter: CellLocationRelativeToViewportGetter,
@@ -82,8 +82,8 @@ export class SpreadsheetStore {
                     this.spreadsheetState = this.resizeColumn(<UpdateColumnSizeAction>action);
                     break;
                 }
-                case ScrollGridSectionAction.type: {
-                    this.spreadsheetState = this.scrollGridSection(<ScrollGridSectionAction>action);
+                case ScrollSpreadsheetSectionAction.type: {
+                    this.spreadsheetState = this.scrollGridSection(<ScrollSpreadsheetSectionAction>action);
                     break;
                 }
                 case ScrollSpreadsheetAction.type: {
@@ -289,7 +289,7 @@ export class SpreadsheetStore {
         return spreadsheetState;
     }
 
-    private scrollGridSection(action: ScrollGridSectionAction): SpreadsheetState {
+    private scrollGridSection(action: ScrollSpreadsheetSectionAction): SpreadsheetState {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
         spreadsheetState.gridSectionScrollLeftMap = Object.assign({}, spreadsheetState.gridSectionScrollLeftMap);
         spreadsheetState.gridSectionScrollLeftMap[action.payload.sectionName] = Math.min(action.payload.scrollLeft);

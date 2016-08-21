@@ -6,12 +6,12 @@ import {
     GridSection,
 } from '../Model/Model';
 import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
-import { GridSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
+import { SpreadsheetSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
 
 @Injectable()
 export class ColumnViewportUpdater {
     constructor(private columnToRenderIndexListGetter: ColumnToRenderIndexListGetter,
-        private gridSectionDataRowMapGetter: GridSectionDataRowMapGetter) {
+        private gridSectionDataRowMapGetter: SpreadsheetSectionDataRowMapGetter) {
     }
 
     update(spreadsheetState: SpreadsheetState, gridSectionName: string): GridSection[] {

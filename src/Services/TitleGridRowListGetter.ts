@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridRowspanSetter } from '../Services/GridRowspanSetter';
+import { SpreadsheetRowspanSetter } from '../Services/GridRowspanSetter';
 import {
     GridRow,
     ColumnDefinition,
@@ -11,7 +11,7 @@ import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
 export class TitleGridRowListGetter {
-    constructor(private gridRowRowspanSetter: GridRowspanSetter) {
+    constructor(private gridRowRowspanSetter: SpreadsheetRowspanSetter) {
 
     }
 

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
-export class GridSectionScrollWidthMapCalculator {
+export class SpreadsheetSectionScrollWidthMapCalculator {
 
     constructor() { }
 

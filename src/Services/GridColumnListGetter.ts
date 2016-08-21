@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { GridColumn, Column } from '../Model/Model';
 
 @Injectable()
-export class GridColumnListGetter {
+export class SpreadsheetColumnListGetter {
 
     get(columnList: Column[], filterExpressionMap: { [gridColumnIndex: number]: string }): GridColumn[] {
         var lastIndex = -1;

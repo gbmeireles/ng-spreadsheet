@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GridSection } from '../Model/Model';
 @Injectable()
-export class GridSectionDataRowMapGetter {
+export class SpreadsheetSectionDataRowMapGetter {
 
     constructor() { }
 

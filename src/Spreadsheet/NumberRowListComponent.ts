@@ -1,5 +1,4 @@
 import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { RowComponent } from './RowComponent';
 import { GridRow } from '../Model/GridRow';
 
 const css = `
@@ -23,7 +22,6 @@ const html = `
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    directives: [RowComponent],
     selector: `NumberRowList`,
     template: html,
     styles: [css],

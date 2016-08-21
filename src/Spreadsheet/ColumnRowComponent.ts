@@ -1,7 +1,6 @@
 import { HostBinding, Component, Input, ElementRef, ViewChildren, Renderer } from '@angular/core';
 import { OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
-import { ColumnCellComponent } from './ColumnCell/ColumnCell';
 import {
     Column,
     GridColumn,
@@ -31,7 +30,6 @@ const html = `
 </ColumnCell>`;
 
 @Component({
-    directives: [ColumnCellComponent, NgFor],
     selector: 'ColumnRow',
     template: html,
     styles: [css],

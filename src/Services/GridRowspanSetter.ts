@@ -15,7 +15,7 @@ interface CellByColumnMapByRowMap {
 }
 
 @Injectable()
-export class GridRowspanSetter {
+export class SpreadsheetRowspanSetter {
     set(gridRowList: GridRow[]) {
         var rowCount = gridRowList.length;
         var list = this.getRowCellList(gridRowList);

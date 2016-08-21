@@ -12,7 +12,7 @@ import { RowToRenderIndexListGetter } from '../Services/RowToRenderIndexListGett
 import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
-export class GridSectionListGetter {
+export class SpreadsheetSectionListGetter {
     constructor(private titleGridRowListGetter: TitleGridRowListGetter,
         private dataGridRowListGetter: DataGridRowListGetter,
         private rowToRenderIndexListGetter: RowToRenderIndexListGetter) {

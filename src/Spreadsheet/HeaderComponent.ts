@@ -1,8 +1,5 @@
 import { HostBinding, HostListener, Component, Input, ElementRef, OnDestroy } from '@angular/core';
 
-import { NumberRowListComponent } from './NumberRowListComponent';
-import { HeaderSectionComponent } from './HeaderSectionComponent';
-import { RowListComponent } from './RowListComponent';
 import {
     GridSection,
     Column,
@@ -51,7 +48,6 @@ const NUMBER_ROW_HEIGHT: number = 20;
     selector: 'Header',
     template: html,
     styles: [css],
-    directives: [NumberRowListComponent, HeaderSectionComponent, RowListComponent],
 })
 export class HeaderComponent implements OnDestroy {
     @HostBinding('style.height') height: number;

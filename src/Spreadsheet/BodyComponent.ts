@@ -18,9 +18,6 @@ import {
     GridSectionPositionInformationMap,
     CellLocation,
 } from '../Model/Model';
-import { BodySectionComponent } from './BodySectionComponent';
-import { NumberRowListComponent } from './NumberRowListComponent';
-import { RowListComponent } from './RowListComponent';
 
 const css = `
 :host {
@@ -58,7 +55,6 @@ const html = `
     selector: 'Body',
     template: html,
     styles: [css],
-    directives: [BodySectionComponent, NumberRowListComponent, RowListComponent],
 })
 export class BodyComponent implements OnInit, OnDestroy {
     @Input('scrollTop') scrollTop: number;

@@ -1,7 +1,5 @@
 import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, HostBinding } from '@angular/core';
 import { OnChanges, SimpleChange } from '@angular/core';
-import { RowComponent } from './RowComponent';
-import { CellComponent } from './Cell/Cell';
 import {
     GridRow,
     GridCell,
@@ -27,7 +25,6 @@ const html = `
 
 @Component({
     changeDetection: ChangeDetectionStrategy.Default,
-    directives: [RowComponent, CellComponent],
     selector: `RowList`,
     template: html,
     styles: [`

@@ -1,6 +1,6 @@
 import { DataGridRowListGetter } from './DataGridRowListGetter';
 import { ColumnListGetter } from './ColumnListGetter';
-import { GridRowspanSetter } from './GridRowspanSetter';
+import { SpreadsheetRowspanSetter } from './GridRowspanSetter';
 import { TitleGridRowListGetter } from './TitleGridRowListGetter';
 import { ColumnPositionInformationMapCalculator } from './ColumnPositionInformationMapCalculator';
 import { CellPositionUpdater } from './CellPositionUpdater';
@@ -8,14 +8,14 @@ import { SectionPositionInformationMapCalculator } from './SectionPositionInform
 import { ColumnViewportUpdater } from './ColumnViewportUpdater';
 import { RowViewportUpdater } from './RowViewportUpdater';
 import { RowViewportVisibleRowCountGetter } from './RowViewportVisibleRowCountGetter';
-import { GridColumnListGetter } from './GridColumnListGetter';
-import { GridSectionListGetter } from './GridSectionListGetter';
+import { SpreadsheetColumnListGetter } from './GridColumnListGetter';
+import { SpreadsheetSectionListGetter } from './GridSectionListGetter';
 import { ColumnToRenderIndexListGetter } from './ColumnToRenderIndexListGetter';
 import { RowToRenderIndexListGetter } from './RowToRenderIndexListGetter';
-import { GridSectionScrollWidthMapCalculator } from './GridSectionScrollWidthMapCalculator';
+import { SpreadsheetSectionScrollWidthMapCalculator } from './GridSectionScrollWidthMapCalculator';
 import { NumberTitleRowListGetter } from './NumberTitleRowListGetter';
 import { NumberDataRowListGetter } from './NumberDataRowListGetter';
-import { GridSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
+import { SpreadsheetSectionDataRowMapGetter } from './GridSectionDataRowMapGetter';
 import { CellManager } from './CellManager';
 import { CellLocationRelativeToViewportGetter } from './CellLocationRelativeToViewportGetter';
 import { CellGetter } from './CellGetter';
@@ -28,48 +28,48 @@ export {
     ColumnPositionInformationMapCalculator,
     DataGridRowListGetter,
     ColumnListGetter,
-    GridRowspanSetter,
-    GridSectionListGetter,
+    SpreadsheetRowspanSetter,
+    SpreadsheetSectionListGetter,
     TitleGridRowListGetter,
     CellPositionUpdater,
     SectionPositionInformationMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
     RowViewportVisibleRowCountGetter,
-    GridColumnListGetter,
+    SpreadsheetColumnListGetter,
     RowToRenderIndexListGetter,
     CellLocationRelativeToViewportGetter,
     ColumnToRenderIndexListGetter,
-    GridSectionScrollWidthMapCalculator,
+    SpreadsheetSectionScrollWidthMapCalculator,
     NumberTitleRowListGetter,
     NumberDataRowListGetter,
-    GridSectionDataRowMapGetter,
+    SpreadsheetSectionDataRowMapGetter,
     CellManager,
     CellGetter,
     ColumnIdentifierMapGetter,
 }
 
-export const GRID_SCOPE_SERVICES: Array<any> = [
+export const SPREADSHEET_SCOPE_PROVIDERS: Array<any> = [
     ColumnPositionInformationMapCalculator,
     DataGridRowListGetter,
     ColumnListGetter,
-    GridRowspanSetter,
-    GridSectionListGetter,
+    SpreadsheetRowspanSetter,
+    SpreadsheetSectionListGetter,
     TitleGridRowListGetter,
     CellPositionUpdater,
     SectionPositionInformationMapCalculator,
     ColumnViewportUpdater,
     RowViewportUpdater,
     RowViewportVisibleRowCountGetter,
-    GridColumnListGetter,
+    SpreadsheetColumnListGetter,
     RowToRenderIndexListGetter,
     CellLocationRelativeToViewportGetter,
     ColumnToRenderIndexListGetter,
     ...FILTERS_PROVIDERS,
-    GridSectionScrollWidthMapCalculator,
+    SpreadsheetSectionScrollWidthMapCalculator,
     NumberTitleRowListGetter,
     NumberDataRowListGetter,
-    GridSectionDataRowMapGetter,
+    SpreadsheetSectionDataRowMapGetter,
     CellManager,
     CellGetter,
     ColumnIdentifierMapGetter,

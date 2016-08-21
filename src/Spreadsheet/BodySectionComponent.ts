@@ -14,7 +14,7 @@ import {
     DISPATCHER_PROVIDERS,
     Action,
     UpdateColumnSizeAction,
-    ScrollGridSectionAction,
+    ScrollSpreadsheetSectionAction,
     ScrollSpreadsheetAction,
     GoToCellLocationAction,
 } from '../Events/Events';
@@ -236,7 +236,7 @@ export class BodySectionComponent implements OnDestroy, OnInit {
             this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
         }
         if (scrollLeft !== undefined) {
-            this.eventEmitter.emit(new ScrollGridSectionAction(this.gridSectionName, scrollLeft));
+            this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.gridSectionName, scrollLeft));
         }
     }
 
@@ -251,7 +251,7 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         var scrollLeft = this.bodyElement.scrollLeft;
         if (this.scrollLeft !== scrollLeft) {
             this.scrollLeft = scrollLeft;
-            this.eventEmitter.emit(new ScrollGridSectionAction(this.gridSectionName, scrollLeft));
+            this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.gridSectionName, scrollLeft));
         };
         if (this.gridSectionName === 'Scroll') {
             var scrollTop = this.bodyElement.scrollTop;

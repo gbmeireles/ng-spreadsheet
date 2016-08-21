@@ -10,9 +10,6 @@ import {
     ClearFilterAction,
 } from '../Events/Events';
 
-import { ColumnRowComponent } from './ColumnRowComponent';
-import { ColumnResizeComponent } from './ColumnResize/ColumnResize';
-import { ColumnCornerCellComponent } from './ColumnCornerCellComponent';
 import {
     GridSectionPositionInformationMap,
     GridColumn,
@@ -51,7 +48,6 @@ const html = `
 <ng-content></ng-content>`;
 
 @Component({
-    directives: [ColumnRowComponent, ColumnResizeComponent, ColumnCornerCellComponent],
     selector: 'HeaderSection',
     template: html,
     styles: [css],
