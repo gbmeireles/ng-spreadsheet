@@ -39,6 +39,7 @@ const css = `
     line-height: 20px;
     vertical-align: middle;
     position: relative;
+    z-index: 5;
 }
 
 .filter-opener {

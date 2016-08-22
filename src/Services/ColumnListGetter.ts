@@ -6,7 +6,7 @@ export class ColumnListGetter {
     get(columnDefinitionList: ColumnDefinition[]): Column[] {
         var lastIndex = -1;
         return columnDefinitionList.filter(c => !c.isHidden).map(columnDefinition => {
-            var spreadsheetColumn = columnDefinition.getColumn(lastIndex + 1);
+            var spreadsheetColumn = columnDefinition.getColumn(lastIndex + 1, columnDefinitionList);
 
             spreadsheetColumn.name = columnDefinition.name;
 

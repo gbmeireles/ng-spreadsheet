@@ -1,5 +1,6 @@
 import { SpreadsheetCell } from './SpreadsheetCell';
 import { Column } from './Column';
+import { ColumnDefinition } from './ColumnDefinition';
 import { ColumnDataTypeEnum } from './ColumnDataTypeEnum';
 
 export interface ColumnDefinition {
@@ -11,7 +12,7 @@ export interface ColumnDefinition {
     filterExpressionMap?: { [columnIndex: number]: string };
     isExportable?: boolean;
 
-    getTitleCellMatrix(column: Column): SpreadsheetCell[][];
-    getDataCellMatrix(rowData: any, column: Column): SpreadsheetCell[][];
-    getColumn(columnStartIndex: number): Column;
+    getTitleCellMatrix(column: Column, columnDefinitionList: ColumnDefinition[]): SpreadsheetCell[][];
+    getDataCellMatrix(rowData: any, column: Column, columnDefinitionList: ColumnDefinition[]): SpreadsheetCell[][];
+    getColumn(columnStartIndex: number, columnDefinitionList: ColumnDefinition[]): Column;
 }

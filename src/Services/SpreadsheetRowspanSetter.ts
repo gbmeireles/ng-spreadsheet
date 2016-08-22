@@ -59,7 +59,7 @@ export class SpreadsheetRowspanSetter {
             }
 
             if (nextRowCellInSameColumn == rc) {
-                rc.cell.rowspan = rowCount - rc.row.rowIndex;
+                rc.cell.rowspan = rowCount - rc.row.sectionRowIndex;
             } else {
                 rc.cell.rowspan = (nextRowCellInSameColumn.row.rowIndex + nextRowCellInSameColumn.cell.rowspan - 1) - rc.row.rowIndex;
             }

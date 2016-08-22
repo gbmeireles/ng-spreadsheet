@@ -30,7 +30,7 @@ export class DataSpreadsheetRowListGetter {
             spreadsheetState.columnList.forEach(column => {
                 var columnDefinition = columnDefinitionMap[column.name];
 
-                var dataCellMatrix = columnDefinition.getDataCellMatrix(rowData, column);
+                var dataCellMatrix = columnDefinition.getDataCellMatrix(rowData, column, spreadsheetState.columnDefinitionList);
                 var lastRow: SpreadsheetRow = null;
                 for (var i = 0; i < dataCellMatrix.length; i++) {
                     var row: SpreadsheetRow = null;

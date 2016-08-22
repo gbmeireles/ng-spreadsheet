@@ -260,6 +260,9 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         if (this.spreadsheetCell.rowspan > 1) {
             this.zIndex = 2;
         }
+        if (this.isActive) {
+            this.zIndex = 4;
+        }
     }
 
     private clear() {
