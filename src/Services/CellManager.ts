@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Cell, GridColumn } from '../Model/Model';
+import { Cell, SpreadsheetColumn } from '../Model/Model';
 
 @Injectable()
 export class CellManager {
@@ -12,8 +12,8 @@ export class CellManager {
         return this.cellList.slice(0);
     }
 
-    getCellListByGridColumnIndex(gridColumnIndex: number) {
-        return this.cellList.filter(c => c.gridColumnIndex === gridColumnIndex);
+    getCellListBySpreadsheetColumnIndex(spreadsheetColumnIndex: number) {
+        return this.cellList.filter(c => c.spreadsheetColumnIndex === spreadsheetColumnIndex);
     }
 
     addCell(cell: Cell) {

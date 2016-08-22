@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
-    GridCell,
+    SpreadsheetCell,
     CellLocation,
 } from '../../Model/Model';
 
@@ -9,12 +9,12 @@ export class IsCellActiveChecker {
 
     constructor() { }
 
-    check(gridCell: GridCell, activeCellLocation: CellLocation): boolean {
-        if (!gridCell || activeCellLocation == null) {
+    check(spreadsheetCell: SpreadsheetCell, activeCellLocation: CellLocation): boolean {
+        if (!spreadsheetCell || activeCellLocation == null) {
             return false;
-        } else if (activeCellLocation.rowIndex !== gridCell.rowIndex) {
+        } else if (activeCellLocation.rowIndex !== spreadsheetCell.rowIndex) {
             return false;
-        } else if (activeCellLocation.gridColumnIndex !== gridCell.columnIndex) {
+        } else if (activeCellLocation.columnIndex !== spreadsheetCell.columnIndex) {
             return false;
         } else {
             return true;

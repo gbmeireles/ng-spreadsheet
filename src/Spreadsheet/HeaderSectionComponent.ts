@@ -11,10 +11,10 @@ import {
 } from '../Events/Events';
 
 import {
-    GridSectionPositionInformationMap,
-    GridColumn,
-    GridRowListMap,
-    GridRow,
+    SpreadsheetSectionPositionInformationMap,
+    SpreadsheetColumn,
+    SpreadsheetRowListMap,
+    SpreadsheetRow,
     Column,
     ColumnPositionInformationMap,
 } from '../Model/Model';
@@ -29,21 +29,21 @@ const css = `
     overflow-x: hidden;
 }
 
-:host([gridSectionName="RowNumber"]) {
+:host([spreadsheetSectionName="RowNumber"]) {
     width: 20px;
 }`;
 
 const html = `
-<ColumnCornerCell *ngIf="gridSectionName === 'RowNumber'" [isFiltered]="isFiltered">
+<ColumnCornerCell *ngIf="spreadsheetSectionName === 'RowNumber'" [isFiltered]="isFiltered">
 </ColumnCornerCell>
-<ColumnRow [gridSectionName]="gridSectionName" 
+<ColumnRow [spreadsheetSectionName]="spreadsheetSectionName" 
     [scrollWidth]="scrollWidth"
-    [visibleGridColumnList]="visibleGridColumnList" 
+    [visibleSpreadsheetColumnList]="visibleSpreadsheetColumnList" 
     [columnList]="columnList"
-    [gridColumnList]="gridColumnList"
+    [spreadsheetColumnList]="spreadsheetColumnList"
     [columnPositionInformationMap]="columnPositionInformationMap"></ColumnRow>
-<ColumnResize *ngFor="let gridColumn of visibleGridColumnList"
-    [gridColumn]="gridColumn"
+<ColumnResize *ngFor="let spreadsheetColumn of visibleSpreadsheetColumnList"
+    [spreadsheetColumn]="spreadsheetColumn"
     [columnPositionInformationMap]="columnPositionInformationMap"></ColumnResize>
 <ng-content></ng-content>`;
 
@@ -55,18 +55,18 @@ const html = `
 export class HeaderSectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;
     @HostBinding('style.width') width: number;
-    @Input('gridSectionScrollWidthMap') gridSectionScrollWidthMap: { [gridSectionName: string]: number };
-    @Input('gridSectionName') gridSectionName: string;
+    @Input('spreadsheetSectionScrollWidthMap') spreadsheetSectionScrollWidthMap: { [spreadsheetSectionName: string]: number };
+    @Input('spreadsheetSectionName') spreadsheetSectionName: string;
     @Input('rowHeight') rowHeight: string;
     @Input('columnList') columnList: Column[];
-    @Input('gridColumnList') gridColumnList: GridColumn[];
+    @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
-    @Input('gridSectionPositionInformationMap') gridSectionPositionInformationMap: GridSectionPositionInformationMap;
-    @Input('gridSectionColumnToRendexIndexListMap') gridSectionColumnToRendexIndexListMap: { [gridSectionName: string]: number[] };
-    @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
+    @Input('spreadsheetSectionPositionInformationMap') spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;
+    @Input('spreadsheetSectionColumnToRendexIndexListMap') spreadsheetSectionColumnToRendexIndexListMap: { [spreadsheetSectionName: string]: number[] };
+    @Input('spreadsheetSectionScrollLeftMap') spreadsheetSectionScrollLeftMap: { [spreadsheetSectionName: string]: number };
 
     scrollWidth: number;
-    visibleGridColumnList: GridColumn[];
+    visibleSpreadsheetColumnList: SpreadsheetColumn[];
     isFiltered: boolean = false;
 
     constructor(private el: ElementRef,
@@ -77,29 +77,29 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
     }
 
     ngOnChanges(obj) {
-        if (obj['gridSectionPositionInformationMap']) {
-            var gridSectionPositionInformation =
-                this.gridSectionPositionInformationMap && this.gridSectionPositionInformationMap[this.gridSectionName];
-            if (gridSectionPositionInformation) {
-                this.left = gridSectionPositionInformation.left;
-                this.width = gridSectionPositionInformation.width;
+        if (obj['spreadsheetSectionPositionInformationMap']) {
+            var spreadsheetSectionPositionInformation =
+                this.spreadsheetSectionPositionInformationMap && this.spreadsheetSectionPositionInformationMap[this.spreadsheetSectionName];
+            if (spreadsheetSectionPositionInformation) {
+                this.left = spreadsheetSectionPositionInformation.left;
+                this.width = spreadsheetSectionPositionInformation.width;
             }
         }
-        if (obj['gridSectionColumnToRendexIndexListMap'] || obj['gridColumnList']) {
-            var gridSectionColumnToRendexIndexList = this.gridSectionColumnToRendexIndexListMap
-                && this.gridSectionColumnToRendexIndexListMap[this.gridSectionName];
-            if (gridSectionColumnToRendexIndexList) {
-                this.visibleGridColumnList = this.gridColumnList.filter(gc => gridSectionColumnToRendexIndexList.indexOf(gc.index) >= 0);
+        if (obj['spreadsheetSectionColumnToRendexIndexListMap'] || obj['spreadsheetColumnList']) {
+            var spreadsheetSectionColumnToRendexIndexList = this.spreadsheetSectionColumnToRendexIndexListMap
+                && this.spreadsheetSectionColumnToRendexIndexListMap[this.spreadsheetSectionName];
+            if (spreadsheetSectionColumnToRendexIndexList) {
+                this.visibleSpreadsheetColumnList = this.spreadsheetColumnList.filter(gc => spreadsheetSectionColumnToRendexIndexList.indexOf(gc.index) >= 0);
             }
         }
-        if (obj['gridSectionScrollWidthMap']) {
-            this.scrollWidth = this.gridSectionScrollWidthMap && this.gridSectionScrollWidthMap[this.gridSectionName];
+        if (obj['spreadsheetSectionScrollWidthMap']) {
+            this.scrollWidth = this.spreadsheetSectionScrollWidthMap && this.spreadsheetSectionScrollWidthMap[this.spreadsheetSectionName];
         }
-        if (obj['gridSectionScrollLeftMap']) {
-            this.el.nativeElement.scrollLeft = this.gridSectionScrollLeftMap && this.gridSectionScrollLeftMap[this.gridSectionName];
+        if (obj['spreadsheetSectionScrollLeftMap']) {
+            this.el.nativeElement.scrollLeft = this.spreadsheetSectionScrollLeftMap && this.spreadsheetSectionScrollLeftMap[this.spreadsheetSectionName];
         }
-        if (obj['gridColumnList']) {
-            this.isFiltered = this.gridColumnList.some(gc => gc.filterExpression && gc.filterExpression.length > 0);
+        if (obj['spreadsheetColumnList']) {
+            this.isFiltered = this.spreadsheetColumnList.some(gc => gc.filterExpression && gc.filterExpression.length > 0);
         }
     }
 

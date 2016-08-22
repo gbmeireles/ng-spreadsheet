@@ -2,29 +2,29 @@ import { Injectable } from '@angular/core';
 import { NumberFilter } from './NumberFilter';
 import { TextFilter } from './TextFilter';
 import { ColumnDataTypeEnum } from '../../Model/Model';
-import { SpreadsheetSectionListGetter } from '../GridSectionListGetter';
+import { SpreadsheetSectionListGetter } from '../SpreadsheetSectionListGetter';
 import { SpreadsheetState } from '../../SpreadSheet/SpreadsheetState';
 @Injectable()
 export class FilteredDataRowListGetter {
 
-    constructor(private gridSectionListGetter: SpreadsheetSectionListGetter,
+    constructor(private spreadsheetSectionListGetter: SpreadsheetSectionListGetter,
         private numberFilter: NumberFilter,
         private textFilter: TextFilter) { }
 
     getList(spreadsheetState: SpreadsheetState) {
-        var originalGridSectionList = this.gridSectionListGetter.get(spreadsheetState);
+        var originalSpreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
         var rowDataToRemoveList = [];
-        Object.keys(spreadsheetState.filterExpressionMap).forEach(gridColumnIndexStr => {
-            var gridColumnIndex = parseInt(gridColumnIndexStr, 10);
-            var expression = spreadsheetState.filterExpressionMap[gridColumnIndex];
+        Object.keys(spreadsheetState.filterExpressionMap).forEach(spreadsheetColumnIndexStr => {
+            var spreadsheetColumnIndex = parseInt(spreadsheetColumnIndexStr, 10);
+            var expression = spreadsheetState.filterExpressionMap[spreadsheetColumnIndex];
             if (!expression || expression.trim() == '') {
                 return;
             }
 
-            var gridColumn = spreadsheetState.gridColumnList.find(gc => gc.index == gridColumnIndex);
-            var gridSection = originalGridSectionList.find(gs => gs.name === gridColumn.gridSectionName);
+            var spreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index == spreadsheetColumnIndex);
+            var spreadsheetSection = originalSpreadsheetSectionList.find(gs => gs.name === spreadsheetColumn.sectionName);
             var filterFn: (data: any) => boolean = () => true;
-            switch (gridColumn.dataType) {
+            switch (spreadsheetColumn.dataType) {
                 case ColumnDataTypeEnum.Number:
                     filterFn = this.numberFilter.getIsMatchFn(expression);
                     break;
@@ -36,8 +36,8 @@ export class FilteredDataRowListGetter {
                     break;
             }
 
-            gridSection.dataRowList
-                .filter(dr => !filterFn(dr.cellMap[gridColumnIndex].data))
+            spreadsheetSection.dataRowList
+                .filter(dr => !filterFn(dr.cellMap[spreadsheetColumnIndex].data))
                 .forEach(dr => {
                     if (rowDataToRemoveList.indexOf(dr.rowData) >= 0) {
                         return;
@@ -46,7 +46,7 @@ export class FilteredDataRowListGetter {
                 });
         });
 
-        var gridSectionDataRowList = spreadsheetState.dataRowList;
+        var spreadsheetSectionDataRowList = spreadsheetState.dataRowList;
         var result = new Array(spreadsheetState.dataRowList.length - rowDataToRemoveList.length);
         var index = 0;
         spreadsheetState.dataRowList.forEach(dr => {

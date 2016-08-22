@@ -6,7 +6,7 @@ import {
     Action,
     UpdateColumnSizeAction,
 } from '../../Events/Events';
-import { GridColumn, ColumnPositionInformationMap } from '../../Model/Model';
+import { SpreadsheetColumn, ColumnPositionInformationMap } from '../../Model/Model';
 import { ColumnTargetWidthGetter } from './ColumnTargetWidthGetter';
 import { ColumnSizeUpdater } from './ColumnSizeUpdater';
 import { MousePositionGetter } from './MousePositionGetter';
@@ -38,7 +38,7 @@ var html = `<div></div>`;
     template: html,
 })
 export class ColumnResizeComponent implements OnInit, OnDestroy {
-    @Input('gridColumn') gridColumn: GridColumn;
+    @Input('spreadsheetColumn') spreadsheetColumn: SpreadsheetColumn;
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
     @HostBinding('class.is-active') isDragging: boolean = false;
     @HostBinding('style.left') left: number;
@@ -65,10 +65,10 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
     }
 
     ngOnChanges(obj) {
-        if (obj['columnPositionInformationMap'] || obj['gridColumn']) {
+        if (obj['columnPositionInformationMap'] || obj['spreadsheetColumn']) {
             var positionInformation = this.columnPositionInformationMap
-                && this.gridColumn
-                && this.columnPositionInformationMap[this.gridColumn.index];
+                && this.spreadsheetColumn
+                && this.columnPositionInformationMap[this.spreadsheetColumn.index];
 
             if (positionInformation) {
                 this.left = positionInformation.left + positionInformation.width - 2;
@@ -84,11 +84,11 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
 
     @HostListener('dblclick', ['$event'])
     private onDoubleClick(evt: MouseEvent) {
-        this.eventEmitter.emit(new UpdateColumnSizeAction(this.gridColumn.name, 50));
+        this.eventEmitter.emit(new UpdateColumnSizeAction(this.spreadsheetColumn.name, 50));
         this.app.tick();
 
-        var newColumnSize = this.columnTargetWidthGetter.getTargetWidth(this.gridColumn.index);
-        this.eventEmitter.emit(new UpdateColumnSizeAction(this.gridColumn.name, newColumnSize));
+        var newColumnSize = this.columnTargetWidthGetter.getTargetWidth(this.spreadsheetColumn.index);
+        this.eventEmitter.emit(new UpdateColumnSizeAction(this.spreadsheetColumn.name, newColumnSize));
     }
 
     @HostListener('mousedown', ['$event'])
@@ -130,8 +130,8 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
 
         this.currentPosition = this.mousePositionGetter.getPosition(evt).x;
 
-        var newColumnSize = this.gridColumn.width + (this.currentPosition - this.startPosition);
-        this.eventEmitter.emit(new UpdateColumnSizeAction(this.gridColumn.name, newColumnSize));
+        var newColumnSize = this.spreadsheetColumn.width + (this.currentPosition - this.startPosition);
+        this.eventEmitter.emit(new UpdateColumnSizeAction(this.spreadsheetColumn.name, newColumnSize));
 
         this.startPosition = 0;
         this.currentPosition = 0;

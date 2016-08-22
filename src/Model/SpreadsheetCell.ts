@@ -1,7 +1,7 @@
 import { Type } from '@angular/core';
 import { ContentTypeEnum } from '../Model/ContentTypeEnum';
 
-export interface GridCell {
+export interface SpreadsheetCell {
     cellStyle?: string;
     cellType?: ContentTypeEnum;
     colspan: number;

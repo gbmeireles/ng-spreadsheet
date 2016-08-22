@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridRow } from '../Model/Model';
+import { SpreadsheetRow } from '../Model/Model';
 import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
@@ -9,34 +9,34 @@ export class ColumnToRenderIndexListGetter {
     constructor() {
     }
 
-    update(spreadsheetState: SpreadsheetState, gridSectionName: string): number[] {
-        if (gridSectionName === 'RowNumber' || gridSectionName === 'Scroll') {
+    update(spreadsheetState: SpreadsheetState, spreadsheetSectionName: string): number[] {
+        if (spreadsheetSectionName === 'RowNumber' || spreadsheetSectionName === 'Scroll') {
             return this.getValidIndexList();
         }
-        var gridSectionWidth = spreadsheetState.gridSectionPositionInformationMap
-            && spreadsheetState.gridSectionPositionInformationMap[gridSectionName]
-            && spreadsheetState.gridSectionPositionInformationMap[gridSectionName].width;
-        if (!gridSectionWidth) {
-            console.error('Grid section width not available');
+        var spreadsheetSectionWidth = spreadsheetState.spreadsheetSectionPositionInformationMap
+            && spreadsheetState.spreadsheetSectionPositionInformationMap[spreadsheetSectionName]
+            && spreadsheetState.spreadsheetSectionPositionInformationMap[spreadsheetSectionName].width;
+        if (!spreadsheetSectionWidth) {
+            console.error('Spreadsheet section width not available');
             return [];
         }
-        var gridSection = spreadsheetState.gridSectionList.find(ts => ts.name === gridSectionName);
-        if (!gridSection) {
+        var spreadsheetSection = spreadsheetState.spreadsheetSectionList.find(ts => ts.name === spreadsheetSectionName);
+        if (!spreadsheetSection) {
             return this.getValidIndexList();
         }
 
-        var gridColumnList = spreadsheetState.gridColumnList.filter(gc => gc.gridSectionName === gridSectionName);
-        if (gridColumnList.length === 0) {
+        var spreadsheetColumnList = spreadsheetState.spreadsheetColumnList.filter(gc => gc.sectionName === spreadsheetSectionName);
+        if (spreadsheetColumnList.length === 0) {
             return this.getValidIndexList();
         }
 
-        var firstGridColumn = gridColumnList.reduce((pv, cv) => { return pv.index < cv.index ? pv : cv; }, gridColumnList[0]);
-        var lastGridColumn = gridColumnList.reduce((pv, cv) => { return pv.index > cv.index ? pv : cv; }, gridColumnList[0]);
+        var firstSpreadsheetColumn = spreadsheetColumnList.reduce((pv, cv) => { return pv.index < cv.index ? pv : cv; }, spreadsheetColumnList[0]);
+        var lastSpreadsheetColumn = spreadsheetColumnList.reduce((pv, cv) => { return pv.index > cv.index ? pv : cv; }, spreadsheetColumnList[0]);
 
-        var firstVisibleCellIndex = firstGridColumn.index;
+        var firstVisibleCellIndex = firstSpreadsheetColumn.index;
         var totalLeft = 0;
-        var scrollLeft = spreadsheetState.gridSectionScrollLeftMap && spreadsheetState.gridSectionScrollLeftMap[gridSectionName];
-        gridColumnList.forEach(gc => {
+        var scrollLeft = spreadsheetState.spreadsheetSectionScrollLeftMap && spreadsheetState.spreadsheetSectionScrollLeftMap[spreadsheetSectionName];
+        spreadsheetColumnList.forEach(gc => {
             totalLeft += gc.width;
             if (totalLeft >= scrollLeft) {
                 return;
@@ -46,16 +46,16 @@ export class ColumnToRenderIndexListGetter {
 
         var lastVisibleCellIndex = firstVisibleCellIndex;
         var totalWidth = 0;
-        gridColumnList.filter(gc => gc.index > firstVisibleCellIndex).forEach(gc => {
+        spreadsheetColumnList.filter(gc => gc.index > firstVisibleCellIndex).forEach(gc => {
             totalWidth += gc.width;
-            if (totalWidth >= gridSectionWidth) {
+            if (totalWidth >= spreadsheetSectionWidth) {
                 return;
             }
             lastVisibleCellIndex++;
         });
 
-        firstVisibleCellIndex = Math.max(firstVisibleCellIndex - 1, firstGridColumn.index);
-        lastVisibleCellIndex = Math.min(lastVisibleCellIndex + 1, lastGridColumn.index);
+        firstVisibleCellIndex = Math.max(firstVisibleCellIndex - 1, firstSpreadsheetColumn.index);
+        lastVisibleCellIndex = Math.min(lastVisibleCellIndex + 1, lastSpreadsheetColumn.index);
 
         if (this.firstVisibleCellIndex === firstVisibleCellIndex && this.lastVisibleCellIndex === lastVisibleCellIndex) {
             return this.getValidIndexList();

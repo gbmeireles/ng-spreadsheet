@@ -12,9 +12,9 @@ import {
 import { OnInit, OnDestroy } from '@angular/core';
 import {
     Cell,
-    GridCell,
+    SpreadsheetCell,
     Column,
-    GridColumn,
+    SpreadsheetColumn,
     ColumnPositionInformationMap,
 } from '../../Model/Model';
 import {
@@ -105,7 +105,7 @@ const html = `
     </span>
     <div *ngIf="isFilterOpen" class="filter" [class.is-visible]="isFilterOpen">
         <div class="filter-input-container">
-            <input ref-filterExpression type="text" [value]="gridColumn.filterExpression" 
+            <input ref-filterExpression type="text" [value]="spreadsheetColumn.filterExpression" 
                 (keypress)="$event.keyCode === 13 ? filter(filterExpression.value) : true"/>
         </div>
         <span (click)="filter(filterExpression.value)">
@@ -126,15 +126,15 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     @HostBinding('style.width') width: number;
     @HostBinding('draggable') draggable: boolean = true;
     @HostBinding('style.margin-left.px') marginLeft: number = 0;
-    @Input('gridColumn') gridColumn: GridColumn;
+    @Input('spreadsheetColumn') spreadsheetColumn: SpreadsheetColumn;
     @Input('columnIdentifier') columnIdentifier: string;
     @Input('columnList') columnList: Column[];
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
     @Input('index') index: number;
 
-    gridCell: GridCell;
+    spreadsheetCell: SpreadsheetCell;
     left: number;
-    gridColumnIndex: number = 0;
+    spreadsheetColumnIndex: number = 0;
     isFilterOpen: boolean = false;
     isFiltered: boolean = false;
 
@@ -147,14 +147,14 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     }
 
     ngOnInit() {
-        this.gridColumnIndex = this.gridColumn.index;
+        this.spreadsheetColumnIndex = this.spreadsheetColumn.index;
         this.updatePosition();
     }
 
     ngOnChanges(changes: { [key: string]: SimpleChange }) {
-        if (changes['gridColumn']) {
-            this.gridColumnIndex = this.gridColumn.index;
-            this.isFiltered = this.gridColumn.filterExpression && this.gridColumn.filterExpression.length > 0;
+        if (changes['spreadsheetColumn']) {
+            this.spreadsheetColumnIndex = this.spreadsheetColumn.index;
+            this.isFiltered = this.spreadsheetColumn.filterExpression && this.spreadsheetColumn.filterExpression.length > 0;
         }
         if (changes['columnPositionInformationMap']) {
 
@@ -170,12 +170,12 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     }
 
     filter(expression: string) {
-        this.eventEmitter.emit(new FilterColumnAction(this.gridColumnIndex, expression));
+        this.eventEmitter.emit(new FilterColumnAction(this.spreadsheetColumnIndex, expression));
     }
 
     @HostListener('dragstart', ['$event'])
     onDragStart(evt: DragEvent) {
-        var columnToMove = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
+        var columnToMove = this.columnGetter.getBySpreadsheetColumnIndex(this.columnList, this.spreadsheetColumnIndex);
         if (columnToMove.endIndex !== columnToMove.startIndex) {
             evt.preventDefault();
         }
@@ -189,8 +189,8 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
     @HostListener('dragover', ['$event'])
     onDragOver(evt: DragEvent) {
-        var currentColumn = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
-        if (currentColumn.gridSectionName === ColumnCellComponent.columnToMove.gridSectionName) {
+        var currentColumn = this.columnGetter.getBySpreadsheetColumnIndex(this.columnList, this.spreadsheetColumnIndex);
+        if (currentColumn.sectionName === ColumnCellComponent.columnToMove.sectionName) {
             evt.preventDefault();
         };
     }
@@ -198,7 +198,7 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     @HostListener('drop', ['$event'])
     onDrop(evt: DragEvent) {
         var columnToMove = ColumnCellComponent.columnToMove;
-        var currentColumn = this.columnGetter.getByGridColumnIndex(this.columnList, this.gridColumnIndex);
+        var currentColumn = this.columnGetter.getBySpreadsheetColumnIndex(this.columnList, this.spreadsheetColumnIndex);
         var oldColumnIndex = this.columnList.indexOf(columnToMove);
         var newColumnIndex = this.columnList.indexOf(currentColumn);
         var moveType = newColumnIndex < oldColumnIndex ? MoveColumnTypeEnum.BeforeReferenceColumn : MoveColumnTypeEnum.AfterReferenceColumn;
@@ -211,7 +211,7 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     }
 
     private updatePosition() {
-        var columnPositionInformation = this.columnPositionInformationMap && this.columnPositionInformationMap[this.gridColumnIndex];
+        var columnPositionInformation = this.columnPositionInformationMap && this.columnPositionInformationMap[this.spreadsheetColumnIndex];
         if (!columnPositionInformation) {
             return;
         }

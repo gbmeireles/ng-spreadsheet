@@ -6,8 +6,13 @@
         <button (click)="requestData()">Request Data</button>
         <input ref-rowNumberInput type="text" />
         <button (click)="goToRow(rowNumberInput.value)">Go To Row</button>
-        <div style="margin-top: 10px;">
-            <NgSpreadsheet id="ggTable">
+        <div class="group" style="margin-top: 10px; height: 640px;">
+            <NgSpreadsheet id="ggTable"
+            [columnDefinitionList]="columnDefinitionList"
+            [rowClassGetter]="getRowStyle"
+            [rowHeight]="30"
+            [dataRowList]="dataRowList"
+            [height]="640">
             </NgSpreadsheet>
         </div>
     </div>

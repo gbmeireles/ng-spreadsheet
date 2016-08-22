@@ -1,3 +1,4 @@
+import { TreeItem } from '../Model/TreeItem';
 export class TreeToListConverter {
     convert(treeItemList: TreeItem[], depth?: number) {
         if (!depth) {

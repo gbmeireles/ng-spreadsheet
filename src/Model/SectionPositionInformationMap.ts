@@ -1,5 +1,5 @@
 import { PositionInformation } from './PositionInformation';
 
-export interface GridSectionPositionInformationMap {
-    [gridSection: string]: PositionInformation;
+export interface SpreadsheetSectionPositionInformationMap {
+    [spreadsheetSection: string]: PositionInformation;
 }

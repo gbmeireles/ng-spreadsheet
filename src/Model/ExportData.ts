@@ -1,6 +1,6 @@
-import { GridRow } from './GridRow';
+import { SpreadsheetRow } from './SpreadsheetRow';
 import { Column } from './Column';
 export interface ExportData {
-    rowList: GridRow[];
+    rowList: SpreadsheetRow[];
     columnList: Column[];
 }

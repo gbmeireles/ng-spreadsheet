@@ -8,7 +8,7 @@ export class ColumnGetter {
 
     constructor() { }
 
-    getByGridColumnIndex(columnList: Column[], gridColumnIndex: number): Column {
-        return columnList.find(c => c.startIndex <= gridColumnIndex && c.endIndex >= gridColumnIndex);
+    getBySpreadsheetColumnIndex(columnList: Column[], spreadsheetColumnIndex: number): Column {
+        return columnList.find(c => c.startIndex <= spreadsheetColumnIndex && c.endIndex >= spreadsheetColumnIndex);
     }
 }

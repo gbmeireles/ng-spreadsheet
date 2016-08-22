@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { GridColumn, Column } from '../Model/Model';
+import { SpreadsheetColumn, Column } from '../Model/Model';
 
 @Injectable()
 export class SpreadsheetColumnListGetter {
 
-    get(columnList: Column[], filterExpressionMap: { [gridColumnIndex: number]: string }): GridColumn[] {
+    get(columnList: Column[], filterExpressionMap: { [spreadsheetColumnIndex: number]: string }): SpreadsheetColumn[] {
         var lastIndex = -1;
-        var result: GridColumn[] = [];
+        var result: SpreadsheetColumn[] = [];
         columnList.forEach(column => {
             var columnIndex = column.startIndex;
             while (columnIndex <= column.endIndex) {
                 result.push({
-                    gridSectionName: column.gridSectionName,
+                    sectionName: column.sectionName,
                     index: columnIndex,
                     name: column.name,
                     style: column.style,

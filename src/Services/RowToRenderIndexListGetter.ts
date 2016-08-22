@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { RowViewportVisibleRowCountGetter } from '../Services/RowViewportVisibleRowCountGetter';
-import { GridSection } from '../Model/Model';
+import { SpreadsheetSection } from '../Model/Model';
 import { SpreadsheetState } from '../Spreadsheet/SpreadsheetState';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class RowToRenderIndexListGetter {
     constructor(private rowViewportVisibleRowCountGetter: RowViewportVisibleRowCountGetter) {
     }
 
-    getListForGridSection(spreadsheetState: SpreadsheetState, gridSection: GridSection): number[] {
+    getListForSpreadsheetSection(spreadsheetState: SpreadsheetState, spreadsheetSection: SpreadsheetSection): number[] {
         var rowHeight = spreadsheetState.rowHeight;
         var scrollTop = spreadsheetState.scrollTop;
         var visibleRowCount = this.rowViewportVisibleRowCountGetter.get(spreadsheetState);
@@ -28,7 +28,7 @@ export class RowToRenderIndexListGetter {
 
         var lastVisibleRowIndex = visibleRowCount + firstVisibleRowIndex;
 
-        var rowList = gridSection.dataRowList;
+        var rowList = spreadsheetSection.dataRowList;
         if (lastVisibleRowIndex > rowList.length - 1) {
             lastVisibleRowIndex = rowList.length - 1;
             firstVisibleRowIndex = Math.max(lastVisibleRowIndex - visibleRowCount - 2, 0);
@@ -46,11 +46,11 @@ export class RowToRenderIndexListGetter {
     }
 
     getList(spreadsheetState: SpreadsheetState): number[] {
-        var gridSection = spreadsheetState.gridSectionList[0];
-        if (!gridSection) {
+        var spreadsheetSection = spreadsheetState.spreadsheetSectionList[0];
+        if (!spreadsheetSection) {
             return [];
         }
-        return this.getListForGridSection(spreadsheetState, gridSection);
+        return this.getListForSpreadsheetSection(spreadsheetState, spreadsheetSection);
     }
 
     private getVisibleRowIndexList(visibleRowCount: number, firstVisibleRowIndex: number, lastVisibleRowIndex: number): number[] {

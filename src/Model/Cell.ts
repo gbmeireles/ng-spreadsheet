@@ -1,12 +1,12 @@
-import { GridCell } from './GridCell';
+import { SpreadsheetCell } from './SpreadsheetCell';
 
 export interface Cell {
     left: number;
     width: number;
-    gridColumnIndex: number;
+    spreadsheetColumnIndex: number;
     sectionColumnIndex?: number;
     getScrollWidth: () => number;
-    gridCell: GridCell;
+    spreadsheetCell: SpreadsheetCell;
     isActive: boolean;
     goToEditMode?: () => void;
     cancelEdit?: () => void;

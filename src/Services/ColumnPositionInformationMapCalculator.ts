@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridColumn } from '../Model/GridColumn';
+import { SpreadsheetColumn } from '../Model/SpreadsheetColumn';
 import { ColumnPositionInformationMap } from '../Model/ColumnPositionInformationMap';
 
 @Injectable()
@@ -7,26 +7,26 @@ export class ColumnPositionInformationMapCalculator {
     constructor() {
     }
 
-    calculate(gridColumnList: GridColumn[]): ColumnPositionInformationMap {
-        var initialColumnPositionInformationMap: ColumnPositionInformationMap = this.getInitialColumnPositionInformationMap(gridColumnList);
+    calculate(spreadsheetColumnList: SpreadsheetColumn[]): ColumnPositionInformationMap {
+        var initialColumnPositionInformationMap: ColumnPositionInformationMap = this.getInitialColumnPositionInformationMap(spreadsheetColumnList);
 
         return initialColumnPositionInformationMap;
     }
 
-    private getInitialColumnPositionInformationMap(gridColumnList: GridColumn[]) {
+    private getInitialColumnPositionInformationMap(spreadsheetColumnList: SpreadsheetColumn[]) {
         var currentColumnPositionBySectionMap = {};
         var columnPositionInformationMap: ColumnPositionInformationMap = {};
 
-        gridColumnList.forEach(gridColumn => {
-            if (!currentColumnPositionBySectionMap[gridColumn.gridSectionName]) {
-                currentColumnPositionBySectionMap[gridColumn.gridSectionName] = 0;
+        spreadsheetColumnList.forEach(spreadsheetColumn => {
+            if (!currentColumnPositionBySectionMap[spreadsheetColumn.sectionName]) {
+                currentColumnPositionBySectionMap[spreadsheetColumn.sectionName] = 0;
             }
 
-            columnPositionInformationMap[gridColumn.index] = {
-                left: currentColumnPositionBySectionMap[gridColumn.gridSectionName],
-                width: gridColumn.width,
+            columnPositionInformationMap[spreadsheetColumn.index] = {
+                left: currentColumnPositionBySectionMap[spreadsheetColumn.sectionName],
+                width: spreadsheetColumn.width,
             };
-            currentColumnPositionBySectionMap[gridColumn.gridSectionName] += gridColumn.width;
+            currentColumnPositionBySectionMap[spreadsheetColumn.sectionName] += spreadsheetColumn.width;
         });
 
         return columnPositionInformationMap;

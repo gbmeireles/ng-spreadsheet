@@ -1,7 +1,7 @@
 import {
     ElementRef,
 } from '@angular/core';
-import { GridCell } from '../../Model/Model';
+import { SpreadsheetCell } from '../../Model/Model';
 import { SpreadsheetComponent } from '../../Spreadsheet/SpreadsheetComponent';
 
 export interface ViewableComponent {

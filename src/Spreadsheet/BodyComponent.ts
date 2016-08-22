@@ -12,10 +12,10 @@ import {
     SimpleChange,
 } from '@angular/core';
 import {
-    GridSection,
-    GridRow,
+    SpreadsheetSection,
+    SpreadsheetRow,
     ColumnPositionInformationMap,
-    GridSectionPositionInformationMap,
+    SpreadsheetSectionPositionInformationMap,
     CellLocation,
 } from '../Model/Model';
 
@@ -27,28 +27,30 @@ const css = `
 }`;
 
 const html = `
-<BodySection #rowNumberSection gridSectionName="RowNumber" [scrollTop]="scrollTop">
+<BodySection #rowNumberSection spreadsheetSectionName="RowNumber" [scrollTop]="scrollTop">
     <NumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></NumberRowList>
-    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
+    <div [style.height.px]="spreadsheetSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
 </BodySection>
-<BodySection *ngFor="let gridSection of gridSectionList; trackBy:gridSectionIdentity"
-    [gridSectionName]="gridSection.name"
-    [gridSectionPositionInformationMap]="gridSectionPositionInformationMap"
-    [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
+<BodySection *ngFor="let spreadsheetSection of spreadsheetSectionList; trackBy:spreadsheetSectionIdentity"
+    [spreadsheetSectionName]="spreadsheetSection.name"
+    [spreadsheetSectionPositionInformationMap]="spreadsheetSectionPositionInformationMap"
+    [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
     [scrollTop]="scrollTop"
     [activeCellLocation]="activeCellLocation"
-    [class.is-separating-section]="gridSection !== gridSectionList[gridSectionList.length - 1]"
+    [class.is-separating-section]="spreadsheetSection !== spreadsheetSectionList[spreadsheetSectionList.length - 1]"
     tabindex="0">
-    <RowList [rowList]="gridSection.visibleDataRowList" 
-        [gridSectionName]="gridSection.name" 
+    <RowList [rowList]="spreadsheetSection.visibleDataRowList" 
+        [spreadsheetSectionName]="spreadsheetSection.name" 
         [columnPositionInformationMap]="columnPositionInformationMap"
-        [gridSectionScrollWidthMap]="gridSectionScrollWidthMap"
-        [gridSectionScrollLeftMap]="gridSectionScrollLeftMap"
-        [activeCellLocation]="activeCellLocation"></RowList>
-    <div [style.height.px]="gridSection?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
+        [spreadsheetSectionScrollWidthMap]="spreadsheetSectionScrollWidthMap"
+        [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
+        [activeCellLocation]="activeCellLocation"
+        [rowHeight]="rowHeight"
+        [activeRowIndexList]="activeRowIndexList"></RowList>
+    <div [style.height.px]="spreadsheetSection?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
 </BodySection>
-<BodySection gridSectionName="Scroll" [scrollTop]="scrollTop">
-    <div [style.height.px]="gridSectionList[0]?.dataRowListLength * rowHeight"></div>
+<BodySection spreadsheetSectionName="Scroll" [scrollTop]="scrollTop">
+    <div [style.height.px]="spreadsheetSectionList[0]?.dataRowListLength * rowHeight"></div>
 </BodySection>`;
 
 @Component({
@@ -58,14 +60,15 @@ const html = `
 })
 export class BodyComponent implements OnInit, OnDestroy {
     @Input('scrollTop') scrollTop: number;
-    @Input('gridSectionList') gridSectionList: GridSection[] = [];
-    @Input('numberDataRowList') numberDataRowList: GridRow[] = [];
+    @Input('spreadsheetSectionList') spreadsheetSectionList: SpreadsheetSection[] = [];
+    @Input('numberDataRowList') numberDataRowList: SpreadsheetRow[] = [];
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
-    @Input('gridSectionScrollWidthMap') gridSectionScrollWidthMap: { [gridSectionName: string]: number };
-    @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
-    @Input('gridSectionPositionInformationMap') gridSectionPositionInformationMap: GridSectionPositionInformationMap;
+    @Input('spreadsheetSectionScrollWidthMap') spreadsheetSectionScrollWidthMap: { [spreadsheetSectionName: string]: number };
+    @Input('spreadsheetSectionScrollLeftMap') spreadsheetSectionScrollLeftMap: { [spreadsheetSectionName: string]: number };
+    @Input('spreadsheetSectionPositionInformationMap') spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;
     @Input('rowHeight') rowHeight: number;
     @Input('activeCellLocation') activeCellLocation: CellLocation;
+    @Input('activeRowIndexList') activeRowIndexList: number[];
 
     @HostBinding('style.height')
     @HostBinding('style.maxHeight')
@@ -94,10 +97,10 @@ export class BodyComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
     }
 
-    gridSectionIdentity(index: number, gridSection: GridSection): any {
-        if (gridSection) {
-            return gridSection.name;
+    spreadsheetSectionIdentity(index: number, spreadsheetSection: SpreadsheetSection): any {
+        if (spreadsheetSection) {
+            return spreadsheetSection.name;
         }
-        return 'gridSection_' + index;
+        return 'spreadsheetSection_' + index;
     }
 }

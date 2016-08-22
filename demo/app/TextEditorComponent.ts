@@ -1,6 +1,6 @@
 import { Component, ElementRef, DynamicComponentLoader, Input, ViewChild } from '@angular/core';
 import { OnInit } from '@angular/core';
-import { EditableComponent, GridCell, GridComponent } from 'ng-spreadsheet';
+import { EditableComponent, SpreadsheetCell } from 'ng-spreadsheet';
 
 @Component({
     selector: 'InputTest',
@@ -10,15 +10,15 @@ export class TextEditorComponent implements EditableComponent {
     @Input() data: any = 'Init';
     @ViewChild('instance') input: ElementRef;
 
-    constructor() {
+    constructor(private spreadsheetCell: SpreadsheetCell) {
 
     }
 
-    onEditStarted(gridComponent: GridComponent, gridCell: GridCell, rowData: any) {
-        if (gridCell.data == null) {
+    onEditStarted(rowData: any) {
+        if (this.spreadsheetCell.data == null) {
             this.data = '';
         } else {
-            this.data = gridCell.data;
+            this.data = this.spreadsheetCell.data;
         }
     }
 
@@ -44,14 +44,10 @@ export class TextEditorComponent implements EditableComponent {
         this.input.nativeElement.select();
     }
 
-    onEditDone(gridComponent: GridComponent, gridCell: GridCell, rowData: any) {
-        gridCell.data = this.data;
-        gridCell.formattedData = this.data === undefined ? '--' : this.data;
-        if (gridCell.dataPathOnRowData) {
-            eval(`rowData.${gridCell.dataPathOnRowData} = gridCell.data;`);
-        }
+    onEditDone(rowData: any) {
+        this.spreadsheetCell.data = this.data;
     }
 
-    onCancelEdit(gridComponent: GridComponent, gridCell: GridCell, rowData: any) {
+    onCancelEdit(rowData: any) {
     }
 }

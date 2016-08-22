@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import {
-    GridRow,
-    GridCell,
+    SpreadsheetRow,
+    SpreadsheetCell,
 } from '../Model/Model';
 
 interface RowCell {
-    cell: GridCell;
-    row: GridRow;
+    cell: SpreadsheetCell;
+    row: SpreadsheetRow;
 }
 interface CellByColumnMapByRowMap {
     [rowIndex: number]: {
@@ -16,11 +16,11 @@ interface CellByColumnMapByRowMap {
 
 @Injectable()
 export class SpreadsheetRowspanSetter {
-    set(gridRowList: GridRow[]) {
-        var rowCount = gridRowList.length;
-        var list = this.getRowCellList(gridRowList);
+    set(spreadsheetRowList: SpreadsheetRow[]) {
+        var rowCount = spreadsheetRowList.length;
+        var list = this.getRowCellList(spreadsheetRowList);
         var cellByColumnMapByRowMap = this.getCellByColumnMapByRowMap(list);
-        var maxRowIndex = gridRowList.reduce((pv, cv) => { return Math.max(cv.rowIndex, pv); }, 0);
+        var maxRowIndex = spreadsheetRowList.reduce((pv, cv) => { return Math.max(cv.rowIndex, pv); }, 0);
         list.forEach(rc => {
             var nextRowCellInSameColumn = rc;
             var rowIndex = rc.row.rowIndex + 1;
@@ -66,37 +66,44 @@ export class SpreadsheetRowspanSetter {
         });
     }
 
-    private getRowCellList(gridRowList: GridRow[]): RowCell[] {
-        if (gridRowList.length === 0) {
+    private getRowCellList(spreadsheetRowList: SpreadsheetRow[]): RowCell[] {
+        if (spreadsheetRowList.length === 0) {
             return [];
         }
 
-        var result: RowCell[] = new Array(gridRowList.length * gridRowList[0].cellList.length);
+        var result: RowCell[] = new Array(spreadsheetRowList.length * spreadsheetRowList[0].cellList.length);
 
-        gridRowList = gridRowList.sort((rowA, rowB) => (rowA.rowIndex > rowB.rowIndex) ? 1 : -1);
+        spreadsheetRowList = spreadsheetRowList.sort((rowA, rowB) => (rowA.rowIndex > rowB.rowIndex) ? 1 : -1);
         var counter = 0;
-        gridRowList.forEach(row => {
+        spreadsheetRowList.forEach(row => {
             row.cellList.forEach(cell => {
                 result[counter] = {
                     cell: cell,
                     row: row,
                 };
+                counter++;
             });
-            counter++;
         });
+
+        result.length = counter;
 
         return result;
     }
 
     private getCellByColumnMapByRowMap(rowCellList: RowCell[]): CellByColumnMapByRowMap {
         var result: CellByColumnMapByRowMap = {};
+        var index = 0;
+        var length = rowCellList.length;
 
-        rowCellList.forEach(rc => {
+        while (index < length) {
+            var rc = rowCellList[index];
+            index++;
+
             if (!result[rc.row.rowIndex]) {
                 result[rc.row.rowIndex] = {};
             }
             result[rc.row.rowIndex][rc.cell.columnIndex] = rc;
-        });
+        }
 
         return result;
     }

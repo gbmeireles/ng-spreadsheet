@@ -1,4 +1,4 @@
 export interface CellLocation {
     rowIndex: number;
-    gridColumnIndex: number;
+    columnIndex: number;
 }

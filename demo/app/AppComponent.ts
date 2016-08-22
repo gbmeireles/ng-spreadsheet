@@ -1,26 +1,41 @@
-import { Component, ViewChild, forwardRef, Injector, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild, forwardRef, Injector, ChangeDetectionStrategy, ViewEncapsulation } from '@angular/core';
 import { HTTP_PROVIDERS, Http }    from '@angular/http';
-import { SpreadsheetComponent, GridData, ColumnDefinition, GridCell, ContentTypeEnum, Column } from 'ng-spreadsheet';
-import { CORE_DIRECTIVES, NgFor } from '@angular/common';
+import { SpreadsheetComponent, ColumnDefinition, SpreadsheetCell, ContentTypeEnum, ColumnDataTypeEnum, Column } from 'ng-spreadsheet';
 import { TreeToListConverter } from './tree/Services/TreeToListConverter';
 import { TextEditorComponent } from './TextEditorComponent';
 import { SimpleColumnCreator } from './SimpleColumnCreator';
 
 @Component({
-    directives: [SpreadsheetComponent, CORE_DIRECTIVES, NgFor],
-    providers: [HTTP_PROVIDERS, TreeToListConverter, SimpleColumnCreator],
-    selector: 'my-app',
-    templateUrl: 'app/app.html',
+    selector: 'SpreadsheetDemoApp',
+    templateUrl: 'app/App.html',
+    encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
     @ViewChild(SpreadsheetComponent) table: SpreadsheetComponent;
     periodList: any[] = [];
+    columnDefinitionList: ColumnDefinition[] = [];
+    dataRowList: any[];
 
     constructor(private http: Http, private treeToListConverter: TreeToListConverter,
         private simpleColumnCreator: SimpleColumnCreator) {
+    }
+
+    ngOnInit() {
         this.http.get('./periodList.json', {}).subscribe((response) => {
             this.periodList = response.json().d.result;
+            var gridData = this.getGridData();
+            this.columnDefinitionList = gridData.columnDefinitionList;
         });
+    }
+
+    getRowStyle(dataRow, rowType: ContentTypeEnum, rowIndex: number) {
+        if (rowType === ContentTypeEnum.Data && dataRow.level) {
+            return `l${(dataRow.level || 0)}`;
+        } else if (rowType === ContentTypeEnum.Title) {
+            return 'title';
+        } else {
+            return 'standard';
+        }
     }
 
     goToRow(rowNumber) {
@@ -35,36 +50,48 @@ export class AppComponent {
         var unitColumn: ColumnDefinition = this.simpleColumnCreator.createColumn('unit', 'Unit', 'unit');
         var periodColumn: ColumnDefinition = {
             description: '',
-            getColumn: (rowDataList: any[], columnStartIndex: number): Column => {
+            getColumn: (columnStartIndex: number): Column => {
                 return {
                     defaultWidth: 200,
                     endIndex: columnStartIndex + this.periodList.length - 1,
-                    gridSectionName: 'PeriodList',
+                    sectionName: 'PeriodList',
                     startIndex: columnStartIndex,
                     name: 'PeriodList',
                 };
             },
-            getDataCellMatrix: (gridData: GridData, rowData: any, gridColumn: Column): GridCell[][] => {
+            getDataCellMatrix: (rowData: any, gridColumn: Column): SpreadsheetCell[][] => {
                 var columnIndex = gridColumn.startIndex;
                 var index = 0;
-                var cellList: GridCell[] = new Array(this.periodList.length);
+                var cellFirstList: SpreadsheetCell[] = new Array(this.periodList.length);
+                var cellSecondList: SpreadsheetCell[] = new Array(this.periodList.length);
                 this.periodList.forEach(period => {
                     var data = rowData.periodValueMap[period.id];
-                    cellList[index] = {
+                    cellFirstList[index] = {
                         cellStyle: 'data-cell',
                         colspan: 1,
                         columnIndex: columnIndex,
                         data: data,
                         editableComponentType: TextEditorComponent,
-                        formattedData: data === undefined ? '--' : (Math.round(rowData.periodValueMap[period.id] * 100) / 100).toString(),
+                        formatData: (rd) => (rd === undefined || !rd.periodValueMap || !rd.periodValueMap[period.id]) ?
+                            '--' : (Math.round(rd.periodValueMap[period.id] * 100) / 100).toString(),
+                        rowspan: 1,
+                    };
+                    cellSecondList[index] = {
+                        cellStyle: 'data-cell',
+                        colspan: 1,
+                        columnIndex: columnIndex,
+                        data: data,
+                        editableComponentType: TextEditorComponent,
+                        formatData: (rd) => (rd === undefined || !rd.periodValueMap || !rd.periodValueMap[period.id]) ?
+                            '--' : (Math.round(rd.periodValueMap[period.id] * 100) / 100).toString(),
                         rowspan: 1,
                     };
                     columnIndex++;
                     index++;
                 });
-                return [cellList];
+                return [cellFirstList];
             },
-            getTitleCellMatrix: (gridData: GridData, column: Column): GridCell[][] => {
+            getTitleCellMatrix: (column: Column): SpreadsheetCell[][] => {
                 var index = 0;
                 var cellList = new Array(this.periodList.length);
                 this.periodList.map(period => {
@@ -77,25 +104,21 @@ export class AppComponent {
                     };
                     index++;
                 });
-                return [cellList];
+                return [[{
+                    cellStyle: 'title-cell',
+                    colspan: this.periodList.length,
+                    columnIndex: column.startIndex,
+                    data: 'Period List',
+                    rowspan: 1,
+                }], cellList];
             },
-            gridSection: 'PeriodList',
+            spreadsheetSection: 'PeriodList',
             name: name,
+            dataType: ColumnDataTypeEnum.Number,
         };
 
         return {
             columnDefinitionList: [titleColumn, codeColumn, levelColumn, descriptionColumn, unitColumn, periodColumn],
-            dataRowList: [],
-            getRowStyle: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => {
-                if (rowType === ContentTypeEnum.Data && dataRow.level) {
-                    return `l${(dataRow.level || 0)}`;
-                } else if (rowType === ContentTypeEnum.Title) {
-                    return 'title';
-                } else {
-                    return 'standard';
-                }
-            },
-            rowHeight: 30,
 
         };
     }
@@ -104,11 +127,10 @@ export class AppComponent {
         this.http.get('./tree.json', {}).subscribe((res) => {
             var gridData = this.getGridData();
             var result = res.json().d.result;
-            gridData.dataRowList =
+            this.dataRowList =
                 // this.treeToListConverter.convert(result).slice(0, 60);
                 this.treeToListConverter.convert(result).slice(0);
 
-            this.table.update(gridData);
             gridData = null;
         });
 

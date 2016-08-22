@@ -4,10 +4,10 @@ import { CellManager } from '../../Services/Services';
 @Injectable()
 export class ColumnTargetWidthGetter {
 
-    constructor(private cellManager:CellManager) { }
+    constructor(private cellManager: CellManager) { }
 
-    getTargetWidth(gridColumnIndex: number): number {
-        return this.cellManager.getCellListByGridColumnIndex(gridColumnIndex).reduce((targetWidth, cell) => {
+    getTargetWidth(spreadsheetColumnIndex: number): number {
+        return this.cellManager.getCellListBySpreadsheetColumnIndex(spreadsheetColumnIndex).reduce((targetWidth, cell) => {
             return Math.max(cell.getScrollWidth(), targetWidth);
         }, 50) + 5;
     }

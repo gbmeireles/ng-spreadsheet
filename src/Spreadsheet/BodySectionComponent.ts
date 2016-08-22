@@ -2,7 +2,7 @@ import { HostBinding, HostListener, Component, Input, ElementRef, EventEmitter, 
 import { OnInit, OnChanges, OnDestroy } from '@angular/core';
 import {
     Cell,
-    GridSectionPositionInformationMap,
+    SpreadsheetSectionPositionInformationMap,
     CellLocation,
 } from '../Model/Model';
 import {
@@ -28,17 +28,17 @@ const css = `
     outline: none;
 }
 
-:host[gridSectionName="RowNumber"] {
+:host[spreadsheetSectionName="RowNumber"] {
     width: 20px;
 }
 
-:host[gridSectionName="Scroll"] {
+:host[spreadsheetSectionName="Scroll"] {
     width: 20px;
     right: 0;
     overflow-y: scroll;
 }
 
-:host[gridSectionName="Scroll"] Row {
+:host[spreadsheetSectionName="Scroll"] Row {
     visibility: hidden;
 }
 
@@ -56,9 +56,9 @@ const css = `
 export class BodySectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;
     @HostBinding('style.width') width: number;
-    @Input('gridSectionName') gridSectionName: string;
-    @Input('gridSectionPositionInformationMap') gridSectionPositionInformationMap: GridSectionPositionInformationMap;
-    @Input('gridSectionScrollLeftMap') gridSectionScrollLeftMap: { [gridSectionName: string]: number };
+    @Input('spreadsheetSectionName') spreadsheetSectionName: string;
+    @Input('spreadsheetSectionPositionInformationMap') spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;
+    @Input('spreadsheetSectionScrollLeftMap') spreadsheetSectionScrollLeftMap: { [spreadsheetSectionName: string]: number };
     @Input('activeCellLocation') activeCellLocation: CellLocation;
 
     private isInitialized: boolean = false;
@@ -122,19 +122,19 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     }
 
     ngOnChanges(obj) {
-        if (obj['gridSectionPositionInformationMap']) {
-            var gridSectionPositionInformation =
-                this.gridSectionPositionInformationMap && this.gridSectionPositionInformationMap[this.gridSectionName];
-            if (gridSectionPositionInformation) {
-                this.left = gridSectionPositionInformation.left;
-                this.width = gridSectionPositionInformation.width;
+        if (obj['spreadsheetSectionPositionInformationMap']) {
+            var spreadsheetSectionPositionInformation =
+                this.spreadsheetSectionPositionInformationMap && this.spreadsheetSectionPositionInformationMap[this.spreadsheetSectionName];
+            if (spreadsheetSectionPositionInformation) {
+                this.left = spreadsheetSectionPositionInformation.left;
+                this.width = spreadsheetSectionPositionInformation.width;
             }
         }
-        if (obj['gridSectionScrollLeftMap']) {
-            this.el.nativeElement.scrollLeft = this.gridSectionScrollLeftMap && this.gridSectionScrollLeftMap[this.gridSectionName];
+        if (obj['spreadsheetSectionScrollLeftMap']) {
+            this.el.nativeElement.scrollLeft = this.spreadsheetSectionScrollLeftMap && this.spreadsheetSectionScrollLeftMap[this.spreadsheetSectionName];
         }
-        if (obj['gridSectionPositionInformationMap']) {
-            this.updateSectionPosition(this.gridSectionPositionInformationMap);
+        if (obj['spreadsheetSectionPositionInformationMap']) {
+            this.updateSectionPosition(this.spreadsheetSectionPositionInformationMap);
         }
     }
 
@@ -142,8 +142,8 @@ export class BodySectionComponent implements OnDestroy, OnInit {
 
     }
 
-    updateSectionPosition(sectionPositionInformationMap: GridSectionPositionInformationMap) {
-        var sectionPositionInformation = sectionPositionInformationMap[this.gridSectionName];
+    updateSectionPosition(sectionPositionInformationMap: SpreadsheetSectionPositionInformationMap) {
+        var sectionPositionInformation = sectionPositionInformationMap[this.spreadsheetSectionName];
         if (!sectionPositionInformation) {
             return;
         }
@@ -158,6 +158,8 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         var sourceActiveCell = this.cellGetter.get(this.activeCellLocation);
         var targetActiveCell: Cell;
         var keyCode = evt.keyCode;
+        var rowspan = sourceActiveCell && sourceActiveCell.spreadsheetCell ? sourceActiveCell.spreadsheetCell.rowspan : 1;
+        var colspan = sourceActiveCell && sourceActiveCell.spreadsheetCell ? sourceActiveCell.spreadsheetCell.colspan : 1;
 
         switch (evt.keyCode) {
             case 27://Esc
@@ -186,16 +188,16 @@ export class BodySectionComponent implements OnDestroy, OnInit {
                 break;
             case 37: {//Arrow Left
                 this.eventEmitter.emit(
-                    new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex - 1, true));
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.columnIndex - colspan, true));
                 break;
             }
             case 38://Arrow Up
                 this.eventEmitter.emit(
-                    new GoToCellLocationAction(this.activeCellLocation.rowIndex - 1, this.activeCellLocation.gridColumnIndex, true));
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex - rowspan, this.activeCellLocation.columnIndex, true));
                 break;
             case 39: {//Arrow right
                 this.eventEmitter.emit(
-                    new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex + 1, true));
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.columnIndex + colspan, true));
                 break;
             }
             case 9://Tab
@@ -203,10 +205,10 @@ export class BodySectionComponent implements OnDestroy, OnInit {
                 var isEditing = (sourceActiveCell == null) ? false : sourceActiveCell.isEditing;
                 if (evt.shiftKey) {
                     this.eventEmitter.emit(
-                        new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex - 1, true));
+                        new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.columnIndex - colspan, true));
                 } else {
                     this.eventEmitter.emit(
-                        new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.gridColumnIndex + 1, true));
+                        new GoToCellLocationAction(this.activeCellLocation.rowIndex, this.activeCellLocation.columnIndex + colspan, true));
                 }
 
                 setTimeout(() => {
@@ -219,7 +221,7 @@ export class BodySectionComponent implements OnDestroy, OnInit {
             case 13://Enter
             case 40: {//Arrow Down
                 this.eventEmitter.emit(
-                    new GoToCellLocationAction(this.activeCellLocation.rowIndex + 1, this.activeCellLocation.gridColumnIndex, true));
+                    new GoToCellLocationAction(this.activeCellLocation.rowIndex + rowspan, this.activeCellLocation.columnIndex, true));
                 break;
             }
             case 113://F2
@@ -236,7 +238,7 @@ export class BodySectionComponent implements OnDestroy, OnInit {
             this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
         }
         if (scrollLeft !== undefined) {
-            this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.gridSectionName, scrollLeft));
+            this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.spreadsheetSectionName, scrollLeft));
         }
     }
 
@@ -251,9 +253,9 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         var scrollLeft = this.bodyElement.scrollLeft;
         if (this.scrollLeft !== scrollLeft) {
             this.scrollLeft = scrollLeft;
-            this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.gridSectionName, scrollLeft));
+            this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.spreadsheetSectionName, scrollLeft));
         };
-        if (this.gridSectionName === 'Scroll') {
+        if (this.spreadsheetSectionName === 'Scroll') {
             var scrollTop = this.bodyElement.scrollTop;
             this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
         }

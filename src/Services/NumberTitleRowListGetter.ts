@@ -9,14 +9,13 @@ export class NumberTitleRowListGetter {
 
     get(spreadsheetState: SpreadsheetState) {
         var index = 0;
-        var gridSection = spreadsheetState.gridSectionList[0];
-        if (!gridSection) {
+        if (spreadsheetState.titleSpreadsheetRowList.length === 0) {
             return [];
         }
 
-        var numberTitleRowList = new Array(gridSection.titleRowList.length);
-        while (index < gridSection.titleRowList.length) {
-            let visibleRow = gridSection.titleRowList[index];
+        var numberTitleRowList = new Array(spreadsheetState.titleSpreadsheetRowList.length);
+        while (index < spreadsheetState.titleSpreadsheetRowList.length) {
+            let visibleRow = spreadsheetState.titleSpreadsheetRowList[index];
             let numberDataRow = {
                 cellList: [],
                 height: spreadsheetState.rowHeight,

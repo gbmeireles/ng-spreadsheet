@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CellManager, ColumnIdentifierMapGetter } from '../Services/Services';
-import { CellLocation, GridColumn } from '../Model/Model';
+import { CellLocation, SpreadsheetColumn } from '../Model/Model';
 const css = `
 :host {
     display: block;
@@ -74,11 +74,11 @@ const html = `
 })
 export class DetailsBarComponent implements OnInit {
     @Input('activeCellLocation') activeCellLocation: CellLocation;
-    @Input('gridColumnList') gridColumnList: GridColumn[];
+    @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
     @Output('download') onDownload: EventEmitter<void> = new EventEmitter<void>(false);
 
     private activeCellData: string = 'Selecione uma célula';
-    private columnIdentifierMap: { [gridColumnIndex: number]: string } = {};
+    private columnIdentifierMap: { [spreadsheetColumnIndex: number]: string } = {};
     private cellLocation: string = '--';
 
     constructor(private cellManager: CellManager,
@@ -88,22 +88,22 @@ export class DetailsBarComponent implements OnInit {
     }
 
     ngOnChanges(obj) {
-        if (obj['gridColumnList']) {
-            this.columnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.gridColumnList);
+        if (obj['spreadsheetColumnList']) {
+            this.columnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.spreadsheetColumnList);
         }
         if (obj['activeCellLocation']) {
-            var activeCell = this.cellManager.getCellListByGridColumnIndex(this.activeCellLocation.gridColumnIndex)
-                .find(cell => cell.gridCell.rowIndex === this.activeCellLocation.rowIndex);
+            var activeCell = this.cellManager.getCellListBySpreadsheetColumnIndex(this.activeCellLocation.columnIndex)
+                .find(cell => cell.spreadsheetCell && cell.spreadsheetCell.rowIndex === this.activeCellLocation.rowIndex);
             if (!activeCell) {
                 return;
             }
-            var gridCell = activeCell.gridCell;
-            if (gridCell.formatData == undefined) {
-                this.activeCellData = gridCell.data;
+            var spreadsheetCell = activeCell.spreadsheetCell;
+            if (spreadsheetCell.formatData == undefined) {
+                this.activeCellData = spreadsheetCell.data;
             } else {
-                this.activeCellData = gridCell.formatData(gridCell.data);
+                this.activeCellData = spreadsheetCell.formatData(spreadsheetCell.data);
             }
-            this.cellLocation = this.columnIdentifierMap[this.activeCellLocation.gridColumnIndex] + (gridCell.rowIndex + 1);
+            this.cellLocation = this.columnIdentifierMap[this.activeCellLocation.columnIndex] + (spreadsheetCell.rowIndex + 1);
         }
     }
 

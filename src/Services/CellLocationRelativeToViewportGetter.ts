@@ -11,10 +11,10 @@ export class CellLocationRelativeToViewportGetter {
         if (spreadsheetState == null) {
             spreadsheetState = this.spreadsheetState;
         }
-        var targetCellPositionInformation = spreadsheetState.columnPositionInformationMap[targetCellLocation.gridColumnIndex];
+        var targetCellPositionInformation = spreadsheetState.columnPositionInformationMap[targetCellLocation.columnIndex];
         var scrollTop = spreadsheetState.scrollTop;
         var bodyHeight = spreadsheetState.bodyHeight;
-        var targetColumn = spreadsheetState.gridColumnList.find(c => c.index === targetCellLocation.gridColumnIndex);
+        var targetColumn = spreadsheetState.spreadsheetColumnList.find(c => c.index === targetCellLocation.columnIndex);
         if (targetColumn == null) {
             return {
                 top: 0,
@@ -26,9 +26,9 @@ export class CellLocationRelativeToViewportGetter {
                 isOutsideViewportVertically: false,
             };
         }
-        var sectionPositionInformation = spreadsheetState.gridSectionPositionInformationMap[targetColumn.gridSectionName];
+        var sectionPositionInformation = spreadsheetState.spreadsheetSectionPositionInformationMap[targetColumn.sectionName];
         var width = sectionPositionInformation.width;
-        var scrollLeft = spreadsheetState.gridSectionScrollLeftMap[targetColumn.gridSectionName];
+        var scrollLeft = spreadsheetState.spreadsheetSectionScrollLeftMap[targetColumn.sectionName];
         var rowHeight = spreadsheetState.rowHeight;
 
         var viewport = {

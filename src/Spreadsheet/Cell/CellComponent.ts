@@ -23,7 +23,7 @@ import {
 } from '@angular/core';
 import {
     Cell,
-    GridCell,
+    SpreadsheetCell,
     ColumnPositionInformationMap,
     ContentTypeEnum,
     CellLocation,
@@ -51,13 +51,12 @@ import { BodySectionComponent } from '../BodySectionComponent';
 const css = `
 :host {
     display: block;
-    float: left;
     overflow: hidden;
     white-space: nowrap;
     -moz-text-overflow: ellipsis;
     text-overflow: ellipsis;
     height: 100%;
-    position: relative;
+    position: absolute;
 }
 
 CellComponent {
@@ -75,20 +74,23 @@ CellComponent {
     styles: [css],
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
-    @Input('cell') gridCell: GridCell;
+    @Input('cell') spreadsheetCell: SpreadsheetCell;
     @Input('rowData') rowData: any;
+    @Input('rowHeight') rowHeight: number;
     @Input('index') index: number;
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
-    @Input('gridSectionScrollLeft') gridSectionScrollLeft: number;
+    @Input('spreadsheetSectionScrollLeft') spreadsheetSectionScrollLeft: number;
     @Input('activeCellLocation') activeCellLocation: CellLocation;
-    @HostBinding('style.width') width: number;
+    @HostBinding('style.zIndex') zIndex: number = 1;
+    @HostBinding('style.height.px') @HostBinding('style.lineHeight.px') height: number;
+    @HostBinding('style.width.px') width: number;
+    @HostBinding('style.left.px') left: number;
     @HostBinding('style.margin-left.px') marginLeft: number;
     @HostBinding('class.is-active') isActive: boolean = false;
     @HostBinding('class.is-custom') isCustom: boolean = false;
     @HostBinding('class') style;
     @ViewChild('cellComponent', { read: ViewContainerRef }) cellViewContainer: ViewContainerRef;
-    left: number;
-    gridColumnIndex: number;
+    spreadsheetColumnIndex: number;
     data: any;
     isEditing: boolean = false;
     private viewComponent: ComponentRef<ViewableComponent>;
@@ -109,41 +111,57 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
 
     @HostListener('mousedown', ['$event'])
     onClick(evt) {
-        this.eventEmitter.emit(new GoToCellLocationAction(this.gridCell.rowIndex, this.gridCell.columnIndex, true));
+        if (!this.spreadsheetCell) {
+            return;
+        }
+        this.eventEmitter.emit(new GoToCellLocationAction(this.spreadsheetCell.rowIndex, this.spreadsheetCell.columnIndex, true));
     }
 
     @HostListener('dblclick', ['$event'])
     onDoubleClick(evt) {
-        this.eventEmitter.emit(new GoToCellLocationAction(this.gridCell.rowIndex, this.gridCell.columnIndex, true));
+        if (!this.spreadsheetCell) {
+            return;
+        }
+        this.eventEmitter.emit(new GoToCellLocationAction(this.spreadsheetCell.rowIndex, this.spreadsheetCell.columnIndex, true));
         this.goToEditMode();
     }
 
     ngOnChanges(changes: { [key: string]: SimpleChange }) {
-        if (!this.gridCell) {
-            console.warn('GridCell not defined');
+        if (!this.spreadsheetCell) {
+            this.clear();
+            this.data = null;
+            this.zIndex = 0;
+            this.isActive = false;
+            this.style = 'is-empty';
             return;
         }
-        if (changes['gridCell']) {
-            this.initCell(this.gridCell);
+        if (changes['spreadsheetCell']) {
+            this.initCell(this.spreadsheetCell);
         }
-        if (changes['rowData'] || changes['gridSectionScrollLeft'] || changes['columnPositionInformationMap']) {
+        if (changes['spreadsheetCell'] || changes['rowHeight']) {
+            this.height = this.spreadsheetCell.rowspan * this.rowHeight;
+        }
+        if (changes['rowData'] || changes['spreadsheetSectionScrollLeft'] || changes['columnPositionInformationMap']) {
             if (this.columnPositionInformationMap) {
                 this.width = 0;
                 var index = 0;
-                while (index < this.gridCell.colspan) {
-                    let columnPositionInformation = this.columnPositionInformationMap[this.gridColumnIndex + index];
+                while (index < this.spreadsheetCell.colspan) {
+                    let columnPositionInformation = this.columnPositionInformationMap[this.spreadsheetColumnIndex + index];
                     this.width += columnPositionInformation ? columnPositionInformation.width : 0;
                     index++;
                 }
-
-                if (this.index === 0) {
-                    let columnPositionInformation = this.columnPositionInformationMap[this.gridColumnIndex];
-                    this.marginLeft = columnPositionInformation ? columnPositionInformation.left : 0;
-                }
             }
         }
+        if (changes['spreadsheetCell'] || changes['rowData'] || changes['spreadsheetSectionScrollLeft'] || changes['columnPositionInformationMap']) {
+            let columnPositionInformation = this.columnPositionInformationMap[this.spreadsheetColumnIndex];
+            var left = columnPositionInformation ? columnPositionInformation.left : 0;
+            // if (this.index === 0) {
+            //     this.marginLeft = columnPositionInformation ? columnPositionInformation.left : 0;
+            // }
+            this.left = left;
+        }
         if (changes['activeCellLocation']) {
-            this.isActive = this.isCellActiveChecker.check(this.gridCell, this.activeCellLocation);
+            this.isActive = this.isCellActiveChecker.check(this.spreadsheetCell, this.activeCellLocation);
             if (this.editComponent && !this.isActive) {
                 this.editComponent.instance.onEditDone(this.rowData);
                 this.goToViewMode();
@@ -156,16 +174,21 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
 
     ngAfterViewInit() {
         this.cellManager.addCell(this);
-        this.initCell(this.gridCell);
+
+        if (!this.spreadsheetCell) {
+            this.style = 'is-empty';
+            return;
+        }
+        this.initCell(this.spreadsheetCell);
     }
 
     goToEditMode() {
-        if (this.gridCell.editableComponentType && !this.isEditing) {
+        if (this.spreadsheetCell.editableComponentType && !this.isEditing) {
             this.isCustom = true;
             this.cdr.markForCheck();
             this.isEditing = true;
             this.clear();
-            this.dcl.loadNextToLocation(this.gridCell.editableComponentType, this.cellViewContainer)
+            this.dcl.loadNextToLocation(this.spreadsheetCell.editableComponentType, this.cellViewContainer)
                 .then((componentRef: ComponentRef<EditableComponent>) => {
                     this.editComponent = componentRef;
                     componentRef.instance.onEditStarted(this.rowData);
@@ -189,13 +212,13 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
 
     goToViewMode() {
         this.clear();
-        if (this.gridCell.viewableComponentType) {
+        if (this.spreadsheetCell.viewableComponentType) {
             if (!this.cellViewContainer) {
                 return;
             }
             this.isCustom = true;
             this.cdr.markForCheck();
-            this.dcl.loadNextToLocation(this.gridCell.viewableComponentType, this.cellViewContainer)
+            this.dcl.loadNextToLocation(this.spreadsheetCell.viewableComponentType, this.cellViewContainer)
                 .then((componentRef: ComponentRef<ViewableComponent>) => {
                     if (this.viewComponent) {
                         this.viewComponent.destroy();
@@ -203,12 +226,12 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                     this.viewComponent = componentRef;
                     componentRef.instance.onRowInit(this.rowData);
                 });
-        } else if (this.gridCell.formatData !== undefined) {
+        } else if (this.spreadsheetCell.formatData !== undefined) {
             this.isCustom = false;
-            this.data = this.gridCell.formatData(this.gridCell.data);
+            this.data = this.spreadsheetCell.formatData(this.spreadsheetCell.data);
         } else {
             this.isCustom = false;
-            this.data = this.gridCell.data;
+            this.data = this.spreadsheetCell.data;
         }
     }
 
@@ -220,19 +243,22 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         this.cellManager.removeCell(this);
     }
 
-    private initCell(gridCell: GridCell) {
-        this.gridColumnIndex = gridCell.columnIndex;
-        this.style = gridCell.cellStyle;
+    private initCell(spreadsheetCell: SpreadsheetCell) {
+        this.spreadsheetColumnIndex = spreadsheetCell.columnIndex;
+        this.style = spreadsheetCell.cellStyle;
 
-        if (gridCell.isEditing) {
+        if (spreadsheetCell.isEditing) {
             this.goToEditMode();
         } else {
             this.goToViewMode();
         }
 
-        this.isActive = this.isCellActiveChecker.check(gridCell, this.activeCellLocation);
+        this.isActive = this.isCellActiveChecker.check(spreadsheetCell, this.activeCellLocation);
         if (this.isActive && this.style) {
             this.style += ' is-active';
+        }
+        if (this.spreadsheetCell.rowspan > 1) {
+            this.zIndex = 2;
         }
     }
 

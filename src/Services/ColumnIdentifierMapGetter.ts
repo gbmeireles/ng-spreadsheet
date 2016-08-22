@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GridColumn } from '../Model/Model';
+import { SpreadsheetColumn } from '../Model/Model';
 
 const columnUnitList: string[] =
     ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
@@ -9,17 +9,17 @@ export class ColumnIdentifierMapGetter {
 
     constructor() { }
 
-    getMap(gridColumnList: GridColumn[]) {
-        var gridColumnIdentifierMap = {};
+    getMap(spreadsheetColumnList: SpreadsheetColumn[]) {
+        var spreadsheetColumnIdentifierMap = {};
 
-        if (!gridColumnList) {
-            return gridColumnIdentifierMap;
+        if (!spreadsheetColumnList) {
+            return spreadsheetColumnIdentifierMap;
         }
 
         var tensCount = 0;
         var unitCount = 0;
 
-        gridColumnList.forEach(gc => {
+        spreadsheetColumnList.forEach(gc => {
             unitCount = gc.index % columnUnitList.length;
             tensCount = Math.floor(gc.index / columnUnitList.length);
             var columnIdentifier = '';
@@ -27,9 +27,9 @@ export class ColumnIdentifierMapGetter {
                 columnIdentifier = columnUnitList[tensCount - 1];
             }
             columnIdentifier = columnIdentifier + columnUnitList[unitCount];
-            gridColumnIdentifierMap[gc.index] = columnIdentifier;
+            spreadsheetColumnIdentifierMap[gc.index] = columnIdentifier;
         });
 
-        return gridColumnIdentifierMap;
+        return spreadsheetColumnIdentifierMap;
     }
 }

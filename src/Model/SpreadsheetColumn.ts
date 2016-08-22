@@ -1,11 +1,11 @@
 import { ColumnDataTypeEnum } from './ColumnDataTypeEnum';
 
-export interface GridColumn {
+export interface SpreadsheetColumn {
     name: string;
     index: number;
     style?: string;
     width: number;
-    gridSectionName: string;
+    sectionName: string;
     filterExpression: string;
     dataType: ColumnDataTypeEnum;
 }

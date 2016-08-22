@@ -22,8 +22,8 @@ export class ColumnMover {
         }
 
         var columnList = spreadsheetState.columnList.slice(0).map(i => <Column>Object.assign({}, i));
-        var columnToTarget = this.columnGetter.getByGridColumnIndex(columnList, newColumnIndex);
-        var columnToMove = this.columnGetter.getByGridColumnIndex(columnList, oldColumnIndex);
+        var columnToTarget = this.columnGetter.getBySpreadsheetColumnIndex(columnList, newColumnIndex);
+        var columnToMove = this.columnGetter.getBySpreadsheetColumnIndex(columnList, oldColumnIndex);
 
         if (!columnToMove) {
             return spreadsheetState.columnList;
@@ -56,7 +56,7 @@ export class ColumnMover {
         return columnList;
     }
 
-    moveFilterExpressionMap(filterExpressionMap: { [gridColumnIndex: number]: string }, oldColumnIndex: number, newColumnIndex: number) {
+    moveFilterExpressionMap(filterExpressionMap: { [spreadsheetColumnIndex: number]: string }, oldColumnIndex: number, newColumnIndex: number) {
         var originalFilterExpressionMap = Object.assign({}, filterExpressionMap);
         var result = Object.assign({}, filterExpressionMap);
         result[newColumnIndex] = originalFilterExpressionMap[oldColumnIndex];

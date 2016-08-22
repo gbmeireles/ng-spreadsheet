@@ -6,17 +6,17 @@ export class ColumnListGetter {
     get(columnDefinitionList: ColumnDefinition[]): Column[] {
         var lastIndex = -1;
         return columnDefinitionList.filter(c => !c.isHidden).map(columnDefinition => {
-            var gridColumn = columnDefinition.getColumn(lastIndex + 1);
+            var spreadsheetColumn = columnDefinition.getColumn(lastIndex + 1);
 
-            gridColumn.name = columnDefinition.name;
+            spreadsheetColumn.name = columnDefinition.name;
 
-            lastIndex = gridColumn.endIndex;
-            gridColumn.width = gridColumn.width || gridColumn.defaultWidth;
-            gridColumn.dataType = columnDefinition.dataType;
-            gridColumn.gridSectionName = columnDefinition.gridSection;
-            gridColumn.isExportable = columnDefinition.isExportable;
+            lastIndex = spreadsheetColumn.endIndex;
+            spreadsheetColumn.width = spreadsheetColumn.width || spreadsheetColumn.defaultWidth;
+            spreadsheetColumn.dataType = columnDefinition.dataType;
+            spreadsheetColumn.sectionName = columnDefinition.spreadsheetSection;
+            spreadsheetColumn.isExportable = columnDefinition.isExportable;
 
-            return gridColumn;
+            return spreadsheetColumn;
         });
     }
 }

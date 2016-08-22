@@ -28,11 +28,11 @@ import {
     ColumnPositionInformationMap,
     Column,
     ContentTypeEnum,
-    GridSection,
-    GridCell,
-    GridRow,
+    SpreadsheetSection,
+    SpreadsheetCell,
+    SpreadsheetRow,
     ColumnDefinition,
-    GridColumn,
+    SpreadsheetColumn,
     ColumnDataTypeEnum,
     ExportData,
 } from '../Model/Model';
@@ -53,7 +53,7 @@ import {
     GoToCellLocationAction,
     ClearFilterAction,
 } from '../Events/Events';
-import { SpreadsheetEvent } from './Model/GridEvent';
+import { SpreadsheetEvent } from './Model/SpreadsheetEvent';
 import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
 import { SpreadsheetStore } from './SpreadsheetStore';
 import { Subscription } from 'rxjs/Subscription';
@@ -61,28 +61,30 @@ import { Subscription } from 'rxjs/Subscription';
 const html = `
 <DetailsBar 
     [activeCellLocation]="spreadsheetState?.activeCellLocation"
-    [gridColumnList]="spreadsheetState?.gridColumnList" 
+    [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList" 
     (download)="onDownload.emit(exportData())"></DetailsBar>
 <Header [rowHeight]="spreadsheetState?.rowHeight" 
     [numberTitleRowList]="spreadsheetState?.numberTitleRowList"
-    [gridSectionList]="spreadsheetState?.gridSectionList" 
+    [spreadsheetSectionList]="spreadsheetState?.spreadsheetSectionList" 
     [columnList]="spreadsheetState?.columnList"
-    [gridColumnList]="spreadsheetState?.gridColumnList"
+    [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList"
     [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
-    [gridSectionScrollWidthMap]="spreadsheetState?.gridSectionScrollWidthMap"
-    [gridSectionScrollLeftMap]="spreadsheetState?.gridSectionScrollLeftMap"
-    [gridSectionPositionInformationMap]="spreadsheetState?.gridSectionPositionInformationMap"
-    [gridSectionColumnToRendexIndexListMap]="spreadsheetState?.gridSectionColumnToRendexIndexListMap"></Header>
+    [spreadsheetSectionScrollWidthMap]="spreadsheetState?.spreadsheetSectionScrollWidthMap"
+    [spreadsheetSectionScrollLeftMap]="spreadsheetState?.spreadsheetSectionScrollLeftMap"
+    [spreadsheetSectionPositionInformationMap]="spreadsheetState?.spreadsheetSectionPositionInformationMap"
+    [spreadsheetSectionColumnToRendexIndexListMap]="spreadsheetState?.spreadsheetSectionColumnToRendexIndexListMap"></Header>
 <Body [height]="spreadsheetState?.bodyHeight" 
     [rowHeight]="spreadsheetState?.rowHeight" 
     [numberDataRowList]="spreadsheetState?.numberDataRowList" 
-    [gridSectionList]="spreadsheetState?.gridSectionList" 
+    [spreadsheetSectionList]="spreadsheetState?.spreadsheetSectionList" 
     [scrollTop]="spreadsheetState?.scrollTop" 
     [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
-    [gridSectionScrollWidthMap]="spreadsheetState?.gridSectionScrollWidthMap"
-    [gridSectionScrollLeftMap]="spreadsheetState?.gridSectionScrollLeftMap"
-    [gridSectionPositionInformationMap]="spreadsheetState?.gridSectionPositionInformationMap"
-    [activeCellLocation]="spreadsheetState?.activeCellLocation"></Body>
+    [spreadsheetSectionScrollWidthMap]="spreadsheetState?.spreadsheetSectionScrollWidthMap"
+    [spreadsheetSectionScrollLeftMap]="spreadsheetState?.spreadsheetSectionScrollLeftMap"
+    [spreadsheetSectionPositionInformationMap]="spreadsheetState?.spreadsheetSectionPositionInformationMap"
+    [activeCellLocation]="spreadsheetState?.activeCellLocation"
+    [activeRowIndexList]="spreadsheetState?.activeRowIndexList"
+    ></Body>
 <StatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></StatusBar>`;
 
 @Component({
@@ -182,20 +184,20 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
 
     getActiveCell() {
         var cellLocation = this.spreadsheetState.activeCellLocation;
-        var gridColumn = this.spreadsheetState.gridColumnList.find(gc => gc.index === cellLocation.gridColumnIndex);
-        var gridSection = this.spreadsheetState.gridSectionList.find(gs => gs.name === gridColumn.name);
-        var gridRow = gridSection.dataRowList.find(dr => dr.rowIndex === cellLocation.rowIndex);
-        var gridCell = gridRow.cellList.find(c => c.columnIndex === gridColumn.index);
-        return gridCell;
+        var spreadsheetColumn = this.spreadsheetState.spreadsheetColumnList.find(gc => gc.index === cellLocation.columnIndex);
+        var spreadsheetSection = this.spreadsheetState.spreadsheetSectionList.find(gs => gs.name === spreadsheetColumn.name);
+        var spreadsheetRow = spreadsheetSection.dataRowList.find(dr => dr.rowIndex === cellLocation.rowIndex);
+        var spreadsheetCell = spreadsheetRow.cellList.find(c => c.columnIndex === spreadsheetColumn.index);
+        return spreadsheetCell;
     }
 
     exportData(): ExportData {
-        var rowList: GridRow[] = new Array(this.spreadsheetState.gridSectionList[0].dataRowList.length);
-        var columnListLength = this.spreadsheetState.gridColumnList.length;
-        var gridColumnMap: { [index: number]: GridColumn } = {};
-        this.spreadsheetState.gridColumnList.forEach(gc => gridColumnMap[gc.index] = gc);
-        this.spreadsheetState.gridSectionList.forEach(gridSection => {
-            gridSection.titleRowList.forEach(tr => {
+        var rowList: SpreadsheetRow[] = new Array(this.spreadsheetState.spreadsheetSectionList[0].dataRowList.length);
+        var columnListLength = this.spreadsheetState.spreadsheetColumnList.length;
+        var spreadsheetColumnMap: { [index: number]: SpreadsheetColumn } = {};
+        this.spreadsheetState.spreadsheetColumnList.forEach(gc => spreadsheetColumnMap[gc.index] = gc);
+        this.spreadsheetState.spreadsheetSectionList.forEach(spreadsheetSection => {
+            spreadsheetSection.titleRowList.forEach(tr => {
                 if (!rowList[tr.rowIndex]) {
                     rowList[tr.rowIndex] = tr;
                 }
@@ -203,7 +205,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
                     rowList[tr.rowIndex].cellList = rowList[tr.rowIndex].cellList.concat(tr.cellList);
                 }
             });
-            gridSection.dataRowList.forEach(tr => {
+            spreadsheetSection.dataRowList.forEach(tr => {
                 if (!rowList[tr.rowIndex]) {
                     rowList[tr.rowIndex] = tr;
                 }
@@ -221,8 +223,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     goToRow(rowNumber: number) {
         if (rowNumber >= this.firstDataRowRowNumber) {
             var rowIndex = (rowNumber - 1);
-            var gridColumnIndex = this.spreadsheetState.activeCellLocation.gridColumnIndex;
-            this.dispatcher.emit(new GoToCellLocationAction(rowIndex, gridColumnIndex, false));
+            var spreadsheetColumnIndex = this.spreadsheetState.activeCellLocation.columnIndex;
+            this.dispatcher.emit(new GoToCellLocationAction(rowIndex, spreadsheetColumnIndex, false));
             this.cdr.markForCheck();
         }
     }
@@ -244,10 +246,10 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         evt.preventDefault();
     }
 
-    private gridSectionIdentity(index: number, gridSection: GridSection): any {
-        if (gridSection) {
-            return gridSection.name;
+    private spreadsheetSectionIdentity(index: number, spreadsheetSection: SpreadsheetSection): any {
+        if (spreadsheetSection) {
+            return spreadsheetSection.name;
         }
-        return 'gridSection_' + index;
+        return 'spreadsheetSection_' + index;
     }
 }

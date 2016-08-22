@@ -9,7 +9,7 @@ export class CellGetter {
     }
 
     get(cellLocation: CellLocation): Cell {
-        var cellList = this.cellManager.getCellListByGridColumnIndex(cellLocation.gridColumnIndex);
-        return cellList.find(c => c.gridCell.rowIndex === cellLocation.rowIndex);
+        var cellList = this.cellManager.getCellListBySpreadsheetColumnIndex(cellLocation.columnIndex);
+        return cellList.find(cell => cell.spreadsheetCell && cell.spreadsheetCell.rowIndex === cellLocation.rowIndex);
     }
 }

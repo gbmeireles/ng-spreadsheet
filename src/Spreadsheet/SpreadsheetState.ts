@@ -1,60 +1,66 @@
 import { Injectable, provide, Provider } from '@angular/core';
 import {
-    GridSectionPositionInformationMap,
+    SpreadsheetSectionPositionInformationMap,
     ColumnPositionInformationMap,
     ColumnDefinition,
     Column,
-    GridColumn,
-    GridSection,
+    SpreadsheetColumn,
+    SpreadsheetSection,
     Cell,
-    GridRow,
+    SpreadsheetRow,
     ContentTypeEnum,
     CellLocation,
 } from '../Model/Model';
 
 @Injectable()
 export class SpreadsheetState {
+    activeRowIndexList: number[];
     activeCellLocation: CellLocation;
     columnDefinitionList: ColumnDefinition[];
     columnList: Column[];
-    filterExpressionMap: { [gridColumnIndex: number]: string };
-    gridColumnList: GridColumn[];
+    filterExpressionMap: { [spreadsheetColumnIndex: number]: string };
+    spreadsheetColumnList: SpreadsheetColumn[];
     columnPositionInformationMap: ColumnPositionInformationMap;
     bodyHeight: number;
     rowHeight: number;
     scrollTop: number;
-    gridSectionScrollWidthMap: { [gridSectionName: string]: number };
-    gridSectionScrollLeftMap: { [gridSectionName: string]: number };
+    spreadsheetSectionScrollWidthMap: { [spreadsheetSectionName: string]: number };
+    spreadsheetSectionScrollLeftMap: { [spreadsheetSectionName: string]: number };
     getRowStyle: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
-    gridSectionList: GridSection[];
-    gridSectionPositionInformationMap: GridSectionPositionInformationMap;
-    gridSectionColumnToRendexIndexListMap: { [gridSectionName: string]: number[] };
+    spreadsheetSectionList: SpreadsheetSection[];
+    spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;
+    spreadsheetSectionColumnToRendexIndexListMap: { [spreadsheetSectionName: string]: number[] };
     dataRowList: any[];
     originalDataRowList: any[];
     spreadsheetWidth: number;
-    numberDataRowList: GridRow[];
-    numberTitleRowList: GridRow[];
+    numberDataRowList: SpreadsheetRow[];
+    numberTitleRowList: SpreadsheetRow[];
+    titleSpreadsheetRowList: SpreadsheetRow[];
+    dataSpreadsheetRowList: SpreadsheetRow[];
 
     constructor(spreadsheetState?: SpreadsheetState) {
         if (spreadsheetState == null) {
-            this.activeCellLocation = { rowIndex: 0, gridColumnIndex: 0 };
+            this.activeRowIndexList = [];
+            this.activeCellLocation = { rowIndex: 0, columnIndex: 0 };
             this.columnDefinitionList = [];
             this.columnList = [];
-            this.gridColumnList = [];
+            this.spreadsheetColumnList = [];
             this.filterExpressionMap = {};
             this.columnPositionInformationMap = {};
             this.bodyHeight = 0;
             this.rowHeight = 20;
             this.scrollTop = 0;
-            this.gridSectionList = [];
-            this.gridSectionScrollWidthMap = {};
-            this.gridSectionPositionInformationMap = {};
+            this.spreadsheetSectionList = [];
+            this.spreadsheetSectionScrollWidthMap = {};
+            this.spreadsheetSectionPositionInformationMap = {};
             this.dataRowList = [];
             this.originalDataRowList = [];
             this.spreadsheetWidth = 0;
             this.numberDataRowList = [];
             this.numberTitleRowList = [];
-            this.gridSectionColumnToRendexIndexListMap = {};
+            this.spreadsheetSectionColumnToRendexIndexListMap = {};
+            this.titleSpreadsheetRowList = [];
+            this.dataSpreadsheetRowList = [];
             return;
         }
     }

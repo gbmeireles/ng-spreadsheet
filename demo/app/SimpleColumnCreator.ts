@@ -1,4 +1,4 @@
-import { GridData, ColumnDefinition, GridCell, Column } from 'ng-spreadsheet';
+import { ColumnDefinition, SpreadsheetCell, Column, ColumnDataTypeEnum } from 'ng-spreadsheet';
 
 export class SimpleColumnCreator {
     constructor() {
@@ -6,17 +6,17 @@ export class SimpleColumnCreator {
     }
 
     createColumn(name, title, dataField): ColumnDefinition {
-        return {
+        var result: ColumnDefinition = {
             description: '',
-            getColumn: (rowDataList: any[], columnStartIndex: number): Column => {
+            getColumn: (columnStartIndex: number): Column => {
                 return {
                     defaultWidth: 120,
                     endIndex: columnStartIndex,
-                    gridSectionName: 'GeneralData',
+                    sectionName: 'GeneralData',
                     startIndex: columnStartIndex,
                 };
             },
-            getDataCellMatrix: (gridData: GridData, rowData: any, column: Column): GridCell[][] => {
+            getDataCellMatrix: (rowData: any, column: Column): SpreadsheetCell[][] => {
                 return [[{
                     cellStyle: 'data-cell',
                     colspan: 1,
@@ -25,7 +25,7 @@ export class SimpleColumnCreator {
                     rowspan: 1,
                 }]];
             },
-            getTitleCellMatrix: (gridData: GridData, column: Column): GridCell[][] => {
+            getTitleCellMatrix: (column: Column): SpreadsheetCell[][] => {
                 return [[{
                     cellStyle: 'title-cell',
                     colspan: 1,
@@ -34,8 +34,11 @@ export class SimpleColumnCreator {
                     rowspan: 1,
                 }]];
             },
-            gridSection: 'GeneralData',
+            spreadsheetSection: 'GeneralData',
             name: name,
+            dataType: ColumnDataTypeEnum.Text,
         };
+
+        return result;
     }
 }

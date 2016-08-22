@@ -10,6 +10,11 @@
         "noImplicitAny": false,
         "suppressImplicitAnyIndexErrors": true
     },
+    "files": [
+        "app/main.ts",
+        "typings/main/ambient/es6-shim/index.d.ts",
+        "typings/lodash/lodash.d.ts"
+    ],
     "exclude": [
         "node_modules",
         "typings/main",

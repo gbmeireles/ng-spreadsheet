@@ -4,15 +4,15 @@ export class GoToCellLocationAction implements Action {
     type: string;
     payload: {
         rowIndex: number;
-        gridColumnIndex: number;
+        spreadsheetColumnIndex: number;
         isToUseMinimunScroll: boolean;
     };
 
-    constructor(rowIndex: number, gridColumnIndex: number, isToUseMinimunScroll: boolean) {
+    constructor(rowIndex: number, spreadsheetColumnIndex: number, isToUseMinimunScroll: boolean) {
         this.type = GoToCellLocationAction.type;
         this.payload = {
             rowIndex: rowIndex,
-            gridColumnIndex: gridColumnIndex,
+            spreadsheetColumnIndex: spreadsheetColumnIndex,
             isToUseMinimunScroll: isToUseMinimunScroll,
         };
     }

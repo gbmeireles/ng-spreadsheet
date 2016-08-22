@@ -1,5 +1,5 @@
 import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { GridRow } from '../Model/GridRow';
+import { SpreadsheetRow } from '../Model/SpreadsheetRow';
 
 const css = `
 RowHandlerCell {
@@ -15,7 +15,7 @@ RowHandlerCell {
 }`;
 
 const html = `
-<Row *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" gridSectionName="RowNumber"
+<Row *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" spreadsheetSectionName="RowNumber"
     [index]="i">
     <RowHandlerCell [style.lineHeight.px]="rowHeight">{{numberRow.rowNumber}}</RowHandlerCell>
 </Row>`;
@@ -27,10 +27,10 @@ const html = `
     styles: [css],
 })
 export class NumberRowListComponent {
-    @Input('numberRowList') numberRowList: GridRow[];
+    @Input('numberRowList') numberRowList: SpreadsheetRow[];
     @Input('rowHeight') rowHeight: number;
 
-    rowIndentity(index: number, row: GridRow): any {
+    rowIndentity(index: number, row: SpreadsheetRow): any {
         return index;
     }
 }

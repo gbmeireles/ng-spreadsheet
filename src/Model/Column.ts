@@ -5,7 +5,7 @@ export interface Column {
     endIndex: number;
     style?: string;
     width?: number;
-    gridSectionName: string;
+    sectionName: string;
     defaultWidth: number;
     name?: string;
     dataType?: ColumnDataTypeEnum;

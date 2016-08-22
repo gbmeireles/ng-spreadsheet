@@ -8,14 +8,14 @@ export class NumberDataRowListGetter {
 
     get(spreadsheetState: SpreadsheetState) {
         var index = 0;
-        var gridSection = spreadsheetState.gridSectionList[0];
-        if (!gridSection) {
+        var spreadsheetSection = spreadsheetState.spreadsheetSectionList[0];
+        if (!spreadsheetSection) {
             return [];
         }
 
-        var numberDataRowList = new Array(gridSection.visibleDataRowList.length);
-        while (index < gridSection.visibleDataRowList.length) {
-            let visibleRow = gridSection.visibleDataRowList[index];
+        var numberDataRowList = new Array(spreadsheetSection.visibleDataRowList.length);
+        while (index < spreadsheetSection.visibleDataRowList.length) {
+            let visibleRow = spreadsheetSection.visibleDataRowList[index];
             let numberDataRow = {
                 cellList: [],
                 height: spreadsheetState.rowHeight,

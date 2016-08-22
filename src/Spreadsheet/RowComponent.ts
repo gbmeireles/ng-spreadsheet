@@ -14,7 +14,7 @@ import { OnInit, OnDestroy } from '@angular/core';
 import { TemplateRef, ViewContainerRef } from '@angular/core';
 import { ElementRef, Host, Inject } from '@angular/core';
 import {
-    GridRow,
+    SpreadsheetRow,
     CellLocation,
     ContentTypeEnum,
 } from '../Model/Model';
@@ -32,9 +32,10 @@ const css = `:host {
 })
 export class RowComponent implements OnInit, OnDestroy {
     @Input('index') index: number;
-    @Input('row') row: GridRow;
-    @Input('gridSectionName') gridSectionName: string;
+    @Input('row') row: SpreadsheetRow;
+    @Input('spreadsheetSectionName') spreadsheetSectionName: string;
     @Input('activeCellLocation') activeCellLocation: CellLocation;
+    @Input('activeRowIndexList') activeRowIndexList: number[];
 
     @Input('scrollWidth')
     @HostBinding('style.minWidth') scrollWidth: number;
@@ -50,8 +51,8 @@ export class RowComponent implements OnInit, OnDestroy {
         if (changes['row']) {
             this.updateRow(changes['row'].currentValue);
         }
-        if (changes['activeCellLocation'] && this.activeCellLocation) {
-            this.isActive = this.activeCellLocation.rowIndex === this.row.rowIndex;
+        if (this.activeRowIndexList && (changes['activeRowIndexList'] || changes['row'])) {
+            this.isActive = this.activeRowIndexList.indexOf(this.row.rowIndex) >= 0;
         }
     }
 
@@ -70,7 +71,7 @@ export class RowComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
     }
 
-    private updateRow(row: GridRow) {
+    private updateRow(row: SpreadsheetRow) {
         if (!row) {
             return;
         }

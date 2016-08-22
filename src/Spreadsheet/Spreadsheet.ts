@@ -12,3 +12,4 @@ export { NumberRowListComponent } from './NumberRowListComponent';
 export { RowListComponent } from './RowListComponent';
 export { DetailsBarComponent } from './DetailsBarComponent';
 export { StatusBarComponent } from './StatusBarComponent';
+export { ColumnCornerCellComponent } from './ColumnCornerCellComponent';

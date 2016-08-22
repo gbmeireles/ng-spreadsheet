@@ -3,7 +3,7 @@ import { OnInit, OnDestroy, OnChanges } from '@angular/core';
 import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import {
     Column,
-    GridColumn,
+    SpreadsheetColumn,
     ColumnPositionInformationMap,
 } from '../Model/Model';
 import {
@@ -21,11 +21,11 @@ const css = `
 }`;
 
 const html = `
-<ColumnCell *ngFor="let gridColumn of visibleGridColumnList; let columnIndex = index; trackBy:cellIndentity;" 
-    [gridColumn]="gridColumn"
+<ColumnCell *ngFor="let spreadsheetColumn of visibleSpreadsheetColumnList; let columnIndex = index; trackBy:cellIndentity;" 
+    [spreadsheetColumn]="spreadsheetColumn"
     [columnList]="columnList"
     [index]="columnIndex" 
-    [columnIdentifier]="gridColumnIdentifierMap[gridColumn.index]"
+    [columnIdentifier]="spreadsheetColumnIdentifierMap[spreadsheetColumn.index]"
     [columnPositionInformationMap]="columnPositionInformationMap">
 </ColumnCell>`;
 
@@ -35,10 +35,10 @@ const html = `
     styles: [css],
 })
 export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
-    @Input('gridSectionName') gridSectionName: string;
+    @Input('spreadsheetSectionName') spreadsheetSectionName: string;
     @HostBinding('style.height') height: number;
-    @Input('visibleGridColumnList') visibleGridColumnList: GridColumn[];
-    @Input('gridColumnList') gridColumnList: GridColumn[];
+    @Input('visibleSpreadsheetColumnList') visibleSpreadsheetColumnList: SpreadsheetColumn[];
+    @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
     @Input('columnList') columnList: Column[];
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
 
@@ -46,11 +46,11 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     @HostBinding('style.minWidth')
     scrollWidth: number;
 
-    gridColumnIdentifierMap: { [columnIndex: number]: string } = {};
+    spreadsheetColumnIdentifierMap: { [columnIndex: number]: string } = {};
 
     constructor(private el: ElementRef,
         private renderer: Renderer,
-        private columnIdentifierMapGetter:ColumnIdentifierMapGetter) {
+        private columnIdentifierMapGetter: ColumnIdentifierMapGetter) {
     }
 
     cellIndentity(index: number, cell): any {
@@ -58,7 +58,7 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     updateColumnIdentifierList() {
-        this.gridColumnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.gridColumnList);
+        this.spreadsheetColumnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.spreadsheetColumnList);
     }
 
     ngOnInit() {
@@ -66,7 +66,7 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     ngOnChanges(obj) {
-        if (obj['gridColumnList'] || obj['visibleGridColumnList']) {
+        if (obj['spreadsheetColumnList'] || obj['visibleSpreadsheetColumnList']) {
             this.updateColumnIdentifierList();
         }
     }

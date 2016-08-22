@@ -6,6 +6,7 @@ import {
     BodySectionComponent,
     CellComponent,
     ColumnCellComponent,
+    ColumnCornerCellComponent,
     ColumnResizeComponent,
     ColumnRowComponent,
     DetailsBarComponent,
@@ -23,6 +24,7 @@ const declarations = [
     BodySectionComponent,
     CellComponent,
     ColumnCellComponent,
+    ColumnCornerCellComponent,
     ColumnResizeComponent,
     ColumnRowComponent,
     DetailsBarComponent,
@@ -41,4 +43,6 @@ const declarations = [
     imports: [CommonModule],
     exports: [SpreadsheetComponent],
 })
-export default class SpreadsheetModule { }
+export class SpreadsheetModule { }
+
+export default SpreadsheetModule;

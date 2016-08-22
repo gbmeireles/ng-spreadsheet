@@ -16,6 +16,8 @@ import {
     NumberFilter,
     FilteredDataRowListGetter,
     CellLocationRelativeToViewportGetter,
+    DataSpreadsheetRowListGetter,
+    TitleSpreadsheetRowListGetter,
 } from '../Services/Services';
 import {
     DISPATCHER_TOKEN,
@@ -35,6 +37,7 @@ import {
     GoToCellLocationAction,
     ClearFilterAction,
 } from '../Events/Events';
+import { SpreadsheetCell, SpreadsheetRow } from '../Model/Model';
 import { ColumnMover } from './ColumnCell/ColumnMover';
 import { ColumnSizeUpdater } from './ColumnResize/ColumnSizeUpdater';
 @Injectable()
@@ -44,10 +47,10 @@ export class SpreadsheetStore {
 
     constructor( @Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<any>,
         private columnListGetter: ColumnListGetter,
-        private gridSectionListGetter: SpreadsheetSectionListGetter,
-        private gridColumnListGetter: SpreadsheetColumnListGetter,
+        private spreadsheetSectionListGetter: SpreadsheetSectionListGetter,
+        private spreadsheetColumnListGetter: SpreadsheetColumnListGetter,
         private columnPositionInformationMapCalculator: ColumnPositionInformationMapCalculator,
-        private gridSectionScrollWidthMapCalculator: SpreadsheetSectionScrollWidthMapCalculator,
+        private spreadsheetSectionScrollWidthMapCalculator: SpreadsheetSectionScrollWidthMapCalculator,
         private columnViewportUpdater: ColumnViewportUpdater,
         private columnMover: ColumnMover,
         private rowViewportUpdater: RowViewportUpdater,
@@ -56,10 +59,12 @@ export class SpreadsheetStore {
         private numberTitleRowListGetter: NumberTitleRowListGetter,
         private numberDataRowListGetter: NumberDataRowListGetter,
         private columnToRenderIndexListGetter: ColumnToRenderIndexListGetter,
-        private gridSectionDataRowMapGetter: SpreadsheetSectionDataRowMapGetter,
+        private spreadsheetSectionDataRowMapGetter: SpreadsheetSectionDataRowMapGetter,
         private numberFilter: NumberFilter,
         private filteredDataRowListGetter: FilteredDataRowListGetter,
         private cellLocationRelativeToViewportGetter: CellLocationRelativeToViewportGetter,
+        private dataSpreadsheetRowListGetter: DataSpreadsheetRowListGetter,
+        private titleSpreadsheetRowListGetter: TitleSpreadsheetRowListGetter,
     ) {
         this.spreadsheetState = new SpreadsheetState();
         this.dispatcher.subscribe((action: Action) => {
@@ -83,7 +88,7 @@ export class SpreadsheetStore {
                     break;
                 }
                 case ScrollSpreadsheetSectionAction.type: {
-                    this.spreadsheetState = this.scrollGridSection(<ScrollSpreadsheetSectionAction>action);
+                    this.spreadsheetState = this.scrollSpreadsheetSection(<ScrollSpreadsheetSectionAction>action);
                     break;
                 }
                 case ScrollSpreadsheetAction.type: {
@@ -126,7 +131,7 @@ export class SpreadsheetStore {
     }
 
     private goToCellLocation(action: GoToCellLocationAction) {
-        if (action.payload.gridColumnIndex === this.spreadsheetState.activeCellLocation.gridColumnIndex
+        if (action.payload.spreadsheetColumnIndex === this.spreadsheetState.activeCellLocation.columnIndex
             && action.payload.rowIndex === this.spreadsheetState.activeCellLocation.rowIndex) {
             return this.spreadsheetState;
         }
@@ -134,18 +139,68 @@ export class SpreadsheetStore {
 
         var firstRowIndex = spreadsheetState.numberTitleRowList.length;
         var lastRowIndex = spreadsheetState.numberDataRowList.reduce((pv, cv) => Math.max(cv.rowIndex, pv), 0);
-        var firstColumnIndex = spreadsheetState.gridColumnList.reduce((pv, cv) => Math.min(cv.index, pv), 999999999);
-        var lastColumnIndex = spreadsheetState.gridColumnList.reduce((pv, cv) => Math.max(cv.index, pv), 0);
+        var firstColumnIndex = spreadsheetState.spreadsheetColumnList.reduce((pv, cv) => Math.min(cv.index, pv), 999999999);
+        var lastColumnIndex = spreadsheetState.spreadsheetColumnList.reduce((pv, cv) => Math.max(cv.index, pv), 0);
         if (action.payload.rowIndex <= lastRowIndex
             && action.payload.rowIndex >= firstRowIndex
-            && action.payload.gridColumnIndex <= lastColumnIndex
-            && action.payload.gridColumnIndex >= firstColumnIndex) {
-            spreadsheetState.activeCellLocation = { gridColumnIndex: action.payload.gridColumnIndex, rowIndex: action.payload.rowIndex };
+            && action.payload.spreadsheetColumnIndex <= lastColumnIndex
+            && action.payload.spreadsheetColumnIndex >= firstColumnIndex) {
+            spreadsheetState.activeCellLocation = {
+                columnIndex: action.payload.spreadsheetColumnIndex,
+                rowIndex: action.payload.rowIndex,
+            };
         }
+
+        var activeCellLocation = spreadsheetState.activeCellLocation;
+
+        var dataRowListLength = spreadsheetState.dataSpreadsheetRowList.length;
+        var dataRowIndex = 0;
+        var targetRow: SpreadsheetRow;
+        var targetCell: SpreadsheetCell;
+        while (dataRowIndex < dataRowListLength) {
+            var row = spreadsheetState.dataSpreadsheetRowList[dataRowIndex];
+            dataRowIndex++;
+
+            if (row.rowIndex > activeCellLocation.rowIndex) {
+                break;
+            }
+
+            var cell =
+                row.cellList.find(c => {
+                    var isInTargetRowRange = (c.rowIndex + c.rowspan - 1) >= activeCellLocation.rowIndex && c.rowIndex <= activeCellLocation.rowIndex;
+
+                    if (!isInTargetRowRange) {
+                        return false;
+                    }
+                    var isInTargetColumnRange =
+                        (c.columnIndex + c.colspan - 1) >= activeCellLocation.columnIndex && c.columnIndex <= activeCellLocation.columnIndex;
+
+                    return isInTargetColumnRange;
+                });
+
+            if (cell) {
+                targetRow = row;
+                targetCell = cell;
+                break;
+            }
+        }
+
+        if (!targetCell) {
+            return spreadsheetState;
+        }
+
+        spreadsheetState.activeCellLocation = {
+            columnIndex: targetCell.columnIndex,
+            rowIndex: targetCell.rowIndex,
+        };
+
+        spreadsheetState.activeRowIndexList = spreadsheetState.dataSpreadsheetRowList
+            .filter(sRow => sRow.rowData === targetRow.rowData)
+            .map(sRow => sRow.rowIndex);
 
         var relative = this.cellLocationRelativeToViewportGetter.get(spreadsheetState, spreadsheetState.activeCellLocation);
         if (relative.isOutsideViewport) {
-            var targetGridColumn = spreadsheetState.gridColumnList.find(gc => gc.index === action.payload.gridColumnIndex);
+            var targetSpreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index === action.payload.spreadsheetColumnIndex);
 
             if (relative.isOutsideViewportVertically) {
                 var targetScrollTop = action.payload.isToUseMinimunScroll ?
@@ -155,26 +210,26 @@ export class SpreadsheetStore {
             }
             if (relative.isOutsideViewportHorizontally) {
                 var targetScrollLeft = action.payload.isToUseMinimunScroll ?
-                    spreadsheetState.gridSectionScrollLeftMap[targetGridColumn.gridSectionName] +
+                    spreadsheetState.spreadsheetSectionScrollLeftMap[targetSpreadsheetColumn.sectionName] +
                     (relative.left <= 0 ? relative.left : relative.right) :
-                    spreadsheetState.columnPositionInformationMap[targetGridColumn.index].left;
-                spreadsheetState.gridSectionScrollLeftMap = Object.assign({}, spreadsheetState.gridSectionScrollLeftMap);
-                spreadsheetState.gridSectionScrollLeftMap[targetGridColumn.gridSectionName] = Math.max(targetScrollLeft, 0);
-                spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, targetGridColumn.gridSectionName);
+                    spreadsheetState.columnPositionInformationMap[targetSpreadsheetColumn.index].left;
+                spreadsheetState.spreadsheetSectionScrollLeftMap = Object.assign({}, spreadsheetState.spreadsheetSectionScrollLeftMap);
+                spreadsheetState.spreadsheetSectionScrollLeftMap[targetSpreadsheetColumn.sectionName] = Math.max(targetScrollLeft, 0);
+                spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, targetSpreadsheetColumn.sectionName);
             }
-            spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+            spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
             spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
             spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 
             if (relative.isOutsideViewportHorizontally) {
-                spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
-                spreadsheetState.gridSectionList.forEach(gs => {
-                    if (targetGridColumn.gridSectionName === gs.name) {
-                        spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
+                spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+                spreadsheetState.spreadsheetSectionList.forEach(gs => {
+                    if (targetSpreadsheetColumn.sectionName === gs.name) {
+                        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                             this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
                     } else {
-                        spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
-                            this.spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name];
+                        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
+                            this.spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name];
                     }
                 });
             }
@@ -195,17 +250,17 @@ export class SpreadsheetStore {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
         spreadsheetState.dataRowList = spreadsheetState.originalDataRowList.slice(0);
 
-        spreadsheetState.gridColumnList = spreadsheetState.gridColumnList.slice(0);
-        var gridColumn = spreadsheetState.gridColumnList.find(gc => gc.index === action.payload.gridColumnIndex);
-        var gridColumnIndex = spreadsheetState.gridColumnList.indexOf(gridColumn);
-        gridColumn = Object.assign({}, gridColumn, { filterExpression: action.payload.expression });
-        spreadsheetState.gridColumnList.splice(gridColumnIndex, 1, gridColumn);
+        spreadsheetState.spreadsheetColumnList = spreadsheetState.spreadsheetColumnList.slice(0);
+        var spreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index === action.payload.spreadsheetColumnIndex);
+        var spreadsheetColumnIndex = spreadsheetState.spreadsheetColumnList.indexOf(spreadsheetColumn);
+        spreadsheetColumn = Object.assign({}, spreadsheetColumn, { filterExpression: action.payload.expression });
+        spreadsheetState.spreadsheetColumnList.splice(spreadsheetColumnIndex, 1, spreadsheetColumn);
 
-        spreadsheetState.filterExpressionMap[action.payload.gridColumnIndex] = action.payload.expression;
+        spreadsheetState.filterExpressionMap[action.payload.spreadsheetColumnIndex] = action.payload.expression;
         spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
 
-        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 
@@ -217,11 +272,12 @@ export class SpreadsheetStore {
         spreadsheetState.dataRowList = spreadsheetState.originalDataRowList.slice(0);
 
         spreadsheetState.filterExpressionMap = {};
-        spreadsheetState.gridColumnList = this.gridColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
+        spreadsheetState.spreadsheetColumnList =
+            this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
         spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
 
-        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 
@@ -232,7 +288,7 @@ export class SpreadsheetStore {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
         spreadsheetState.getRowStyle = action.payload.newGetRowStyleFn;
 
-        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
 
         return spreadsheetState;
     }
@@ -246,19 +302,19 @@ export class SpreadsheetStore {
         spreadsheetState.spreadsheetWidth = action.payload.newWidth;
         spreadsheetState.bodyHeight = bodyHeight;
 
-        spreadsheetState.gridSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
+        spreadsheetState.spreadsheetSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
 
-        spreadsheetState.gridSectionList.slice(0).forEach(gs => {
-            spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gs.name);
+        spreadsheetState.spreadsheetSectionList.slice(0).forEach(gs => {
+            spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, gs.name);
         });
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
-        spreadsheetState.gridSectionScrollWidthMap = this.gridSectionScrollWidthMapCalculator.calculate(spreadsheetState);
+        spreadsheetState.spreadsheetSectionScrollWidthMap = this.spreadsheetSectionScrollWidthMapCalculator.calculate(spreadsheetState);
 
-        spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
-        spreadsheetState.gridSectionList.forEach(gs => {
-            spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
+        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                 this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
         });
 
@@ -269,7 +325,7 @@ export class SpreadsheetStore {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
 
         spreadsheetState.rowHeight = action.payload.newRowHeight;
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 
@@ -278,26 +334,26 @@ export class SpreadsheetStore {
 
     private scrollSpreadsheet(action: ScrollSpreadsheetAction): SpreadsheetState {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
-        var maxScrollTop = spreadsheetState.gridSectionList.length > 0 ?
-            ((spreadsheetState.gridSectionList[0].dataRowListLength + 1) * spreadsheetState.rowHeight - spreadsheetState.bodyHeight)
+        var maxScrollTop = spreadsheetState.spreadsheetSectionList.length > 0 ?
+            ((spreadsheetState.spreadsheetSectionList[0].dataRowListLength + 1) * spreadsheetState.rowHeight - spreadsheetState.bodyHeight)
             : 999999999;
         spreadsheetState.scrollTop = Math.min(Math.max(action.payload, 0), Math.max(maxScrollTop, 0));
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 
         return spreadsheetState;
     }
 
-    private scrollGridSection(action: ScrollSpreadsheetSectionAction): SpreadsheetState {
+    private scrollSpreadsheetSection(action: ScrollSpreadsheetSectionAction): SpreadsheetState {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
-        spreadsheetState.gridSectionScrollLeftMap = Object.assign({}, spreadsheetState.gridSectionScrollLeftMap);
-        spreadsheetState.gridSectionScrollLeftMap[action.payload.sectionName] = Math.min(action.payload.scrollLeft);
-        spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, action.payload.sectionName);
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
-        spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
-        spreadsheetState.gridSectionList.forEach(gs => {
-            spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
+        spreadsheetState.spreadsheetSectionScrollLeftMap = Object.assign({}, spreadsheetState.spreadsheetSectionScrollLeftMap);
+        spreadsheetState.spreadsheetSectionScrollLeftMap[action.payload.sectionName] = Math.min(action.payload.scrollLeft);
+        spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, action.payload.sectionName);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                 this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
         });
 
@@ -311,16 +367,16 @@ export class SpreadsheetStore {
             this.columnMover.moveFilterExpressionMap(spreadsheetState.filterExpressionMap,
                 action.payload.oldColumnIndex, action.payload.newColumnIndex);
 
-        spreadsheetState.gridColumnList = this.gridColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
+        spreadsheetState.spreadsheetColumnList = this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
         spreadsheetState.columnPositionInformationMap =
-            this.columnPositionInformationMapCalculator.calculate(spreadsheetState.gridColumnList);
+            this.columnPositionInformationMapCalculator.calculate(spreadsheetState.spreadsheetColumnList);
 
-        var gridColumn = spreadsheetState.gridColumnList.find(gc => gc.index === action.payload.newColumnIndex);
+        var spreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index === action.payload.newColumnIndex);
 
-        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
-        spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
-        spreadsheetState.gridSectionList.forEach(gs => {
-            spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
+        spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
+        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                 this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
         });
 
@@ -335,19 +391,20 @@ export class SpreadsheetStore {
         }
 
         spreadsheetState.columnList = columnList;
-        spreadsheetState.gridColumnList = this.gridColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
+        spreadsheetState.spreadsheetColumnList =
+            this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
         spreadsheetState.columnPositionInformationMap =
-            this.columnPositionInformationMapCalculator.calculate(spreadsheetState.gridColumnList);
-        spreadsheetState.gridSectionScrollWidthMap = this.gridSectionScrollWidthMapCalculator.calculate(spreadsheetState);
-        spreadsheetState.gridSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
+            this.columnPositionInformationMapCalculator.calculate(spreadsheetState.spreadsheetColumnList);
+        spreadsheetState.spreadsheetSectionScrollWidthMap = this.spreadsheetSectionScrollWidthMapCalculator.calculate(spreadsheetState);
+        spreadsheetState.spreadsheetSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
 
-        spreadsheetState.gridSectionList.map(gs => gs.name).forEach(gridSectionName => {
-            spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gridSectionName);
+        spreadsheetState.spreadsheetSectionList.map(gs => gs.name).forEach(spreadsheetSectionName => {
+            spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, spreadsheetSectionName);
         });
 
-        spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
-        spreadsheetState.gridSectionList.forEach(gs => {
-            spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
+        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                 this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
         });
 
@@ -362,24 +419,30 @@ export class SpreadsheetStore {
 
         spreadsheetState.columnDefinitionList = action.payload.newColumnDefinitionList || [];
         spreadsheetState.columnList = this.columnListGetter.get(spreadsheetState.columnDefinitionList);
-        spreadsheetState.gridColumnList = this.gridColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
-        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
-        spreadsheetState.columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(spreadsheetState.gridColumnList);
-        spreadsheetState.gridSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
-        spreadsheetState.gridSectionScrollWidthMap = this.gridSectionScrollWidthMapCalculator.calculate(spreadsheetState);
-        spreadsheetState.gridSectionColumnToRendexIndexListMap = {};
-        spreadsheetState.gridSectionScrollLeftMap = Object.assign({}, spreadsheetState.gridSectionScrollLeftMap);
-        spreadsheetState.gridSectionList.forEach(gs => {
-            spreadsheetState.gridSectionList = this.columnViewportUpdater.update(spreadsheetState, gs.name);
-        });
-        spreadsheetState.gridSectionList = this.rowViewportUpdater.update(spreadsheetState);
-        spreadsheetState.gridSectionList.forEach(gs => {
-            if (!spreadsheetState.gridSectionScrollLeftMap[gs.name]) {
-                spreadsheetState.gridSectionScrollLeftMap[gs.name] = 0;
+
+        spreadsheetState.spreadsheetColumnList =
+            this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
+
+        spreadsheetState.titleSpreadsheetRowList = this.titleSpreadsheetRowListGetter.get(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
+        spreadsheetState.columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(spreadsheetState.spreadsheetColumnList);
+        spreadsheetState.spreadsheetSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
+        spreadsheetState.spreadsheetSectionScrollWidthMap = this.spreadsheetSectionScrollWidthMapCalculator.calculate(spreadsheetState);
+        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+        spreadsheetState.spreadsheetSectionScrollLeftMap = Object.assign({}, spreadsheetState.spreadsheetSectionScrollLeftMap);
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            if (!spreadsheetState.spreadsheetSectionScrollLeftMap[gs.name]) {
+                spreadsheetState.spreadsheetSectionScrollLeftMap[gs.name] = 0;
             }
-            spreadsheetState.gridSectionColumnToRendexIndexListMap[gs.name] =
+            spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                 this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
         });
+
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, gs.name);
+        });
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         return spreadsheetState;
     }
 
@@ -391,7 +454,12 @@ export class SpreadsheetStore {
         spreadsheetState.originalDataRowList = (action.payload.newDataRowList || []).slice(0);
         spreadsheetState.dataRowList = action.payload.newDataRowList || [];
         spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
-        spreadsheetState.gridSectionList = this.gridSectionListGetter.get(spreadsheetState);
+
+        spreadsheetState.titleSpreadsheetRowList = this.titleSpreadsheetRowListGetter.get(spreadsheetState);
+        spreadsheetState.dataSpreadsheetRowList =
+            this.dataSpreadsheetRowListGetter.get(spreadsheetState, spreadsheetState.titleSpreadsheetRowList.length);
+
+        spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
 
