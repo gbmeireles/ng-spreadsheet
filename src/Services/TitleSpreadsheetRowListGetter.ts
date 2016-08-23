@@ -15,13 +15,15 @@ export class TitleSpreadsheetRowListGetter {
     }
 
     get(spreadsheetState: SpreadsheetState): SpreadsheetRow[] {
-        var result: SpreadsheetRow[] = [];
         var columnDefinitionMap: { [columnName: string]: ColumnDefinition } = {};
         spreadsheetState.columnList.forEach(column => {
             var columnDefinition = spreadsheetState.columnDefinitionList.find(cd => cd.name === column.name);
             columnDefinitionMap[column.name] = columnDefinition;
         });
 
+        var result: SpreadsheetRow[] = [];
+        var counter = 0;
+        var cellCounterByRow: { [rowIndex: number]: number } = {};
         spreadsheetState.columnList.forEach(column => {
             var columnDefinition = columnDefinitionMap[column.name];
 
@@ -32,6 +34,10 @@ export class TitleSpreadsheetRowListGetter {
                     row = result[i];
                 }
                 if (row == null) {
+                    var previousRow = result[counter - 1];
+                    if (previousRow) {
+                        previousRow.cellList.length = cellCounterByRow[previousRow.rowIndex];
+                    }
                     row = {
                         cellList: [],
                         height: spreadsheetState.rowHeight,
@@ -42,10 +48,24 @@ export class TitleSpreadsheetRowListGetter {
                         sectionRowIndex: i,
                     };
                     result.push(row);
+                    cellCounterByRow[row.rowIndex] = 0;
+                    counter++;
                 }
-                row.cellList = row.cellList.concat(titleCellMatrix[i]);
+                var titleCellMatrixLength = titleCellMatrix[i].length;
+                var titleCellCounter = 0;
+                while (titleCellCounter < titleCellMatrixLength) {
+                    var cell = titleCellMatrix[i][titleCellCounter];
+                    if (cell != null) {
+                        row.cellList[cellCounterByRow[row.rowIndex]] = titleCellMatrix[i][titleCellCounter];
+                        cellCounterByRow[row.rowIndex]++;
+                    }
+                    titleCellCounter++;
+                }
             }
         });
+        if (result[counter - 1]) {
+            result[counter - 1].cellList.length = cellCounterByRow[result[counter - 1].rowIndex];
+        }
 
         for (var i = 0; i < result.length; i++) {
             var row = result[i];
@@ -78,13 +98,30 @@ export class TitleSpreadsheetRowListGetter {
             var row = <SpreadsheetRow>Object.assign({}, cs);
             row.cellList = cs.cellList.filter(cell => sectionColumnIndexList.indexOf(cell.columnIndex) >= 0);
             row.cellMap = {};
-            row.cellList.forEach(cell => {
+            var counter = 0;
+            var cellListIndex = 0;
+            var cellListLength = cs.cellList.length;
+            while (cellListIndex < cellListLength) {
+                var cell = cs.cellList[cellListIndex];
+
+                cellListIndex++;
+                if (sectionColumnIndexList.indexOf(cell.columnIndex) < 0) {
+                    continue;
+                }
+                cell.rowIndex = row.rowIndex;
+                cell.sectionRowIndex = row.sectionRowIndex;
+                cell.cellType = row.rowType;
+
                 var columnCellIndex = 0;
                 while (columnCellIndex < cell.colspan) {
                     row.cellMap[cell.columnIndex + columnCellIndex] = cell;
                     columnCellIndex++;
                 }
-            });
+
+                row.cellList[counter] = cell;
+                counter++;
+            }
+            row.cellList.length = counter;
 
             if (columnToRenderIndexList) {
                 row.visibleCellList = new Array(columnToRenderIndexList.length);

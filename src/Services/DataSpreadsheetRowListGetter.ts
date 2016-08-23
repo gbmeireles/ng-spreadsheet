@@ -59,8 +59,11 @@ export class DataSpreadsheetRowListGetter {
                     var dataCellMatrixLength = dataCellMatrix[i].length;
                     var dataCellCounter = 0;
                     while (dataCellCounter < dataCellMatrixLength) {
-                        row.cellList[cellCounter] = dataCellMatrix[i][dataCellCounter];
-                        cellCounter++;
+                        var cell = dataCellMatrix[i][dataCellCounter];
+                        if (cell != null) {
+                            row.cellList[cellCounter] = dataCellMatrix[i][dataCellCounter];
+                            cellCounter++;
+                        }
                         dataCellCounter++;
                     }
                 }
