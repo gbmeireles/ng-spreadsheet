@@ -257,8 +257,11 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         if (this.isActive && this.style) {
             this.style += ' is-active';
         }
+        this.zIndex = 1;
         if (this.spreadsheetCell.rowspan > 1) {
             this.zIndex = 2;
+        } else if (this.spreadsheetCell.colspan > 1) {
+            this.zIndex = 3;
         }
         if (this.isActive) {
             this.zIndex = 4;

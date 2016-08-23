@@ -25,7 +25,7 @@ export class TitleSpreadsheetRowListGetter {
         spreadsheetState.columnList.forEach(column => {
             var columnDefinition = columnDefinitionMap[column.name];
 
-            var titleCellMatrix = columnDefinition.getTitleCellMatrix(column, spreadsheetState.columnDefinitionList);
+            var titleCellMatrix = columnDefinition.getTitleCellMatrix(column, spreadsheetState.columnList, spreadsheetState.columnDefinitionList);
             for (var i = 0; i < titleCellMatrix.length; i++) {
                 var row: SpreadsheetRow = null;
                 if (result.length >= i + 1) {

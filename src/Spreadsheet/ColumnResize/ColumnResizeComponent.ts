@@ -23,6 +23,7 @@ var css = `
     background-color: black;
     transition: opacity 0.4s ease-out;
     height: 20px;
+    z-index: 6;
 }
 
 :host:hover, :host.is-active {

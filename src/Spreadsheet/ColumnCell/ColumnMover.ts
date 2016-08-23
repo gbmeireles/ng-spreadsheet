@@ -5,6 +5,7 @@ import {
 } from '../../Events/Events';
 import {
     Column,
+    ColumnDefinition,
 } from '../../Model/Model';
 import { ColumnGetter } from './ColumnGetter';
 import { SpreadsheetState } from '../../Spreadsheet/SpreadsheetState';
@@ -14,46 +15,37 @@ export class ColumnMover {
 
     constructor(private columnGetter: ColumnGetter) { }
 
-    moveColumn(spreadsheetState: SpreadsheetState, action: MoveColumnAction): Column[] {
+    moveColumn(spreadsheetState: SpreadsheetState, action: MoveColumnAction): ColumnDefinition[] {
         var oldColumnIndex = action.payload.oldColumnIndex;
         var newColumnIndex = action.payload.newColumnIndex;
         if (oldColumnIndex === newColumnIndex) {
-            return spreadsheetState.columnList;
+            return spreadsheetState.columnDefinitionList;
         }
 
-        var columnList = spreadsheetState.columnList.slice(0).map(i => <Column>Object.assign({}, i));
+        var columnList = spreadsheetState.columnList.map(i => <Column>Object.assign({}, i));
         var columnToTarget = this.columnGetter.getBySpreadsheetColumnIndex(columnList, newColumnIndex);
         var columnToMove = this.columnGetter.getBySpreadsheetColumnIndex(columnList, oldColumnIndex);
 
         if (!columnToMove) {
-            return spreadsheetState.columnList;
+            return spreadsheetState.columnDefinitionList;
         }
         if (columnToTarget.endIndex !== columnToTarget.startIndex) {
-            return spreadsheetState.columnList;
+            return spreadsheetState.columnDefinitionList;
         }
         if (columnToMove === columnToTarget) {
-            return spreadsheetState.columnList;
+            return spreadsheetState.columnDefinitionList;
         }
 
-        if (newColumnIndex > oldColumnIndex) {
-            columnList.filter(c => c.startIndex >= oldColumnIndex && c.startIndex <= newColumnIndex).forEach(c => {
-                c.startIndex--;
-                c.endIndex--;
-            });
+        var columnDefinitionList = spreadsheetState.columnDefinitionList.map(i => <ColumnDefinition>Object.assign({}, i));;
+        var columnDefinitionToTarget = columnDefinitionList.find(cd => cd.name === columnToTarget.name);
+        var columnDefinitionToMove = columnDefinitionList.find(cd => cd.name === columnToMove.name);
 
-        } else {
-            columnList.filter(c => c.startIndex >= newColumnIndex && c.startIndex <= oldColumnIndex).forEach(c => {
-                c.startIndex++;
-                c.endIndex++;
-            });
-        }
-        columnToMove.startIndex = newColumnIndex;
-        columnToMove.endIndex = newColumnIndex;
+        var columnDefinitionIndexToMove = columnDefinitionList.indexOf(columnDefinitionToMove);
+        var columnDefinitionIndexToTarget = columnDefinitionList.indexOf(columnDefinitionToTarget);
+        columnDefinitionList.splice(columnDefinitionIndexToMove, 1);
+        columnDefinitionList.splice(columnDefinitionIndexToTarget, 0, columnDefinitionToMove);
 
-        columnList.splice(oldColumnIndex, 1);
-        columnList.splice(newColumnIndex, 0, columnToMove);
-
-        return columnList;
+        return columnDefinitionList;
     }
 
     moveFilterExpressionMap(filterExpressionMap: { [spreadsheetColumnIndex: number]: string }, oldColumnIndex: number, newColumnIndex: number) {

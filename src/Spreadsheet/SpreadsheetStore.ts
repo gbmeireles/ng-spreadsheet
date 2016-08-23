@@ -362,18 +362,27 @@ export class SpreadsheetStore {
 
     private moveColumn(action: MoveColumnAction): SpreadsheetState {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
-        spreadsheetState.columnList = this.columnMover.moveColumn(spreadsheetState, action);
+        spreadsheetState.columnDefinitionList = this.columnMover.moveColumn(spreadsheetState, action);
+        spreadsheetState.columnList = this.columnListGetter.get(spreadsheetState.columnDefinitionList);
+
         spreadsheetState.filterExpressionMap =
             this.columnMover.moveFilterExpressionMap(spreadsheetState.filterExpressionMap,
                 action.payload.oldColumnIndex, action.payload.newColumnIndex);
 
-        spreadsheetState.spreadsheetColumnList = this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
+        spreadsheetState.spreadsheetColumnList =
+            this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
         spreadsheetState.columnPositionInformationMap =
             this.columnPositionInformationMapCalculator.calculate(spreadsheetState.spreadsheetColumnList);
 
         var spreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index === action.payload.newColumnIndex);
 
+        spreadsheetState.titleSpreadsheetRowList = this.titleSpreadsheetRowListGetter.get(spreadsheetState);
+        spreadsheetState.dataSpreadsheetRowList =
+            this.dataSpreadsheetRowListGetter.get(spreadsheetState, spreadsheetState.titleSpreadsheetRowList.length);
+
         spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
+        spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, spreadsheetColumn.sectionName);
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
         spreadsheetState.spreadsheetSectionList.forEach(gs => {
             spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
@@ -462,6 +471,16 @@ export class SpreadsheetStore {
         spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
+
+        spreadsheetState.spreadsheetSectionList.forEach(ss => {
+            spreadsheetState.spreadsheetSectionList = this.columnViewportUpdater.update(spreadsheetState, ss.name);
+        });
+        spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
+        spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap = {};
+        spreadsheetState.spreadsheetSectionList.forEach(gs => {
+            spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
+                this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
+        });
 
         return spreadsheetState;
     }

@@ -12,7 +12,7 @@ export interface ColumnDefinition {
     filterExpressionMap?: { [columnIndex: number]: string };
     isExportable?: boolean;
 
-    getTitleCellMatrix(column: Column, columnDefinitionList: ColumnDefinition[]): SpreadsheetCell[][];
-    getDataCellMatrix(rowData: any, column: Column, columnDefinitionList: ColumnDefinition[]): SpreadsheetCell[][];
+    getTitleCellMatrix(column: Column, columnList: Column[], columnDefinitionList: ColumnDefinition[]): SpreadsheetCell[][];
+    getDataCellMatrix(rowData: any, column: Column, columnList: Column[], columnDefinitionList: ColumnDefinition[]): SpreadsheetCell[][];
     getColumn(columnStartIndex: number, columnDefinitionList: ColumnDefinition[]): Column;
 }
