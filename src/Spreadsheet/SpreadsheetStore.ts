@@ -298,7 +298,7 @@ export class SpreadsheetStore {
 
         var headerHeight = spreadsheetState.numberTitleRowList.length * spreadsheetState.rowHeight + 20;
         var statusBarHeight = 20;
-        var bodyHeight = action.payload.newHeight - headerHeight - statusBarHeight;
+        var bodyHeight = Math.max(action.payload.newHeight - headerHeight - statusBarHeight, spreadsheetState.rowHeight * 3);
         spreadsheetState.spreadsheetWidth = action.payload.newWidth;
         spreadsheetState.bodyHeight = bodyHeight;
 

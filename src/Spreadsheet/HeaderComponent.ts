@@ -40,6 +40,7 @@ const css = `
     display: block;
     position: relative;
     overflow-y: scroll;
+    overflow-x: hidden;
 }`;
 
 const NUMBER_ROW_HEIGHT: number = 20;

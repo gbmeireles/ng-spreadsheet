@@ -166,6 +166,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                 this.editComponent.instance.onEditDone(this.rowData);
                 this.goToViewMode();
             }
+            this.updateZIndex();
         }
     }
 
@@ -257,6 +258,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         if (this.isActive && this.style) {
             this.style += ' is-active';
         }
+        this.updateZIndex();
+    }
+
+    private updateZIndex() {
         this.zIndex = 1;
         if (this.spreadsheetCell.rowspan > 1) {
             this.zIndex = 2;
