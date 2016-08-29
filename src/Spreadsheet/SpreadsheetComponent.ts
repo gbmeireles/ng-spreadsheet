@@ -23,6 +23,7 @@ import { COLUMN_CELL_PROVIDERS } from './ColumnCell/ColumnCell';
 import { COLUMN_RESIZE_PROVIDERS } from './ColumnResize/ColumnResize';
 import {
     SPREADSHEET_SCOPE_PROVIDERS,
+    CellManager,
 } from '../Services/Services';
 import {
     ColumnPositionInformationMap,
@@ -132,7 +133,8 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         private app: ApplicationRef,
         private renderer: Renderer,
         private spreadsheetStateGlobal: SpreadsheetState,
-        private spreadsheetStore: SpreadsheetStore) {
+        private spreadsheetStore: SpreadsheetStore,
+        private cellManager: CellManager) {
         this.eventEmitterSubscription = this.dispatcher.subscribe((data: Action) => {
             this.onSpreadsheetEvent.emit({
                 eventData: data,
@@ -182,13 +184,19 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         this.windowResizeUnregisterFn();
     }
 
-    getActiveCell() {
+    getActiveCell(): { cell: SpreadsheetCell, element: HTMLElement } {
         var cellLocation = this.spreadsheetState.activeCellLocation;
         var spreadsheetColumn = this.spreadsheetState.spreadsheetColumnList.find(gc => gc.index === cellLocation.columnIndex);
         var spreadsheetSection = this.spreadsheetState.spreadsheetSectionList.find(gs => gs.name === spreadsheetColumn.name);
         var spreadsheetRow = spreadsheetSection.dataRowList.find(dr => dr.rowIndex === cellLocation.rowIndex);
         var spreadsheetCell = spreadsheetRow.cellList.find(c => c.columnIndex === spreadsheetColumn.index);
-        return spreadsheetCell;
+
+        var cell = this.cellManager.getCellByPosition(spreadsheetCell.columnIndex, spreadsheetCell.rowIndex);
+
+        return {
+            cell: spreadsheetCell,
+            element: cell.getElement(),
+        };
     }
 
     exportData(): ExportData {

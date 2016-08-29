@@ -16,6 +16,10 @@ export class CellManager {
         return this.cellList.filter(c => c.spreadsheetColumnIndex === spreadsheetColumnIndex);
     }
 
+    getCellByPosition(spreadsheetColumnIndex: number, rowNumberIndex: number): Cell {
+        return this.cellList.find(c => c.spreadsheetColumnIndex === spreadsheetColumnIndex && c.spreadsheetCell.rowIndex === rowNumberIndex);
+    }
+
     addCell(cell: Cell) {
         this.cellList.push(cell);
     }

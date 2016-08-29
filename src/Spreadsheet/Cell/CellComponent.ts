@@ -183,6 +183,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         this.initCell(this.spreadsheetCell);
     }
 
+    getElement(): HTMLElement {
+        return this.el.nativeElement;
+    }
+
     goToEditMode() {
         if (this.spreadsheetCell.editableComponentType && !this.isEditing) {
             this.isCustom = true;
