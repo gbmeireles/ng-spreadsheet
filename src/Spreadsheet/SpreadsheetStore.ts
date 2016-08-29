@@ -433,6 +433,9 @@ export class SpreadsheetStore {
             this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
 
         spreadsheetState.titleSpreadsheetRowList = this.titleSpreadsheetRowListGetter.get(spreadsheetState);
+        spreadsheetState.dataSpreadsheetRowList =
+            this.dataSpreadsheetRowListGetter.get(spreadsheetState, spreadsheetState.titleSpreadsheetRowList.length);
+
         spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
         spreadsheetState.columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(spreadsheetState.spreadsheetColumnList);
         spreadsheetState.spreadsheetSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
