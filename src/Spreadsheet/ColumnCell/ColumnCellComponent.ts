@@ -166,6 +166,10 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     ngOnDestroy() {
     }
 
+    getElement(): HTMLElement {
+        return this.el.nativeElement;
+    }
+
     toggleFilter() {
         this.isFilterOpen = !this.isFilterOpen;
     }
