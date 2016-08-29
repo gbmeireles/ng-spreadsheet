@@ -22,6 +22,7 @@ export class SpreadsheetState {
     spreadsheetColumnList: SpreadsheetColumn[];
     columnPositionInformationMap: ColumnPositionInformationMap;
     bodyHeight: number;
+    totalHeight: number;
     rowHeight: number;
     scrollTop: number;
     spreadsheetSectionScrollWidthMap: { [spreadsheetSectionName: string]: number };
@@ -47,6 +48,7 @@ export class SpreadsheetState {
             this.spreadsheetColumnList = [];
             this.filterExpressionMap = {};
             this.columnPositionInformationMap = {};
+            this.totalHeight = 0;
             this.bodyHeight = 0;
             this.rowHeight = 20;
             this.scrollTop = 0;

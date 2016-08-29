@@ -24,6 +24,7 @@ const css = `
     position: relative;
     overflow-y: hidden;
     display: block;
+    height: 400px;
 }`;
 
 const html = `

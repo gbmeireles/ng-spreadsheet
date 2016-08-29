@@ -40,6 +40,10 @@ import {
 import { SpreadsheetCell, SpreadsheetRow } from '../Model/Model';
 import { ColumnMover } from './ColumnCell/ColumnMover';
 import { ColumnSizeUpdater } from './ColumnResize/ColumnSizeUpdater';
+
+const statusBarHeight = 20;
+const detailsBarHeight = 36;
+
 @Injectable()
 export class SpreadsheetStore {
     spreadsheetState: SpreadsheetState;
@@ -297,9 +301,9 @@ export class SpreadsheetStore {
         var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
 
         var headerHeight = spreadsheetState.numberTitleRowList.length * spreadsheetState.rowHeight + 20;
-        var statusBarHeight = 20;
-        var bodyHeight = Math.max(action.payload.newHeight - headerHeight - statusBarHeight, spreadsheetState.rowHeight * 3);
         spreadsheetState.spreadsheetWidth = action.payload.newWidth;
+        spreadsheetState.totalHeight = action.payload.newHeight;
+        var bodyHeight = Math.max(spreadsheetState.totalHeight - headerHeight - statusBarHeight - detailsBarHeight, spreadsheetState.rowHeight * 3);
         spreadsheetState.bodyHeight = bodyHeight;
 
         spreadsheetState.spreadsheetSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
@@ -435,6 +439,10 @@ export class SpreadsheetStore {
         spreadsheetState.titleSpreadsheetRowList = this.titleSpreadsheetRowListGetter.get(spreadsheetState);
         spreadsheetState.dataSpreadsheetRowList =
             this.dataSpreadsheetRowListGetter.get(spreadsheetState, spreadsheetState.titleSpreadsheetRowList.length);
+
+        var headerHeight = (spreadsheetState.titleSpreadsheetRowList.length * spreadsheetState.rowHeight + 20) || 0;
+        var bodyHeight = Math.max(spreadsheetState.totalHeight - headerHeight - statusBarHeight - detailsBarHeight, spreadsheetState.rowHeight * 3);
+        spreadsheetState.bodyHeight = bodyHeight;
 
         spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
         spreadsheetState.columnPositionInformationMap = this.columnPositionInformationMapCalculator.calculate(spreadsheetState.spreadsheetColumnList);

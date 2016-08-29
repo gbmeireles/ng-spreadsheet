@@ -11,4 +11,5 @@ export interface Cell {
     goToEditMode?: () => void;
     cancelEdit?: () => void;
     isEditing?: boolean;
+    getElement: () => HTMLElement;
 }
