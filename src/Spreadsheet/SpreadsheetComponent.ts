@@ -184,10 +184,10 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         this.windowResizeUnregisterFn();
     }
 
-    getActiveCell(): { cell: SpreadsheetCell, element: HTMLElement } {
+    getActiveCell(): { cell: SpreadsheetCell, element: HTMLElement, rowData: any } {
         var cellLocation = this.spreadsheetState.activeCellLocation;
         var spreadsheetColumn = this.spreadsheetState.spreadsheetColumnList.find(gc => gc.index === cellLocation.columnIndex);
-        var spreadsheetSection = this.spreadsheetState.spreadsheetSectionList.find(gs => gs.name === spreadsheetColumn.name);
+        var spreadsheetSection = this.spreadsheetState.spreadsheetSectionList.find(gs => gs.name === spreadsheetColumn.sectionName);
         var spreadsheetRow = spreadsheetSection.dataRowList.find(dr => dr.rowIndex === cellLocation.rowIndex);
         var spreadsheetCell = spreadsheetRow.cellList.find(c => c.columnIndex === spreadsheetColumn.index);
 
@@ -195,6 +195,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
 
         return {
             cell: spreadsheetCell,
+            rowData: spreadsheetRow.rowData,
             element: cell.getElement(),
         };
     }
