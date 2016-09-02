@@ -2,7 +2,7 @@ import { Component, Input, ElementRef, ChangeDetectionStrategy, ChangeDetectorRe
 import { SpreadsheetRow } from '../Model/SpreadsheetRow';
 
 const css = `
-RowHandlerCell {
+div.handler {
     display: inline-block;
     position: absolute;
     width: 20px;
@@ -17,7 +17,7 @@ RowHandlerCell {
 const html = `
 <Row *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" spreadsheetSectionName="RowNumber"
     [index]="i">
-    <RowHandlerCell [style.lineHeight.px]="rowHeight">{{numberRow.rowNumber}}</RowHandlerCell>
+    <div class="handler" [style.lineHeight.px]="rowHeight">{{numberRow.rowNumber}}</div>
 </Row>`;
 
 @Component({
