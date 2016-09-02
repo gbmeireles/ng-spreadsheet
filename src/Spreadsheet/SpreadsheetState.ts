@@ -1,4 +1,4 @@
-import { Injectable, provide, Provider } from '@angular/core';
+import { Injectable, FactoryProvider } from '@angular/core';
 import {
     SpreadsheetSectionPositionInformationMap,
     ColumnPositionInformationMap,
@@ -69,4 +69,11 @@ export class SpreadsheetState {
 }
 
 export default SpreadsheetState;
-export const SPREADSHEET_STATE_PROVIDERS = [provide(SpreadsheetState, { useFactory: () => { return new SpreadsheetState(); } })];
+export const SPREADSHEET_STATE_PROVIDERS = [
+    <FactoryProvider>{
+        deps: [],
+        multi: false,
+        provide: SpreadsheetState,
+        useFactory: () => { return new SpreadsheetState(); },
+    },
+];

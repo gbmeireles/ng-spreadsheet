@@ -132,7 +132,8 @@ export class BodySectionComponent implements OnDestroy, OnInit {
             }
         }
         if (obj['spreadsheetSectionScrollLeftMap']) {
-            this.el.nativeElement.scrollLeft = this.spreadsheetSectionScrollLeftMap && this.spreadsheetSectionScrollLeftMap[this.spreadsheetSectionName];
+            this.el.nativeElement.scrollLeft = this.spreadsheetSectionScrollLeftMap
+                && this.spreadsheetSectionScrollLeftMap[this.spreadsheetSectionName];
         }
         if (obj['spreadsheetSectionPositionInformationMap']) {
             this.updateSectionPosition(this.spreadsheetSectionPositionInformationMap);

@@ -9,8 +9,8 @@ export interface SpreadsheetCell {
     rowspan: number;
     data: any;
     formatData?: (data: any) => string;
-    viewableComponentType?: Type;
-    editableComponentType?: Type;
+    viewableComponentType?: Type<any>;
+    editableComponentType?: Type<any>;
     rowIndex?: number;
     sectionRowIndex?: number;
     isEditing?: boolean;

@@ -1,6 +1,5 @@
 import { HostBinding, Component, Input, ElementRef, ViewChildren, Renderer } from '@angular/core';
 import { OnInit, OnDestroy, OnChanges } from '@angular/core';
-import { CORE_DIRECTIVES, NgFor } from '@angular/common';
 import {
     Column,
     SpreadsheetColumn,
