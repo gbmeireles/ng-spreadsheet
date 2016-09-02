@@ -59,18 +59,18 @@ const css = `
     position: absolute;
 }
 
-CellComponent {
+div {
     padding: 2px;
 }
 
-:host.is-custom CellComponent {
+:host.is-custom div {
     padding: 0px;
 }
 `;
 
 @Component({
     selector: 'Cell',
-    template: '<CellComponent ref-cellComponent>{{data}}</CellComponent>',
+    template: '<div ref-cellComponent>{{data}}</div>',
     styles: [css],
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
