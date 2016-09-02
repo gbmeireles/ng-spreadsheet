@@ -163,9 +163,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         }
         if (obj.dataRowList) {
             this.dispatcher.emit(new UpdateDataRowListAction(this.dataRowList));
-            //Possible fix to angular 2 render issue
-            // setTimeout(() => this.dispatcher.emit(new ScrollSpreadsheetAction(this.spreadsheetState.scrollTop - 1)), 100);
-            // setTimeout(() => this.dispatcher.emit(new ScrollSpreadsheetAction(this.spreadsheetState.scrollTop - 1)), 200);
         }
         if (obj.rowHeight) {
             this.dispatcher.emit(new UpdateSpreadsheetRowHeightAction(this.rowHeight));
@@ -182,6 +179,17 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     ngOnDestroy() {
         this.eventEmitterSubscription.unsubscribe();
         this.windowResizeUnregisterFn();
+    }
+
+    recalculateDimensions() {
+        setTimeout(() => {
+            var style = window.getComputedStyle(this.el.nativeElement);
+            this.dispatcher.emit(new UpdateSpreadsheetSizeAction(this.height || parseInt(style.height, 10), parseInt(style.width, 10)));
+        }, 200);
+    }
+
+    getElement(): HTMLElement {
+        return this.el.nativeElement;
     }
 
     getActiveCell(): { cell: SpreadsheetCell, element: HTMLElement, rowData: any } {

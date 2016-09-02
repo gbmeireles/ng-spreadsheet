@@ -2,7 +2,7 @@ import {
     Component,
     ComponentRef,
     forwardRef,
-    DynamicComponentLoader,
+    ComponentFactoryResolver,
     Input,
     ElementRef,
     Injector,
@@ -96,7 +96,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     private viewComponent: ComponentRef<ViewableComponent>;
     private editComponent: ComponentRef<EditableComponent>;
 
-    constructor(private dcl: DynamicComponentLoader,
+    constructor(private resolver: ComponentFactoryResolver,
         private el: ElementRef,
         private app: ApplicationRef,
         private cellPositionUpdater: CellPositionUpdater,
@@ -193,15 +193,15 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             this.cdr.markForCheck();
             this.isEditing = true;
             this.clear();
-            this.dcl.loadNextToLocation(this.spreadsheetCell.editableComponentType, this.cellViewContainer)
-                .then((componentRef: ComponentRef<EditableComponent>) => {
-                    this.editComponent = componentRef;
-                    componentRef.instance.onEditStarted(this.rowData);
-                    componentRef.onDestroy(() => {
-                        this.isEditing = false;
-                        this.bodySectionComponent.focus();
-                    });
-                });
+
+            var factory = this.resolver.resolveComponentFactory<EditableComponent>(<any>this.spreadsheetCell.editableComponentType);
+            var componentRef = this.cellViewContainer.createComponent(factory);
+            this.editComponent = componentRef;
+            componentRef.instance.onEditStarted(this.rowData);
+            componentRef.onDestroy(() => {
+                this.isEditing = false;
+                this.bodySectionComponent.focus();
+            });
         } else {
             this.isCustom = false;
         }
@@ -223,7 +223,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             }
             this.isCustom = true;
             this.cdr.markForCheck();
-            this.dcl.loadNextToLocation(this.spreadsheetCell.viewableComponentType, this.cellViewContainer)
+            this.resolver.loadNextToLocation(this.spreadsheetCell.viewableComponentType, this.cellViewContainer)
                 .then((componentRef: ComponentRef<ViewableComponent>) => {
                     if (this.viewComponent) {
                         this.viewComponent.destroy();

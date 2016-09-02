@@ -26,6 +26,7 @@ const css = `
     position: absolute;
     height: 100%;
     outline: none;
+    z-index: 0;
 }
 
 :host[spreadsheetSectionName="RowNumber"] {
