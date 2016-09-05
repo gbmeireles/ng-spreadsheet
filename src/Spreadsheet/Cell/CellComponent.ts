@@ -222,14 +222,18 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
                 return;
             }
             this.isCustom = true;
-            this.cdr.markForCheck();
-            var factory = this.resolver.resolveComponentFactory(this.spreadsheetCell.viewableComponentType);
-            var componentRef = this.cellViewContainer.createComponent(factory);
-            if (this.viewComponent) {
-                this.viewComponent.destroy();
-            }
-            this.viewComponent = componentRef;
-            componentRef.instance.onRowInit(this.rowData);
+            setTimeout(() => {
+                if (!this.spreadsheetCell.viewableComponentType) {
+                    return;
+                }
+                var factory = this.resolver.resolveComponentFactory(this.spreadsheetCell.viewableComponentType);
+                var componentRef = this.cellViewContainer.createComponent(factory);
+                if (this.viewComponent) {
+                    this.viewComponent.destroy();
+                }
+                this.viewComponent = componentRef;
+                componentRef.instance.onRowInit(this.rowData);
+            }, 1);
 
         } else if (this.spreadsheetCell.formatData !== undefined) {
             this.isCustom = false;
