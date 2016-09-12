@@ -52,7 +52,9 @@ export class RowComponent implements OnInit, OnDestroy {
             this.updateRow(changes['row'].currentValue);
         }
         if (this.activeRowIndexList && (changes['activeRowIndexList'] || changes['row'])) {
+            var style = this.row.rowStyle;
             this.isActive = this.activeRowIndexList.indexOf(this.row.rowIndex) >= 0;
+            this.updateStyle(this.row);
         }
     }
 
@@ -87,7 +89,10 @@ export class RowComponent implements OnInit, OnDestroy {
         if (this.index === 0 && row.rowType === ContentTypeEnum.Data) {
             this.renderer.setElementStyle(this.el.nativeElement, 'marginTop', `${top}px`);
         }
+        this.updateStyle(row);
+    }
 
+    private updateStyle(row: SpreadsheetRow) {
         var style = row.rowStyle;
         if (this.activeCellLocation) {
             this.isActive = this.activeCellLocation.rowIndex === this.row.rowIndex;

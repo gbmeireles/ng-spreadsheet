@@ -246,6 +246,19 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         }
     }
 
+    goToRowByRowData(rowData: any) {
+        var row = this.spreadsheetState.dataSpreadsheetRowList.find(sr => sr.rowData === rowData);
+        var spreadsheetColumnIndex = this.spreadsheetState.activeCellLocation.columnIndex;
+        var action = new GoToCellLocationAction(row.rowIndex, spreadsheetColumnIndex, false);
+        action.payload.rowData = rowData;
+        this.dispatcher.emit(action);
+        this.cdr.markForCheck();
+    }
+
+    resizeColumn(columnName: string, newSize: number) {
+        this.dispatcher.emit(new UpdateColumnSizeAction(columnName, newSize));
+    }
+
     clearFilter() {
         this.dispatcher.emit(new ClearFilterAction());
         this.cdr.markForCheck();

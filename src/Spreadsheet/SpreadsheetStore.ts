@@ -72,8 +72,10 @@ export class SpreadsheetStore {
     ) {
         this.spreadsheetState = new SpreadsheetState();
         this.dispatcher.subscribe((action: Action) => {
-            console.time('SpreadsheetAction');
-            console.log(`Action requested: ${action.type}`);
+            if (window['isToLogSpreadsheetEvents']) {
+                console.time('SpreadsheetAction');
+                console.log(`Action requested: ${action.type}`);
+            }
             switch (action.type) {
                 case UpdateColumnDefinitionListAction.type: {
                     this.spreadsheetState = this.updateColumnDefinitionList(<UpdateColumnDefinitionListAction>action);
@@ -128,8 +130,10 @@ export class SpreadsheetStore {
                     break;
                 }
             }
-            console.log(`Action executed: ${action.type}`);
-            console.timeEnd('SpreadsheetAction');
+            if (window['isToLogSpreadsheetEvents']) {
+                console.log(`Action executed: ${action.type}`);
+                console.timeEnd('SpreadsheetAction');
+            }
             this.onChanged.emit(this.spreadsheetState);
         });
     }
@@ -189,17 +193,17 @@ export class SpreadsheetStore {
             }
         }
 
-        if (!targetCell) {
+        if (!targetCell && action.payload.rowData === undefined) {
             return spreadsheetState;
         }
 
         spreadsheetState.activeCellLocation = {
-            columnIndex: targetCell.columnIndex,
-            rowIndex: targetCell.rowIndex,
+            columnIndex: targetCell ? targetCell.columnIndex : action.payload.spreadsheetColumnIndex,
+            rowIndex: targetCell ? targetCell.rowIndex : action.payload.rowIndex,
         };
 
         spreadsheetState.activeRowIndexList = spreadsheetState.dataSpreadsheetRowList
-            .filter(sRow => sRow.rowData === targetRow.rowData)
+            .filter(sRow => sRow.rowData === (action.payload.rowData !== undefined ? action.payload.rowData : targetRow.rowData))
             .map(sRow => sRow.rowIndex);
 
         var relative = this.cellLocationRelativeToViewportGetter.get(spreadsheetState, spreadsheetState.activeCellLocation);

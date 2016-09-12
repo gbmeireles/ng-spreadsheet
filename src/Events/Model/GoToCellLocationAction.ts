@@ -3,9 +3,10 @@ export class GoToCellLocationAction implements Action {
     static type = 'GoToCellLocation';
     type: string;
     payload: {
-        rowIndex: number;
+        rowIndex?: number;
         spreadsheetColumnIndex: number;
         isToUseMinimunScroll: boolean;
+        rowData?: any;
     };
 
     constructor(rowIndex: number, spreadsheetColumnIndex: number, isToUseMinimunScroll: boolean) {

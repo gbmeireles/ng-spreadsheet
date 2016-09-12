@@ -67,6 +67,6 @@ export class RowListComponent {
     }
 
     cellIdentity(index: number, cell: SpreadsheetCell): any {
-        return index;
+        return cell.columnIndex || index;
     }
 }
