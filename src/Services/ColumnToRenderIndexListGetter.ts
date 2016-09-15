@@ -17,7 +17,6 @@ export class ColumnToRenderIndexListGetter {
             && spreadsheetState.spreadsheetSectionPositionInformationMap[spreadsheetSectionName]
             && spreadsheetState.spreadsheetSectionPositionInformationMap[spreadsheetSectionName].width;
         if (!spreadsheetSectionWidth) {
-            console.error('Spreadsheet section width not available');
             return [];
         }
         var spreadsheetSection = spreadsheetState.spreadsheetSectionList.find(ts => ts.name === spreadsheetSectionName);
