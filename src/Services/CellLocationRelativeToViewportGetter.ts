@@ -54,8 +54,17 @@ export class CellLocationRelativeToViewportGetter {
             isOutsideViewportHorizontally: false,
             isOutsideViewportVertically: false,
         };
-        relative.isOutsideViewportHorizontally = relative.left < 0 || relative.right > 0;
-        relative.isOutsideViewportVertically = relative.top < 0 || relative.bottom > 0;
+        var isLeftBorderInsideViewport = relative.left >= 0;
+        var isRightBorderInsideViewport = relative.right <= 0;
+        var isHorizontalCenterInsideViewport = relative.left <= 0 && relative.right >= 0;
+        var isColumnGreaterThanViewport = targetCellPositionInformation.width > width;
+        if (isColumnGreaterThanViewport) {
+            relative.isOutsideViewportHorizontally = !isHorizontalCenterInsideViewport && !isLeftBorderInsideViewport && !isRightBorderInsideViewport;
+        } else {
+            relative.isOutsideViewportHorizontally = !isLeftBorderInsideViewport || !isRightBorderInsideViewport;
+        }
+
+        relative.isOutsideViewportVertically = !(relative.top < 0 && relative.bottom > 0) && (relative.top < 0 || relative.bottom > 0);
         relative.isOutsideViewport = relative.isOutsideViewportHorizontally || relative.isOutsideViewportVertically;
 
         return relative;

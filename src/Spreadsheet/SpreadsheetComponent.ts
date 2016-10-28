@@ -86,7 +86,7 @@ const html = `
     [activeCellLocation]="spreadsheetState?.activeCellLocation"
     [activeRowIndexList]="spreadsheetState?.activeRowIndexList"
     ></Body>
-<StatusBar [message]="statusMessage" [timeout]="statusMessageTimeout"></StatusBar>`;
+<StatusBar [message]="statusMessage" [timeout]="statusMessageTimeout" [count]="statusMessageCount"></StatusBar>`;
 
 @Component({
     changeDetection: ChangeDetectionStrategy.Default,
@@ -118,6 +118,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @ViewChild(BodyComponent) body: BodyComponent;
     statusMessage: string;
     statusMessageTimeout: number;
+    statusMessageCount: number = 0;
 
     get firstDataRowRowNumber() {
         return this.spreadsheetState.numberTitleRowList.length + 1;
@@ -268,6 +269,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         setTimeout(() => {
             this.statusMessage = message;
             this.statusMessageTimeout = timeout;
+            this.statusMessageCount++;
         }, 100);
     }
 
