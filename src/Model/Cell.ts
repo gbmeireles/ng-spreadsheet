@@ -8,6 +8,7 @@ export interface Cell {
     getScrollWidth: () => number;
     spreadsheetCell: SpreadsheetCell;
     isActive: boolean;
+    confirmEdit?: () => void;
     goToEditMode?: () => void;
     cancelEdit?: () => void;
     isEditing?: boolean;

@@ -163,10 +163,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         if (changes['activeCellLocation']) {
             this.isActive = this.isCellActiveChecker.check(this.spreadsheetCell, this.activeCellLocation);
             if (this.editComponent && !this.isActive) {
-                this.editComponent.instance.onEditDone(this.rowData);
-                this.goToViewMode();
+                this.confirmEdit();
+            } else {
+                this.updateZIndex();
             }
-            this.updateZIndex();
         }
     }
 
@@ -185,6 +185,12 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
 
     getElement(): HTMLElement {
         return this.el.nativeElement;
+    }
+
+    confirmEdit() {
+        this.editComponent.instance.onEditDone(this.rowData);
+        this.goToViewMode();
+        this.updateZIndex();
     }
 
     goToEditMode() {

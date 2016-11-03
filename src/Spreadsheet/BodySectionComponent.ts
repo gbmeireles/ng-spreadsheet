@@ -221,6 +221,10 @@ export class BodySectionComponent implements OnDestroy, OnInit {
                 });
                 break;
             case 13://Enter
+                targetActiveCell = this.cellGetter.get(this.activeCellLocation);
+                if (targetActiveCell) {
+                    targetActiveCell.confirmEdit();
+                }
             case 40: {//Arrow Down
                 this.eventEmitter.emit(
                     new GoToCellLocationAction(this.activeCellLocation.rowIndex + rowspan, this.activeCellLocation.columnIndex, true));
