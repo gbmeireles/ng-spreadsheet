@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CellManager, ColumnIdentifierMapGetter } from '../Services/Services';
 import { CellLocation, SpreadsheetColumn } from '../Model/Model';
+import { Subject } from 'rxjs/Subject';
+
 const css = `
 :host {
     display: block;
@@ -55,6 +57,13 @@ i {
 .download-button {
     display: block;
     top: 11px;
+    right: 20px;
+    position: absolute;
+}
+
+.toggle-full-button {
+    display: block;
+    top: 11px;
     right: 9px;
     position: absolute;
 }
@@ -64,7 +73,8 @@ const html = `
 <i class="icon-logo"></i>
 <span class="cell-location">{{cellLocation}}</span>
 <span class="cell-content">{{activeCellData}}</span>
-<span class="download-button" (click)="onDownload.emit()"></span>
+<span class="download-button" (click)="onDownload.next()"></span>
+<span class="toggle-full-button" [class.is-full]="isFull" (click)="toggleFullScreen()"></span>
 `;
 
 @Component({
@@ -75,11 +85,13 @@ const html = `
 export class DetailsBarComponent implements OnInit {
     @Input('activeCellLocation') activeCellLocation: CellLocation;
     @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
-    @Output('download') onDownload: EventEmitter<void> = new EventEmitter<void>(false);
+    @Output('download') onDownload: Subject<void> = new Subject<void>();
+    @Output('toggleFullScreen') onToggleFullScreen: Subject<boolean> = new Subject<boolean>();
 
     private activeCellData: string = 'Selecione uma célula';
     private columnIdentifierMap: { [spreadsheetColumnIndex: number]: string } = {};
     private cellLocation: string = '--';
+    private isFull: boolean = false;
 
     constructor(private cellManager: CellManager,
         private columnIdentifierMapGetter: ColumnIdentifierMapGetter) { }
@@ -105,6 +117,11 @@ export class DetailsBarComponent implements OnInit {
             }
             this.cellLocation = this.columnIdentifierMap[this.activeCellLocation.columnIndex] + (spreadsheetCell.rowIndex + 1);
         }
+    }
+
+    toggleFullScreen() {
+        this.isFull = !this.isFull;
+        this.onToggleFullScreen.next(this.isFull);
     }
 
 }

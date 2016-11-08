@@ -1,6 +1,6 @@
 {
   "name": "ng-spreadsheet",
-  "version": "0.10.13",
+  "version": "0.10.14",
   "description": "Spreadhsheet for angular 2",
   "main": "dist/ngSpreadsheet.js",
   "typings": "dist/ngSpreadsheet.d.ts",

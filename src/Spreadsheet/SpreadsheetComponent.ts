@@ -58,12 +58,14 @@ import { SpreadsheetEvent } from './Model/SpreadsheetEvent';
 import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetState';
 import { SpreadsheetStore } from './SpreadsheetStore';
 import { Subscription } from 'rxjs/Subscription';
+import { Subject } from 'rxjs/Subject';
 
 const html = `
 <DetailsBar 
     [activeCellLocation]="spreadsheetState?.activeCellLocation"
     [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList" 
-    (download)="onDownload.emit(exportData())"></DetailsBar>
+    (download)="onDownload.next(exportData())"
+    (toggleFullScreen)="onToggleFullScreen.next($event)"></DetailsBar>
 <Header [rowHeight]="spreadsheetState?.rowHeight" 
     [numberTitleRowList]="spreadsheetState?.numberTitleRowList"
     [spreadsheetSectionList]="spreadsheetState?.spreadsheetSectionList" 
@@ -113,8 +115,9 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('rowHeight') rowHeight: number;
     @Input('height') height: number;
     @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
-    @Output('event') onSpreadsheetEvent: EventEmitter<SpreadsheetEvent<any>> = new EventEmitter<any>(false);
-    @Output('download') onDownload: EventEmitter<void> = new EventEmitter<void>(false);
+    @Output('event') onSpreadsheetEvent: Subject<SpreadsheetEvent<any>> = new Subject<any>();
+    @Output('download') onDownload: Subject<void> = new Subject<void>();
+    @Output('toggleFullScreen') onToggleFullScreen: Subject<boolean> = new Subject<boolean>();
     @ViewChild(BodyComponent) body: BodyComponent;
     statusMessage: string;
     statusMessageTimeout: number;
@@ -137,7 +140,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         private spreadsheetStore: SpreadsheetStore,
         private cellManager: CellManager) {
         this.eventEmitterSubscription = this.dispatcher.subscribe((data: Action) => {
-            this.onSpreadsheetEvent.emit({
+            this.onSpreadsheetEvent.next({
                 eventData: data,
                 eventType: 'Action',
             });
