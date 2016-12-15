@@ -285,6 +285,8 @@ export class SpreadsheetStore {
         spreadsheetState.spreadsheetColumnList =
             this.spreadsheetColumnListGetter.get(spreadsheetState.columnList, spreadsheetState.filterExpressionMap);
         spreadsheetState.dataRowList = this.filteredDataRowListGetter.getList(spreadsheetState);
+        spreadsheetState.dataSpreadsheetRowList =
+            this.dataSpreadsheetRowListGetter.get(spreadsheetState, spreadsheetState.titleSpreadsheetRowList.length);
 
         spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
         spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
