@@ -115,9 +115,9 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('rowHeight') rowHeight: number;
     @Input('height') height: number;
     @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
-    @Output('event') onSpreadsheetEvent: Subject<SpreadsheetEvent<any>> = new Subject<any>();
-    @Output('download') onDownload: Subject<void> = new Subject<void>();
-    @Output('toggleFullScreen') onToggleFullScreen: Subject<boolean> = new Subject<boolean>();
+    @Output('event') onSpreadsheetEvent = new Subject<any>();
+    @Output('download') onDownload = new Subject<ExportData>();
+    @Output('toggleFullScreen') onToggleFullScreen = new Subject<boolean>();
     @ViewChild(BodyComponent) body: BodyComponent;
     statusMessage: string;
     statusMessageTimeout: number;
