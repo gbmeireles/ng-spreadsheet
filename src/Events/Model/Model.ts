@@ -12,3 +12,4 @@ export * from './UpdateSpreadsheetGetRowStyleFnAction';
 export * from './UpdateSpreadsheetHeightAction';
 export * from './GoToCellLocationAction';
 export * from './ClearFilterAction';
+export * from './ToggleFilterAction';

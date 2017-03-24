@@ -24,6 +24,7 @@ const html = `
     [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
     [spreadsheetSectionColumnToRendexIndexListMap]="spreadsheetSectionColumnToRendexIndexListMap"
     [columnPositionInformationMap]="columnPositionInformationMap"
+    [isFilterOpenMap]="isFilterOpenMap"
     [class.is-separating-section]="spreadsheetSection !== spreadsheetSectionList[spreadsheetSectionList.length - 1]">
     <RowList [rowList]="spreadsheetSection.titleRowList" 
         [spreadsheetSectionName]="spreadsheetSection.name"
@@ -61,7 +62,9 @@ export class HeaderComponent implements OnDestroy {
     @Input('spreadsheetSectionScrollWidthMap') spreadsheetSectionScrollWidthMap: { [spreadsheetSectionName: string]: number };
     @Input('spreadsheetSectionScrollLeftMap') spreadsheetSectionScrollLeftMap: { [spreadsheetSectionName: string]: number };
     @Input('spreadsheetSectionPositionInformationMap') spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;
-    @Input('spreadsheetSectionColumnToRendexIndexListMap') spreadsheetSectionColumnToRendexIndexListMap: { [spreadsheetSectionName: string]: number[] };
+    @Input('isFilterOpenMap') isFilterOpenMap: { [columnIndex: number]: boolean };
+    @Input('spreadsheetSectionColumnToRendexIndexListMap')
+    spreadsheetSectionColumnToRendexIndexListMap: { [spreadsheetSectionName: string]: number[] };
 
     constructor() {
     }

@@ -27,6 +27,7 @@ export class SpreadsheetState {
     scrollTop: number;
     spreadsheetSectionScrollWidthMap: { [spreadsheetSectionName: string]: number };
     spreadsheetSectionScrollLeftMap: { [spreadsheetSectionName: string]: number };
+    isFilterOpenMap: { [columnIndex: number]: boolean };
     getRowStyle: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
     spreadsheetSectionList: SpreadsheetSection[];
     spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;
@@ -48,6 +49,7 @@ export class SpreadsheetState {
             this.spreadsheetColumnList = [];
             this.filterExpressionMap = {};
             this.columnPositionInformationMap = {};
+            this.isFilterOpenMap = {};
             this.totalHeight = 0;
             this.bodyHeight = 0;
             this.rowHeight = 20;

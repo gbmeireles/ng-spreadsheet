@@ -41,7 +41,8 @@ const html = `
     [visibleSpreadsheetColumnList]="visibleSpreadsheetColumnList" 
     [columnList]="columnList"
     [spreadsheetColumnList]="spreadsheetColumnList"
-    [columnPositionInformationMap]="columnPositionInformationMap"></ColumnRow>
+    [columnPositionInformationMap]="columnPositionInformationMap"
+    [isFilterOpenMap]="isFilterOpenMap"></ColumnRow>
 <ColumnResize *ngFor="let spreadsheetColumn of visibleSpreadsheetColumnList"
     [spreadsheetColumn]="spreadsheetColumn"
     [columnPositionInformationMap]="columnPositionInformationMap"></ColumnResize>
@@ -59,6 +60,7 @@ export class HeaderSectionComponent implements OnDestroy, OnInit {
     @Input('spreadsheetSectionName') spreadsheetSectionName: string;
     @Input('rowHeight') rowHeight: string;
     @Input('columnList') columnList: Column[];
+    @Input('isFilterOpenMap') isFilterOpenMap: { [columnIndex: number]: boolean };
     @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
     @Input('spreadsheetSectionPositionInformationMap') spreadsheetSectionPositionInformationMap: SpreadsheetSectionPositionInformationMap;

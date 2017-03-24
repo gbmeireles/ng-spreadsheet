@@ -20,7 +20,9 @@ import {
     OnInit,
     OnDestroy,
     Optional,
+    ChangeDetectionStrategy,
 } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import {
     Cell,
     SpreadsheetCell,
@@ -70,8 +72,9 @@ div {
 
 @Component({
     selector: 'Cell',
-    template: '<div ref-cellComponent>{{data}}</div>',
+    template: '<div ref-cellComponent [innerHTML]="data"></div>',
     styles: [css],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
     @Input('cell') spreadsheetCell: SpreadsheetCell;
@@ -105,6 +108,7 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         private isCellActiveChecker: IsCellActiveChecker,
         private cellManager: CellManager,
         private spreadsheetState: SpreadsheetState,
+        private domSanitizer: DomSanitizer,
         @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>,
         @Optional() @Inject(forwardRef(() => BodySectionComponent)) private bodySectionComponent: BodySectionComponent) {
     }
@@ -155,9 +159,6 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
         if (changes['spreadsheetCell'] || changes['rowData'] || changes['spreadsheetSectionScrollLeft'] || changes['columnPositionInformationMap']) {
             let columnPositionInformation = this.columnPositionInformationMap[this.spreadsheetColumnIndex];
             var left = columnPositionInformation ? columnPositionInformation.left : 0;
-            // if (this.index === 0) {
-            //     this.marginLeft = columnPositionInformation ? columnPositionInformation.left : 0;
-            // }
             this.left = left;
         }
         if (changes['activeCellLocation']) {
@@ -235,14 +236,25 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
             var componentRef = this.cellViewContainer.createComponent(factory);
             this.viewComponent = componentRef;
             componentRef.instance.onRowInit(this.rowData);
-            this.cdr.detectChanges();
+            this.cdr.markForCheck();
 
         } else if (this.spreadsheetCell.formatData !== undefined) {
             this.isCustom = false;
-            this.data = this.spreadsheetCell.formatData(this.spreadsheetCell.data);
+
+            let data = this.spreadsheetCell.formatData(this.spreadsheetCell.data);
+            if (this.spreadsheetCell.cellType === ContentTypeEnum.Title) {
+                this.data = this.domSanitizer.bypassSecurityTrustHtml(data);
+            } else {
+                this.data = data;
+            }
         } else {
             this.isCustom = false;
-            this.data = this.spreadsheetCell.data;
+            let data = this.spreadsheetCell.data;
+            if (this.spreadsheetCell.cellType === ContentTypeEnum.Title) {
+                this.data = this.domSanitizer.bypassSecurityTrustHtml(data);
+            } else {
+                this.data = data;
+            }
         }
     }
 

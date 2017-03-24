@@ -24,6 +24,7 @@ import {
     MoveColumnAction,
     MoveColumnTypeEnum,
     FilterColumnAction,
+    ToggleFilterAction,
 } from '../../Events/Events';
 import { ColumnMover } from './ColumnMover';
 import { ColumnGetter } from './ColumnGetter';
@@ -132,11 +133,11 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     @Input('columnList') columnList: Column[];
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
     @Input('index') index: number;
+    @Input('isFilterOpen') isFilterOpen: boolean = false;
 
     spreadsheetCell: SpreadsheetCell;
     left: number;
     spreadsheetColumnIndex: number = 0;
-    isFilterOpen: boolean = false;
     isFiltered: boolean = false;
 
     constructor(private el: ElementRef,
@@ -171,7 +172,7 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
     }
 
     toggleFilter() {
-        this.isFilterOpen = !this.isFilterOpen;
+        this.eventEmitter.emit(new ToggleFilterAction(this.spreadsheetColumnIndex));
     }
 
     filter(expression: string) {

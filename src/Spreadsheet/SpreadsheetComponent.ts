@@ -75,6 +75,7 @@ const html = `
     [spreadsheetSectionScrollWidthMap]="spreadsheetState?.spreadsheetSectionScrollWidthMap"
     [spreadsheetSectionScrollLeftMap]="spreadsheetState?.spreadsheetSectionScrollLeftMap"
     [spreadsheetSectionPositionInformationMap]="spreadsheetState?.spreadsheetSectionPositionInformationMap"
+    [isFilterOpenMap]="spreadsheetState?.isFilterOpenMap"
     [spreadsheetSectionColumnToRendexIndexListMap]="spreadsheetState?.spreadsheetSectionColumnToRendexIndexListMap"></Header>
 <Body [height]="spreadsheetState?.bodyHeight" 
     [rowHeight]="spreadsheetState?.rowHeight" 
@@ -201,7 +202,14 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         var spreadsheetColumn = this.spreadsheetState.spreadsheetColumnList.find(gc => gc.index === cellLocation.columnIndex);
         var spreadsheetSection = this.spreadsheetState.spreadsheetSectionList.find(gs => gs.name === spreadsheetColumn.sectionName);
         var spreadsheetRow = spreadsheetSection.dataRowList.find(dr => dr.rowIndex === cellLocation.rowIndex);
+        if (!spreadsheetRow) {
+            return null;
+        }
+
         var spreadsheetCell = spreadsheetRow.cellList.find(c => c.columnIndex === spreadsheetColumn.index);
+        if (!spreadsheetCell) {
+            return null;
+        }
 
         var cell = this.cellManager.getCellByPosition(spreadsheetCell.columnIndex, spreadsheetCell.rowIndex);
 

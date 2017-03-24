@@ -24,6 +24,7 @@ const html = `
     [spreadsheetColumn]="spreadsheetColumn"
     [columnList]="columnList"
     [index]="columnIndex" 
+    [isFilterOpen]="!!isFilterOpenMap[spreadsheetColumn?.index]" 
     [columnIdentifier]="spreadsheetColumnIdentifierMap[spreadsheetColumn.index]"
     [columnPositionInformationMap]="columnPositionInformationMap">
 </ColumnCell>`;
@@ -39,6 +40,7 @@ export class ColumnRowComponent implements OnInit, OnDestroy, OnChanges {
     @Input('visibleSpreadsheetColumnList') visibleSpreadsheetColumnList: SpreadsheetColumn[];
     @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
     @Input('columnList') columnList: Column[];
+    @Input('isFilterOpenMap') isFilterOpenMap: { [columnIndex: number]: boolean };
     @Input('columnPositionInformationMap') columnPositionInformationMap: ColumnPositionInformationMap;
 
     @Input('scrollWidth')

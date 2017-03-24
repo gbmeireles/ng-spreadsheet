@@ -36,6 +36,7 @@ import {
     UpdateSpreadsheetGetRowStyleFnAction,
     GoToCellLocationAction,
     ClearFilterAction,
+    ToggleFilterAction,
 } from '../Events/Events';
 import { SpreadsheetCell, SpreadsheetRow } from '../Model/Model';
 import { ColumnMover } from './ColumnCell/ColumnMover';
@@ -79,6 +80,10 @@ export class SpreadsheetStore {
             switch (action.type) {
                 case UpdateColumnDefinitionListAction.type: {
                     this.spreadsheetState = this.updateColumnDefinitionList(<UpdateColumnDefinitionListAction>action);
+                    break;
+                }
+                case ToggleFilterAction.type: {
+                    this.spreadsheetState = this.toggleFilter(<ToggleFilterAction>action);
                     break;
                 }
                 case UpdateDataRowListAction.type: {
@@ -349,7 +354,13 @@ export class SpreadsheetStore {
         var maxScrollTop = spreadsheetState.spreadsheetSectionList.length > 0 ?
             ((spreadsheetState.spreadsheetSectionList[0].dataRowListLength + 1) * spreadsheetState.rowHeight - spreadsheetState.bodyHeight)
             : 999999999;
-        spreadsheetState.scrollTop = Math.min(Math.max(action.payload, 0), Math.max(maxScrollTop, 0));
+        var newScrollTop = Math.min(Math.max(action.payload, 0), Math.max(maxScrollTop, 0));
+
+        if (spreadsheetState.scrollTop === newScrollTop) {
+            return spreadsheetState;
+        }
+
+        spreadsheetState.scrollTop = newScrollTop;
         spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
         spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
         spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
@@ -428,6 +439,15 @@ export class SpreadsheetStore {
             spreadsheetState.spreadsheetSectionColumnToRendexIndexListMap[gs.name] =
                 this.columnToRenderIndexListGetter.update(spreadsheetState, gs.name);
         });
+
+        return spreadsheetState;
+    }
+
+    private toggleFilter(action: ToggleFilterAction): SpreadsheetState {
+        var spreadsheetState = <SpreadsheetState>Object.assign(new SpreadsheetState(), this.spreadsheetState);
+
+        var columnIndex = action.payload.columnIndex;
+        spreadsheetState.isFilterOpenMap[columnIndex] = !spreadsheetState.isFilterOpenMap[columnIndex];
 
         return spreadsheetState;
     }

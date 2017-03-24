@@ -63,6 +63,7 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     @Input('activeCellLocation') activeCellLocation: CellLocation;
 
     private isInitialized: boolean = false;
+    private onWheelTimeoutId: number;
     private unregisterActiveCellPositionChangeSubscription: () => void;
     private _scrollTop: number;
     private _scrollLeft: number;
@@ -75,14 +76,17 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     }
 
     get scrollTop(): number {
-        if (this._scrollTop == undefined) {
+        if (this._scrollTop == null) {
             this._scrollTop = this.bodyElement.scrollTop;
+        }
+        if (isNaN(this._scrollTop)) {
+            this._scrollTop = 0;
         }
         return this._scrollTop;
     }
     @Input('scrollTop')
     set scrollTop(scrollTop: number) {
-        if (scrollTop < 0) {
+        if (scrollTop < 0 || isNaN(this._scrollTop)) {
             scrollTop = 0;
         }
         if (this._scrollTop !== scrollTop) {
@@ -92,7 +96,7 @@ export class BodySectionComponent implements OnDestroy, OnInit {
     }
 
     get scrollLeft(): number {
-        if (this._scrollLeft == undefined) {
+        if (this._scrollLeft == null) {
             this._scrollLeft = this.bodyElement.scrollLeft;
         }
         return this._scrollLeft;
@@ -264,6 +268,8 @@ export class BodySectionComponent implements OnDestroy, OnInit {
         if (this.spreadsheetSectionName === 'Scroll') {
             var scrollTop = this.bodyElement.scrollTop;
             this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
+        } else if (this.scrollTop !== this.bodyElement.scrollTop) {
+            this.bodyElement.scrollTop = this.scrollTop;
         }
     }
 }

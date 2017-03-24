@@ -26,7 +26,7 @@ const html = `
 </Row>`;
 
 @Component({
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     selector: `RowList`,
     template: html,
     styles: [`
