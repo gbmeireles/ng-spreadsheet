@@ -29,13 +29,13 @@ export class ColumnViewportUpdater {
         var validIndexList: number[] =
             this.columnToRenderIndexListGetter.update(spreadsheetState, spreadsheetSectionName);
 
-        spreadsheetSection.titleRowList = spreadsheetSection.titleRowList.map(row => {
+        spreadsheetSection.titleRowList = this.map(spreadsheetSection.titleRowList, row => {
             var result = Object.assign({}, row);
             result.visibleCellList = this.getVisibleCellList(validIndexList, result);
             return result;
         });
 
-        spreadsheetSection.dataRowList = spreadsheetSection.dataRowList.map(row => {
+        spreadsheetSection.dataRowList = this.map(spreadsheetSection.dataRowList, row => {
             var result = Object.assign({}, row);
             result.visibleCellList = this.getVisibleCellList(validIndexList, result);
             return result;
@@ -47,16 +47,30 @@ export class ColumnViewportUpdater {
         return spreadsheetSectionList;
     }
 
+    private map(array, mapFunction) {
+        var arrayLen = array.length;
+        var newArray = new Array(arrayLen);
+        for (var i = 0; i < arrayLen; i++) {
+            newArray[i] = mapFunction(array[i], i, array);
+        }
+
+        return newArray;
+    }
+
     private getVisibleCellList(validIndexList: number[], row: SpreadsheetRow) {
         var cellToAddList = new Array(validIndexList.length);
         var index = 0;
-        validIndexList.forEach(columnIndex => {
+        var lastCell;
+        var length = validIndexList.length;
+        for (var arrayIndex = 0; arrayIndex < length; arrayIndex++) {
+            var columnIndex = validIndexList[arrayIndex];
             var cell = row.cellMap[columnIndex];
-            if (cell && cellToAddList.indexOf(cell) < 0) {
+            if (cell && cell !== lastCell) {
                 cellToAddList[index] = cell;
                 index++;
             }
-        });
+            lastCell = cell;
+        }
         cellToAddList.length = index;
         return cellToAddList;
     }

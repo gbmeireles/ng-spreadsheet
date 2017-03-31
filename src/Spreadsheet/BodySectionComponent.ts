@@ -1,4 +1,13 @@
-import { HostBinding, HostListener, Component, Input, ElementRef, EventEmitter, Inject } from '@angular/core';
+import {
+    HostBinding,
+    HostListener,
+    Component,
+    Input,
+    ElementRef,
+    EventEmitter,
+    Inject,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 import { OnInit, OnChanges, OnDestroy } from '@angular/core';
 import {
     Cell,
@@ -53,6 +62,7 @@ const css = `
     selector: 'BodySection',
     styles: [css],
     template: '<ng-content></ng-content>',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BodySectionComponent implements OnDestroy, OnInit {
     @HostBinding('style.left') left: number;

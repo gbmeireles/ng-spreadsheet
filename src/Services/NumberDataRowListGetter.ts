@@ -13,15 +13,19 @@ export class NumberDataRowListGetter {
             return [];
         }
 
-        var numberDataRowList = new Array(spreadsheetSection.visibleDataRowList.length);
-        while (index < spreadsheetSection.visibleDataRowList.length) {
+        var rowToCreateCount = spreadsheetSection.visibleDataRowList.length;
+        var numberDataRowList = new Array(rowToCreateCount);
+        var titleRowCount = spreadsheetState.numberTitleRowList.length;
+        while (index < rowToCreateCount) {
             let visibleRow = spreadsheetSection.visibleDataRowList[index];
             let numberDataRow = {
                 cellList: [],
                 height: spreadsheetState.rowHeight,
                 rowData: null,
                 rowIndex: visibleRow.rowIndex,
-                rowNumber: visibleRow.rowIndex + 1,
+                rowNumber: visibleRow.rowData && visibleRow.rowData.rowNumber
+                    ? visibleRow.rowData.rowNumber + titleRowCount
+                    : visibleRow.rowIndex + 1,
                 rowStyle: '',
                 rowType: ContentTypeEnum.Data,
                 sectionRowIndex: visibleRow.sectionRowIndex,
