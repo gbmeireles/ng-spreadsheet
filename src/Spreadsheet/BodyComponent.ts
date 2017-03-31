@@ -10,6 +10,7 @@ import {
     Input,
     ViewChild,
     SimpleChange,
+    ChangeDetectionStrategy,
 } from '@angular/core';
 import {
     SpreadsheetSection,
@@ -28,9 +29,9 @@ const css = `
 }`;
 
 const html = `
-<BodySection #rowNumberSection spreadsheetSectionName="RowNumber" [scrollTop]="scrollTop">
+<BodySection spreadsheetSectionName="RowNumber" [scrollTop]="scrollTop">
     <NumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></NumberRowList>
-    <div [style.height.px]="spreadsheetSectionList[0]?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
+    <div [style.height.px]="spreadsheetSectionList[0]?.dataRowListLength * rowHeight + 8.5" style="position: absolute; width:2px; top:0;"></div>
 </BodySection>
 <BodySection *ngFor="let spreadsheetSection of spreadsheetSectionList; trackBy:spreadsheetSectionIdentity"
     [spreadsheetSectionName]="spreadsheetSection.name"
@@ -58,6 +59,7 @@ const html = `
     selector: 'Body',
     template: html,
     styles: [css],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BodyComponent implements OnInit, OnDestroy {
     @Input('scrollTop') scrollTop: number;

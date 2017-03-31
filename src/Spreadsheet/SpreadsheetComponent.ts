@@ -59,6 +59,7 @@ import { SpreadsheetState, SPREADSHEET_STATE_PROVIDERS } from './SpreadsheetStat
 import { SpreadsheetStore } from './SpreadsheetStore';
 import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 const html = `
 <DetailsBar 
@@ -117,6 +118,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     @Input('height') height: number;
     @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
     @Output('event') onSpreadsheetEvent = new Subject<any>();
+    @Output('state') onStateChanged = new BehaviorSubject<SpreadsheetState>(new SpreadsheetState());
     @Output('download') onDownload = new Subject<ExportData>();
     @Output('toggleFullScreen') onToggleFullScreen = new Subject<boolean>();
     @ViewChild(BodyComponent) body: BodyComponent;
@@ -128,7 +130,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         return this.spreadsheetState.numberTitleRowList.length + 1;
     }
 
-    private spreadsheetState: SpreadsheetState;
+    spreadsheetState: SpreadsheetState;
     private eventEmitterSubscription: Subscription;
     private windowResizeUnregisterFn: Function;
 
@@ -149,6 +151,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
         this.spreadsheetStore.onChanged.subscribe((changedSpreadsheet) => {
             this.spreadsheetState = changedSpreadsheet;
             Object.assign(this.spreadsheetStateGlobal, changedSpreadsheet);
+            this.onStateChanged.next(this.spreadsheetState);
         });
     }
 

@@ -1,4 +1,12 @@
-import { HostBinding, HostListener, Component, Input, ElementRef, OnDestroy } from '@angular/core';
+import {
+    HostBinding,
+    HostListener,
+    Component,
+    Input,
+    ElementRef,
+    OnDestroy,
+    ChangeDetectionStrategy,
+} from '@angular/core';
 
 import {
     SpreadsheetSection,
@@ -50,6 +58,7 @@ const NUMBER_ROW_HEIGHT: number = 20;
     selector: 'Header',
     template: html,
     styles: [css],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnDestroy {
     @HostBinding('style.height') height: number;
