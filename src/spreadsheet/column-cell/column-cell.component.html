@@ -1,0 +1,13 @@
+<span>{{columnIdentifier}}</span>
+<span [class.is-filtered]="isFiltered" class="filter-opener" (click)="toggleFilter()">
+    <i class="filter-opener-icon"></i>
+  </span>
+<div *ngIf="isFilterOpen" class="filter" [class.is-visible]="isFilterOpen">
+  <div class="filter-input-container">
+    <input ref-filterExpression type="text" [value]="spreadsheetColumn.filterExpression" (keypress)="$event.keyCode === 13 ? filter(filterExpression.value) : true"
+    />
+  </div>
+  <span (click)="filter(filterExpression.value)">
+      <i class="filter-check-icon"></i>
+    </span>
+</div>

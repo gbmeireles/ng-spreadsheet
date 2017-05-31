@@ -1,4 +1,4 @@
 export enum ContentTypeEnum {
-    Data,
-    Title
+  Data,
+  Title,
 }

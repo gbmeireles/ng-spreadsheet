@@ -1,67 +1,67 @@
 import { Injectable } from '@angular/core';
 import { RowViewportVisibleRowCountGetter } from '../services/row-viewport-visible-row-count-getter';
-import { SpreadsheetSection } from '../model/model';
+import { SpreadsheetSection } from '../model';
 import { SpreadsheetState } from '../spreadsheet/spreadsheet-state';
 
 @Injectable()
 export class RowToRenderIndexListGetter {
-    private previousFirstVisibleRowIndex;
-    private previousLastVisibleRowIndex;
-    private rowToRenderIndexList: number[] = [];
+  private previousFirstVisibleRowIndex;
+  private previousLastVisibleRowIndex;
+  private rowToRenderIndexList: number[] = [];
 
-    constructor(private rowViewportVisibleRowCountGetter: RowViewportVisibleRowCountGetter) {
+  constructor(private rowViewportVisibleRowCountGetter: RowViewportVisibleRowCountGetter) {
+  }
+
+  getListForSpreadsheetSection(spreadsheetState: SpreadsheetState, spreadsheetSection: SpreadsheetSection): number[] {
+    var rowHeight = spreadsheetState.dataRowHeight;
+    var scrollTop = spreadsheetState.scrollTop;
+    var visibleRowCount = this.rowViewportVisibleRowCountGetter.get(spreadsheetState);
+    if (scrollTop < 0) {
+      return this.rowToRenderIndexList;
+    }
+    if (rowHeight === 0) {
+      return [];
     }
 
-    getListForSpreadsheetSection(spreadsheetState: SpreadsheetState, spreadsheetSection: SpreadsheetSection): number[] {
-        var rowHeight = spreadsheetState.rowHeight;
-        var scrollTop = spreadsheetState.scrollTop;
-        var visibleRowCount = this.rowViewportVisibleRowCountGetter.get(spreadsheetState);
-        if (scrollTop < 0) {
-            return this.rowToRenderIndexList;
-        }
-        if (rowHeight === 0) {
-            return [];
-        }
+    var firstVisibleRowIndex = Math.floor(scrollTop / rowHeight) || 0;
+    firstVisibleRowIndex = Math.max(firstVisibleRowIndex, 0);
 
-        var firstVisibleRowIndex = Math.floor(scrollTop / rowHeight) || 0;
-        firstVisibleRowIndex = Math.max(firstVisibleRowIndex, 0);
+    var lastVisibleRowIndex = visibleRowCount + firstVisibleRowIndex;
 
-        var lastVisibleRowIndex = visibleRowCount + firstVisibleRowIndex;
-
-        var rowList = spreadsheetSection.dataRowList;
-        if (lastVisibleRowIndex > rowList.length - 1) {
-            lastVisibleRowIndex = rowList.length - 1;
-            firstVisibleRowIndex = Math.max(lastVisibleRowIndex - visibleRowCount - 2, 0);
-        }
-
-        if (this.previousFirstVisibleRowIndex === firstVisibleRowIndex && this.previousLastVisibleRowIndex === lastVisibleRowIndex) {
-            return this.rowToRenderIndexList;
-        }
-
-        this.previousFirstVisibleRowIndex = firstVisibleRowIndex;
-        this.previousLastVisibleRowIndex = lastVisibleRowIndex;
-
-        this.rowToRenderIndexList = this.getVisibleRowIndexList(visibleRowCount, firstVisibleRowIndex, lastVisibleRowIndex);
-        return this.rowToRenderIndexList;
+    var rowList = spreadsheetSection.dataRowList;
+    if (lastVisibleRowIndex > rowList.length - 1) {
+      lastVisibleRowIndex = rowList.length - 1;
+      firstVisibleRowIndex = Math.max(lastVisibleRowIndex - visibleRowCount - 2, 0);
     }
 
-    getList(spreadsheetState: SpreadsheetState): number[] {
-        var spreadsheetSection = spreadsheetState.spreadsheetSectionList[0];
-        if (!spreadsheetSection) {
-            return [];
-        }
-        return this.getListForSpreadsheetSection(spreadsheetState, spreadsheetSection);
+    if (this.previousFirstVisibleRowIndex === firstVisibleRowIndex && this.previousLastVisibleRowIndex === lastVisibleRowIndex) {
+      return this.rowToRenderIndexList;
     }
 
-    private getVisibleRowIndexList(visibleRowCount: number, firstVisibleRowIndex: number, lastVisibleRowIndex: number): number[] {
-        var visibleRowIndexList = new Array(visibleRowCount);
-        var index = firstVisibleRowIndex;
-        var counter = 0;
-        while (index <= lastVisibleRowIndex) {
-            visibleRowIndexList[counter] = index;
-            counter++;
-            index++;
-        }
-        return visibleRowIndexList;
+    this.previousFirstVisibleRowIndex = firstVisibleRowIndex;
+    this.previousLastVisibleRowIndex = lastVisibleRowIndex;
+
+    this.rowToRenderIndexList = this.getVisibleRowIndexList(visibleRowCount, firstVisibleRowIndex, lastVisibleRowIndex);
+    return this.rowToRenderIndexList;
+  }
+
+  getList(spreadsheetState: SpreadsheetState): number[] {
+    var spreadsheetSection = spreadsheetState.spreadsheetSectionList[0];
+    if (!spreadsheetSection) {
+      return [];
     }
+    return this.getListForSpreadsheetSection(spreadsheetState, spreadsheetSection);
+  }
+
+  private getVisibleRowIndexList(visibleRowCount: number, firstVisibleRowIndex: number, lastVisibleRowIndex: number): number[] {
+    var visibleRowIndexList = new Array(visibleRowCount);
+    var index = firstVisibleRowIndex;
+    var counter = 0;
+    while (index <= lastVisibleRowIndex) {
+      visibleRowIndexList[counter] = index;
+      counter++;
+      index++;
+    }
+    return visibleRowIndexList;
+  }
 }

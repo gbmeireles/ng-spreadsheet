@@ -1,16 +1,16 @@
 import { Action } from './action';
 
 export class ToggleFilterAction implements Action {
-    static type = 'ToggleFilter';
-    type: string;
-    payload: {
-        columnIndex: number;
-    };
+  static type = 'ToggleFilter';
+  type: string;
+  payload: {
+    columnIndex: number;
+  };
 
-    constructor(columnIndex: number) {
-        this.type = ToggleFilterAction.type;
-        this.payload = {
-            columnIndex: columnIndex,
-        };
-    }
+  constructor(columnIndex: number) {
+    this.type = ToggleFilterAction.type;
+    this.payload = {
+      columnIndex: columnIndex,
+    };
+  }
 }

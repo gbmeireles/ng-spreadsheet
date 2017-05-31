@@ -1,5 +1,5 @@
 export enum ColumnDataTypeEnum {
-    Text,
-    Number,
-    Date
+  Text,
+  Number,
+  Date,
 }

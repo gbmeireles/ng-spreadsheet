@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Column, ColumnDefinition } from '../model/model';
+import { Column, ColumnDefinition } from '../model';
 
 @Injectable()
 export class ColumnListGetter {
-    get(columnDefinitionList: ColumnDefinition[]): Column[] {
-        var lastIndex = -1;
-        return columnDefinitionList.filter(c => !c.isHidden).map(columnDefinition => {
-            var spreadsheetColumn = columnDefinition.getColumn(lastIndex + 1, columnDefinitionList);
+  get(columnDefinitionList: ColumnDefinition[]): Column[] {
+    var lastIndex = -1;
+    return columnDefinitionList.filter(c => !c.isHidden).map(columnDefinition => {
+      var spreadsheetColumn = columnDefinition.getColumn(lastIndex + 1, columnDefinitionList);
 
-            spreadsheetColumn.name = columnDefinition.name;
+      spreadsheetColumn.name = columnDefinition.name;
 
-            lastIndex = spreadsheetColumn.endIndex;
-            spreadsheetColumn.width = spreadsheetColumn.width || spreadsheetColumn.defaultWidth;
-            spreadsheetColumn.dataType = columnDefinition.dataType;
-            spreadsheetColumn.sectionName = columnDefinition.spreadsheetSection;
-            spreadsheetColumn.isExportable = columnDefinition.isExportable;
+      lastIndex = spreadsheetColumn.endIndex;
+      spreadsheetColumn.width = spreadsheetColumn.width || spreadsheetColumn.defaultWidth;
+      spreadsheetColumn.dataType = columnDefinition.dataType;
+      spreadsheetColumn.sectionName = columnDefinition.spreadsheetSection;
+      spreadsheetColumn.isExportable = columnDefinition.isExportable;
 
-            return spreadsheetColumn;
-        });
-    }
+      return spreadsheetColumn;
+    });
+  }
 }

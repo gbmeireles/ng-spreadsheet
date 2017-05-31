@@ -1,0 +1,14 @@
+<DetailsBar [activeCellLocation]="spreadsheetState?.activeCellLocation" [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList"
+  (download)="onDownload.next(exportData())" (toggleFullScreen)="onToggleFullScreen.next($event)"></DetailsBar>
+<Header [rowHeight]="spreadsheetState?.titleRowHeight" [numberTitleRowList]="spreadsheetState?.numberTitleRowList" [spreadsheetSectionList]="spreadsheetState?.spreadsheetSectionList"
+  [columnList]="spreadsheetState?.columnList" [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList" [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
+  [spreadsheetSectionScrollWidthMap]="spreadsheetState?.spreadsheetSectionScrollWidthMap" [spreadsheetSectionScrollLeftMap]="spreadsheetState?.spreadsheetSectionScrollLeftMap"
+  [spreadsheetSectionPositionInformationMap]="spreadsheetState?.spreadsheetSectionPositionInformationMap" [isFilterOpenMap]="spreadsheetState?.isFilterOpenMap"
+  [spreadsheetSectionColumnToRendexIndexListMap]="spreadsheetState?.spreadsheetSectionColumnToRendexIndexListMap"></Header>
+
+<Body [height]="spreadsheetState?.bodyHeight" [rowHeight]="spreadsheetState?.dataRowHeight" [numberDataRowList]="spreadsheetState?.numberDataRowList"
+  [spreadsheetSectionList]="spreadsheetState?.spreadsheetSectionList" [scrollTop]="spreadsheetState?.scrollTop" [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
+  [spreadsheetSectionScrollWidthMap]="spreadsheetState?.spreadsheetSectionScrollWidthMap" [spreadsheetSectionScrollLeftMap]="spreadsheetState?.spreadsheetSectionScrollLeftMap"
+  [spreadsheetSectionPositionInformationMap]="spreadsheetState?.spreadsheetSectionPositionInformationMap" [activeCellLocation]="spreadsheetState?.activeCellLocation"
+  [activeRowIndexList]="spreadsheetState?.activeRowIndexList"></Body>
+<StatusBar [message]="statusMessage" [timeout]="statusMessageTimeout" [count]="statusMessageCount"></StatusBar>

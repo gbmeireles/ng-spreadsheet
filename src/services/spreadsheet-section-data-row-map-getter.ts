@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
-import { SpreadsheetSection } from '../model/model';
+import { SpreadsheetSection } from '../model';
 @Injectable()
 export class SpreadsheetSectionDataRowMapGetter {
 
-    constructor() { }
+  constructor() { }
 
-    get(spreadsheetSection: SpreadsheetSection): SpreadsheetSection {
-        spreadsheetSection = Object.assign({}, spreadsheetSection);
-        spreadsheetSection.dataRowMap = {};
-        var counter = 0;
-        spreadsheetSection.dataRowList.forEach(spreadsheetRow => {
-            spreadsheetSection.dataRowMap[spreadsheetRow.sectionRowIndex] = spreadsheetRow;
-        });
-        return spreadsheetSection;
-    }
+  get(spreadsheetSection: SpreadsheetSection): SpreadsheetSection {
+    spreadsheetSection = Object.assign({}, spreadsheetSection);
+    spreadsheetSection.dataRowMap = {};
+    var counter = 0;
+    spreadsheetSection.dataRowList.forEach(spreadsheetRow => {
+      spreadsheetSection.dataRowMap[spreadsheetRow.sectionRowIndex] = spreadsheetRow;
+    });
+    return spreadsheetSection;
+  }
 }

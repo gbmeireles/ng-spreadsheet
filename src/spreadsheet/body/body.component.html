@@ -1,0 +1,25 @@
+<BodySection spreadsheetSectionName="RowNumber" [scrollTop]="scrollTop">
+  <NumberRowList [numberRowList]="numberDataRowList" [rowHeight]="rowHeight"></NumberRowList>
+  <div [style.height.px]="spreadsheetSectionList[0]?.dataRowListLength * rowHeight + 8.5" style="position: absolute; width:2px; top:0;"></div>
+</BodySection>
+<BodySection *ngFor="let spreadsheetSection of spreadsheetSectionList; trackBy:spreadsheetSectionIdentity"
+  [spreadsheetSectionName]="spreadsheetSection.name"
+  [spreadsheetSectionPositionInformationMap]="spreadsheetSectionPositionInformationMap"
+  [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
+  [scrollTop]="scrollTop"
+  [activeCellLocation]="activeCellLocation"
+  [class.is-separating-section]="spreadsheetSection !== spreadsheetSectionList[spreadsheetSectionList.length - 1]"
+  tabindex="0">
+  <RowList [rowList]="spreadsheetSection.visibleDataRowList"
+    [spreadsheetSectionName]="spreadsheetSection.name"
+    [columnPositionInformationMap]="columnPositionInformationMap"
+    [spreadsheetSectionScrollWidthMap]="spreadsheetSectionScrollWidthMap"
+    [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
+    [activeCellLocation]="activeCellLocation"
+    [rowHeight]="rowHeight"
+    [activeRowIndexList]="activeRowIndexList"></RowList>
+  <div [style.height.px]="spreadsheetSection?.dataRowListLength * rowHeight" style="position: absolute; width:2px; top:0;"></div>
+</BodySection>
+<BodySection spreadsheetSectionName="Scroll" [scrollTop]="scrollTop">
+  <div [style.height.px]="spreadsheetSectionList[0]?.dataRowListLength * rowHeight"></div>
+</BodySection>

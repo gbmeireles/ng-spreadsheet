@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  -moz-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  height: 100%;
+  position: absolute;
+  /*display: flex;
+  align-items: center;
+  justify-content: center;*/
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+
+}
+
+div {
+  padding: 2px;
+}
+
+:host.is-custom div {
+  padding: 0px;
+}

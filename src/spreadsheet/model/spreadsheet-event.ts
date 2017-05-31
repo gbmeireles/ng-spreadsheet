@@ -1,4 +1,4 @@
 export interface SpreadsheetEvent<T> {
-    eventType: string;
-    eventData: T;
+  eventType: string;
+  eventData: T;
 }

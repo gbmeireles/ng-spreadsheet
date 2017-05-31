@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import {
-    Column,
-} from '../../model/model';
+  Column,
+} from '../../model';
 
 @Injectable()
 export class ColumnGetter {
 
-    constructor() { }
+  constructor() { }
 
-    getBySpreadsheetColumnIndex(columnList: Column[], spreadsheetColumnIndex: number): Column {
-        return columnList.find(c => c.startIndex <= spreadsheetColumnIndex && c.endIndex >= spreadsheetColumnIndex);
-    }
+  getBySpreadsheetColumnIndex(columnList: Column[], spreadsheetColumnIndex: number): Column {
+    return columnList.find(c => c.startIndex <= spreadsheetColumnIndex && c.endIndex >= spreadsheetColumnIndex);
+  }
 }

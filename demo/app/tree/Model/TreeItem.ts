@@ -1,5 +1,5 @@
 export interface TreeItem {
-    isExpanded: boolean;
-    childList?: TreeItem[];
-    isParent: boolean;
+  isExpanded: boolean;
+  childList?: TreeItem[];
+  isParent: boolean;
 }

@@ -1,0 +1,4 @@
+<Row *ngFor="let numberRow of numberRowList; trackBy:rowIndentity; let i = index" [row]="numberRow" spreadsheetSectionName="RowNumber"
+  [index]="i">
+  <div class="handler">{{numberRow.rowNumber}}</div>
+</Row>

@@ -1,118 +1,118 @@
 NgSpreadsheet {
-    font-family: "Lato", Helvetica, Arial, sans-serif;
-    font-size: 12px;
-    height: 640px;
+  font-family: "Lato", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  height: 640px;
 }
 
 NgSpreadsheet input {
-    background: white;
-    color: black;
-    border: 1px solid green;
-    width: 100%;
-    height: 100%;
+  background: white;
+  color: black;
+  border: 1px solid green;
+  width: 100%;
+  height: 100%;
 }
 
 NgSpreadsheet .title {
-    background-color: white;
-    font-weight: bold;
-    text-align: center;
-    line-height: 30px;
-    vertical-align: middle;
+  background-color: white;
+  font-weight: bold;
+  text-align: center;
+  line-height: 30px;
+  vertical-align: middle;
 }
 
 NgSpreadsheet .standard {
-    background-color: white;
-    line-height: 30px;
-    vertical-align: middle;
+  background-color: white;
+  line-height: 30px;
+  vertical-align: middle;
 }
 
 NgSpreadsheet .l1 {
-    line-height: 30px;
-    vertical-align: middle;
-    background-color: #e2e2e2;
-    font-weight: bold;
+  line-height: 30px;
+  vertical-align: middle;
+  background-color: #e2e2e2;
+  font-weight: bold;
 }
 
 NgSpreadsheet .l2 {
-    line-height: 30px;
-    vertical-align: middle;
-    background-color: #e7e7e7;
+  line-height: 30px;
+  vertical-align: middle;
+  background-color: #e7e7e7;
 }
 
 NgSpreadsheet .l3 {
-    line-height: 30px;
-    vertical-align: middle;
-    background-color: #ececec;
+  line-height: 30px;
+  vertical-align: middle;
+  background-color: #ececec;
 }
 
 NgSpreadsheet .l4 {
-    line-height: 30px;
-    vertical-align: middle;
-    background-color: #f1f1f1;
+  line-height: 30px;
+  vertical-align: middle;
+  background-color: #f1f1f1;
 }
 
 NgSpreadsheet .l5 {
-    line-height: 30px;
-    vertical-align: middle;
-    background-color: #f6f6f6;
+  line-height: 30px;
+  vertical-align: middle;
+  background-color: #f6f6f6;
 }
 
 NgSpreadsheet .l6 {
-    line-height: 30px;
-    vertical-align: middle;
-    background-color: #f9f9f9;
+  line-height: 30px;
+  vertical-align: middle;
+  background-color: #f9f9f9;
 }
 
 NgSpreadsheet .l7 {
-    background-color: #fdfdfd;
+  background-color: #fdfdfd;
 }
 
 NgSpreadsheet .l8 {
-    background-color: #fdfdfd;
+  background-color: #fdfdfd;
 }
 
 NgSpreadsheet .l9 {
-    background-color: #fdfdfd;
+  background-color: #fdfdfd;
 }
 
 NgSpreadsheet .l10 {
-    background-color: #fdfdfd;
+  background-color: #fdfdfd;
 }
 
 NgSpreadsheet .title-cell {
-    border: 1px solid #EEF0F0;
+  border: 1px solid #EEF0F0;
 }
 
 NgSpreadsheet .data-cell {
-    border: 1px solid #EEF0F0;
+  border: 1px solid #EEF0F0;
 }
 
 NgSpreadsheet Row.is-active {
-    background-color: lightyellow;
+  background-color: lightyellow;
 }
 
 NgSpreadsheet Cell.is-empty {
-    border: none;
+  border: none;
 }
 
 NgSpreadsheet Cell.is-active {
-    border: 1px solid blue;
+  border: 1px solid blue;
 }
 
 NgSpreadsheet .is-separating-section rowList:after {
-    border-right: 1px solid #999;
-    width: 1px;
-    content: ' ';
-    height: 100%;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 3;
+  border-right: 1px solid #999;
+  width: 1px;
+  content: ' ';
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
 }
 
 .group:after {
-    content: "";
-    display: table;
-    clear: both;
+  content: "";
+  display: table;
+  clear: both;
 }

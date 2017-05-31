@@ -1,0 +1,18 @@
+:host {
+  display: block;
+  position: absolute;
+  width: 4px;
+  cursor: col-resize;
+  top: 0;
+  opacity: 0;
+  background-color: black;
+  transition: opacity 0.4s ease-out;
+  height: 20px;
+  z-index: 6;
+}
+
+:host:hover,
+:host.is-active {
+  opacity: 1;
+  transition: opacity 0.4s ease-out;
+}

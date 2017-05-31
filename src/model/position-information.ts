@@ -1,4 +1,4 @@
 export interface PositionInformation {
-    left: number;
-    width: number;
+  left: number;
+  width: number;
 }

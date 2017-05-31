@@ -1,0 +1,4 @@
+<ColumnCell *ngFor="let spreadsheetColumn of visibleSpreadsheetColumnList; let columnIndex = index; trackBy:cellIndentity;"
+  [spreadsheetColumn]="spreadsheetColumn" [columnList]="columnList" [index]="columnIndex" [isFilterOpen]="!!isFilterOpenMap[spreadsheetColumn?.index]"
+  [columnIdentifier]="spreadsheetColumnIdentifierMap[spreadsheetColumn.index]" [columnPositionInformationMap]="columnPositionInformationMap">
+</ColumnCell>

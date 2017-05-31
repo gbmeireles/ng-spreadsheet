@@ -1,12 +1,11 @@
 {
   "name": "ng-spreadsheet",
-  "version": "0.10.20",
+  "version": "0.20.0",
   "description": "Spreadhsheet for angular 2",
-  "main": "dist/ngSpreadsheet.js",
-  "typings": "dist/ngSpreadsheet.d.ts",
+  "typings": "src/ng-spreadsheet.ts",
   "scripts": {
-    "tsc": "tsc",
-    "typings": "typings"
+    "build": "webpack --env build",
+    "dev": "webpack --progress --colors --watch --env dev"
   },
   "author": {
     "name": "Guilherme Meireles",
@@ -17,19 +16,29 @@
     "definition": "dist/ngSpreadsheet.d.ts"
   },
   "peerDependencies": {
-    "es6-shim": "^0.35.0",
     "@angular/common": "^4.0.0",
-    "@angular/compiler": "^4.0.0",
     "@angular/core": "^4.0.0",
     "@angular/platform-browser": "^4.0.0",
-    "@angular/platform-browser-dynamic": "^4.0.0",
-    "rxjs": "^5.0.0",
+    "es6-shim": "^0.35.0",
     "reflect-metadata": "^0.1.3",
+    "rxjs": "^5.0.0",
     "zone.js": "^0.7.4"
   },
   "devDependencies": {
-    "tslint": "^3.8.0",
+    "angular2-template-loader": "^0.6.2",
+    "clean-webpack-plugin": "^0.1.16",
+    "ts-loader": "^2.1.0",
+    "tslint": "^5.3.2",
+    "tslint-loader": "^3.5.3",
     "typescript": "^2.3.4",
-    "typings": "^0.8.1"
+    "uglifyjs-webpack-plugin": "^0.4.3",
+    "webpack": "^2.6.1"
+  },
+  "dependencies": {
+    "@angular/common": "^4.1.3",
+    "@angular/core": "^4.1.3",
+    "@angular/platform-browser": "^4.1.3",
+    "raw-loader": "^0.5.1",
+    "rxjs": "^5.4.0"
   }
 }

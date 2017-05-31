@@ -1,4 +1,4 @@
 export interface CellIndexData {
-    columnIndex: number;
-    rowIndex: number;
+  columnIndex: number;
+  rowIndex: number;
 }

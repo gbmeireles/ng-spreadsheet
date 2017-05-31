@@ -1,0 +1,7 @@
+<ColumnCornerCell *ngIf="spreadsheetSectionName === 'RowNumber'" [isFiltered]="isFiltered">
+</ColumnCornerCell>
+<ColumnRow [spreadsheetSectionName]="spreadsheetSectionName" [scrollWidth]="scrollWidth" [visibleSpreadsheetColumnList]="visibleSpreadsheetColumnList"
+  [columnList]="columnList" [spreadsheetColumnList]="spreadsheetColumnList" [columnPositionInformationMap]="columnPositionInformationMap"
+  [isFilterOpenMap]="isFilterOpenMap"></ColumnRow>
+<ColumnResize *ngFor="let spreadsheetColumn of visibleSpreadsheetColumnList" [spreadsheetColumn]="spreadsheetColumn" [columnPositionInformationMap]="columnPositionInformationMap"></ColumnResize>
+<ng-content></ng-content>

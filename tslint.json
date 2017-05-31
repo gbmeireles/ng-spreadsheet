@@ -20,10 +20,10 @@
         "no-consecutive-blank-lines": true,
         "no-construct": true,
         "no-duplicate-variable": true,
-        "no-invalid-this": true,
+        "no-invalid-this": [true, "check-function-in-method"],
         "no-shadowed-variable": true,
         "no-trailing-whitespace": true,
-        // "object-literal-sort-keys": true,
+        "no-floating-promises": true,
         "one-line": [
             true,
             "check-else",

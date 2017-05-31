@@ -4,18 +4,18 @@ import { SpreadsheetState } from '../spreadsheet/spreadsheet-state';
 @Injectable()
 export class SpreadsheetSectionScrollWidthMapCalculator {
 
-    constructor() { }
+  constructor() { }
 
-    calculate(spreadsheetState: SpreadsheetState): { [spreadsheetSectionMap: string]: number } {
-        var result = {};
-        spreadsheetState.spreadsheetSectionList.forEach(spreadsheetSection => {
-            var scrollWidth = 0;
-            var spreadsheetColumnList = spreadsheetState.spreadsheetColumnList.filter(gc => gc.sectionName === spreadsheetSection.name);
+  calculate(spreadsheetState: SpreadsheetState): { [spreadsheetSectionMap: string]: number } {
+    var result = {};
+    spreadsheetState.spreadsheetSectionList.forEach(spreadsheetSection => {
+      var scrollWidth = 0;
+      var spreadsheetColumnList = spreadsheetState.spreadsheetColumnList.filter(gc => gc.sectionName === spreadsheetSection.name);
 
-            spreadsheetColumnList.forEach(gc => scrollWidth += spreadsheetState.columnPositionInformationMap[gc.index].width);
+      spreadsheetColumnList.forEach(gc => scrollWidth += spreadsheetState.columnPositionInformationMap[gc.index].width);
 
-            result[spreadsheetSection.name] = scrollWidth;
-        });
-        return result;
-    }
+      result[spreadsheetSection.name] = scrollWidth;
+    });
+    return result;
+  }
 }

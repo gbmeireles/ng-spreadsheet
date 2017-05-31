@@ -1,0 +1,14 @@
+<HeaderSection spreadsheetSectionName="RowNumber" [columnList]="columnList" [spreadsheetColumnList]="spreadsheetColumnList">
+  <NumberRowList [numberRowList]="numberTitleRowList" [rowHeight]="rowHeight"></NumberRowList>
+</HeaderSection>
+<HeaderSection *ngFor="let spreadsheetSection of spreadsheetSectionList; trackBy:spreadsheetSectionIdentity" [spreadsheetSectionScrollWidthMap]="spreadsheetSectionScrollWidthMap"
+  [spreadsheetSectionName]="spreadsheetSection.name" [spreadsheetSectionPositionInformationMap]="spreadsheetSectionPositionInformationMap"
+  [columnList]="columnList" [spreadsheetColumnList]="spreadsheetColumnList" [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
+  [spreadsheetSectionColumnToRendexIndexListMap]="spreadsheetSectionColumnToRendexIndexListMap" [columnPositionInformationMap]="columnPositionInformationMap"
+  [isFilterOpenMap]="isFilterOpenMap" [class.is-separating-section]="spreadsheetSection !== spreadsheetSectionList[spreadsheetSectionList.length - 1]">
+  <RowList [rowList]="spreadsheetSection.titleRowList" [spreadsheetSectionName]="spreadsheetSection.name" [columnPositionInformationMap]="columnPositionInformationMap"
+    [spreadsheetSectionScrollWidthMap]="spreadsheetSectionScrollWidthMap" [spreadsheetSectionScrollLeftMap]="spreadsheetSectionScrollLeftMap"
+    [rowHeight]="rowHeight"></RowList>
+</HeaderSection>
+<HeaderSection spreadsheetSectionName="Scroll" [columnList]="columnList">
+</HeaderSection>

@@ -1,0 +1,16 @@
+<Row *ngFor="let row of rowList; trackBy:rowIndentity; let rowIndex = index"
+  [row]="row" [spreadsheetSectionName]="spreadsheetSectionName" [index]="rowIndex"
+  [scrollWidth]="spreadsheetSectionScrollWidth"
+  [activeCellLocation]="activeCellLocation"
+  [activeRowIndexList]="activeRowIndexList">
+  <Cell *ngFor="let cell of row?.visibleCellList; let cellIndex = index; trackBy:cellIdentity"
+    [cell]="cell"
+    [index]="cellIndex"
+    [rowData]="row?.rowData"
+    [columnPositionInformationMap]="columnPositionInformationMap"
+    [spreadsheetSectionScrollLeft]="spreadsheetSectionScrollLeft"
+    [activeCellLocation]="activeCellLocation"
+    [rowHeight]="rowHeight"
+    >
+  </Cell>
+</Row>

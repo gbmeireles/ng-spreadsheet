@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  position: absolute;
+  height: 100%;
+  outline: none;
+  z-index: 0;
+}
+
+:host[spreadsheetSectionName="Scroll"] {
+  width: 20px;
+  right: 0;
+  overflow-y: scroll;
+}
+
+:host[spreadsheetSectionName="Scroll"] Row {
+  visibility: hidden;
+}
+
+:host {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
