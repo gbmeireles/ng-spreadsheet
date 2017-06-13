@@ -11,10 +11,11 @@ import { Subject } from 'rxjs';
 export class DetailsBarComponent implements OnInit {
   @Input('activeCellLocation') activeCellLocation: CellLocation;
   @Input('spreadsheetColumnList') spreadsheetColumnList: SpreadsheetColumn[];
+  @Input('defaultMessage') defaultMessage: string;
   @Output('download') onDownload: Subject<void> = new Subject<void>();
   @Output('toggleFullScreen') onToggleFullScreen: Subject<boolean> = new Subject<boolean>();
 
-  private activeCellData: string = 'Selecione uma célula';
+  private activeCellData: string;
   private columnIdentifierMap: { [spreadsheetColumnIndex: number]: string } = {};
   private cellLocation: string = '--';
   private isFull: boolean = false;
@@ -23,6 +24,7 @@ export class DetailsBarComponent implements OnInit {
     private columnIdentifierMapGetter: ColumnIdentifierMapGetter) { }
 
   ngOnInit() {
+    this.activeCellData = this.activeCellData || this.defaultMessage || 'Selecione uma célula';
   }
 
   ngOnChanges(obj) {

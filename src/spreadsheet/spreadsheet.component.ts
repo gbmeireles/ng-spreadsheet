@@ -86,6 +86,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
   @Input('rowHeight') rowHeight: number;
   @Input('titleRowHeight') titleRowHeight: number;
   @Input('height') height: number;
+  @Input('defaultDetailsBarMessage') defaultDetailsBarMessage: string;
   @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
   @Output('event') onSpreadsheetEvent = new Subject<any>();
   @Output('state') onStateChanged = new BehaviorSubject<SpreadsheetState>(new SpreadsheetState());

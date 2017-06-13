@@ -1,5 +1,5 @@
 <DetailsBar [activeCellLocation]="spreadsheetState?.activeCellLocation" [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList"
-  (download)="onDownload.next(exportData())" (toggleFullScreen)="onToggleFullScreen.next($event)"></DetailsBar>
+  (download)="onDownload.next(exportData())" (toggleFullScreen)="onToggleFullScreen.next($event)" [defaultMessage]="defaultDetailsBarMessage"></DetailsBar>
 <Header [rowHeight]="spreadsheetState?.titleRowHeight" [numberTitleRowList]="spreadsheetState?.numberTitleRowList" [spreadsheetSectionList]="spreadsheetState?.spreadsheetSectionList"
   [columnList]="spreadsheetState?.columnList" [spreadsheetColumnList]="spreadsheetState?.spreadsheetColumnList" [columnPositionInformationMap]="spreadsheetState?.columnPositionInformationMap"
   [spreadsheetSectionScrollWidthMap]="spreadsheetState?.spreadsheetSectionScrollWidthMap" [spreadsheetSectionScrollLeftMap]="spreadsheetState?.spreadsheetSectionScrollLeftMap"
