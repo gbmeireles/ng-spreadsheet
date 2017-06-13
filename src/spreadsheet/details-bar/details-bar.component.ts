@@ -27,7 +27,7 @@ export class DetailsBarComponent implements OnInit {
   }
 
   ngOnChanges(obj) {
-    this.activeCellData = this.activeCellData || this.defaultMessage || 'Selecione uma célula';
+    this.activeCellData = this.activeCellData || this.defaultMessage;
     if (obj['spreadsheetColumnList']) {
       this.columnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.spreadsheetColumnList);
     }

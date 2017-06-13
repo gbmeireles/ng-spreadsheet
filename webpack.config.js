@@ -83,11 +83,11 @@ if (isProduction) {
   plugins.push(new CleanWebpackPlugin([distPath], {
     verbose: true,
   }));
-  plugins.push(new UglifyJSPlugin({
-    compress: true,
-    mangle: false,
-    sourceMap: true,
-  }));
+  // plugins.push(new UglifyJSPlugin({
+  //   compress: true,
+  //   mangle: false,
+  //   sourceMap: true,
+  // }));
 }
 
 module.exports = config;
