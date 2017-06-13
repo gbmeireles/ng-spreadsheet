@@ -24,10 +24,10 @@ export class DetailsBarComponent implements OnInit {
     private columnIdentifierMapGetter: ColumnIdentifierMapGetter) { }
 
   ngOnInit() {
-    this.activeCellData = this.activeCellData || this.defaultMessage || 'Selecione uma célula';
   }
 
   ngOnChanges(obj) {
+    this.activeCellData = this.activeCellData || this.defaultMessage || 'Selecione uma célula';
     if (obj['spreadsheetColumnList']) {
       this.columnIdentifierMap = this.columnIdentifierMapGetter.getMap(this.spreadsheetColumnList);
     }
