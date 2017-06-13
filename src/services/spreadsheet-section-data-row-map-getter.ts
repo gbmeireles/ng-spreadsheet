@@ -8,7 +8,7 @@ export class SpreadsheetSectionDataRowMapGetter {
   get(spreadsheetSection: SpreadsheetSection): SpreadsheetSection {
     spreadsheetSection = Object.assign({}, spreadsheetSection);
     spreadsheetSection.dataRowMap = {};
-    var counter = 0;
+
     spreadsheetSection.dataRowList.forEach(spreadsheetRow => {
       spreadsheetSection.dataRowMap[spreadsheetRow.sectionRowIndex] = spreadsheetRow;
     });

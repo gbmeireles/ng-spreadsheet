@@ -46,7 +46,6 @@ export class FilteredDataRowListGetter {
         });
     });
 
-    var spreadsheetSectionDataRowList = spreadsheetState.dataRowList;
     var result = new Array(spreadsheetState.dataRowList.length - rowDataToRemoveList.length);
     var index = 0;
     spreadsheetState.dataRowList.forEach(dr => {

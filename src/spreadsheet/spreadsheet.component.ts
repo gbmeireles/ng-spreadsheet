@@ -61,9 +61,6 @@ import { Subscription } from 'rxjs';
 import { Subject } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
 
-const html = `
-`;
-
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
@@ -136,7 +133,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(obj) {
-    var changedFieldsCount = Object.keys(obj).length;
     if (obj.columnDefinitionList) {
       this.dispatcher.emit(new UpdateColumnDefinitionListAction((this.columnDefinitionList || [])));
     }
@@ -200,7 +196,6 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
 
   exportData(): ExportData {
     var rowList: SpreadsheetRow[] = new Array(this.spreadsheetState.spreadsheetSectionList[0].dataRowList.length);
-    var columnListLength = this.spreadsheetState.spreadsheetColumnList.length;
     var spreadsheetColumnMap: { [index: number]: SpreadsheetColumn } = {};
     this.spreadsheetState.spreadsheetColumnList.forEach(gc => spreadsheetColumnMap[gc.index] = gc);
     this.spreadsheetState.spreadsheetSectionList.forEach(spreadsheetSection => {

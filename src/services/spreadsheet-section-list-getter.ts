@@ -101,7 +101,6 @@ export class SpreadsheetSectionListGetter {
         spreadsheetSection.dataRowMap[spreadsheetRow.sectionRowIndex] = spreadsheetRow;
         counter++;
       });
-      var lastRow = spreadsheetSection.dataRowList[spreadsheetSection.dataRowList.length - 1];
       var rowToRenderIndexList = this.rowToRenderIndexListGetter.getListForSpreadsheetSection(spreadsheetState, spreadsheetSection);
       spreadsheetSection.visibleDataRowList =
         rowToRenderIndexList.map(index => spreadsheetSection.dataRowList[index]).filter(row => row != null);

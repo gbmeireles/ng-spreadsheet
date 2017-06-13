@@ -71,7 +71,6 @@ export class TitleSpreadsheetRowListGetter {
       var row = result[i];
       row.rowIndex = i;
       row.sectionRowIndex = i;
-      var lastCell = row.cellList[row.cellList.length - 1];
       row.cellMap = {};
       row.cellList.forEach(cell => {
         cell.rowIndex = row.rowIndex;

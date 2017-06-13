@@ -5,7 +5,6 @@ import { SpreadsheetColumn, Column } from '../model';
 export class SpreadsheetColumnListGetter {
 
   get(columnList: Column[], filterExpressionMap: { [spreadsheetColumnIndex: number]: string }): SpreadsheetColumn[] {
-    var lastIndex = -1;
     var result: SpreadsheetColumn[] = [];
     columnList.forEach(column => {
       var columnIndex = column.startIndex;

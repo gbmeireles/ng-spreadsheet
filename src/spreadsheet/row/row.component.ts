@@ -46,7 +46,6 @@ export class RowComponent implements OnInit, OnDestroy {
       this.updateRow(changes['row'].currentValue);
     }
     if (this.activeRowIndexList && (changes['activeRowIndexList'] || changes['row'])) {
-      var style = this.row.rowStyle;
       this.isActive = this.activeRowIndexList.indexOf(this.row.rowIndex) >= 0;
       this.updateStyle(this.row);
     }

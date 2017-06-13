@@ -32,7 +32,6 @@ export class DataSpreadsheetRowListGetter {
 
         var dataCellMatrix = columnDefinition.getDataCellMatrix(rowData, column,
           spreadsheetState.columnList, spreadsheetState.columnDefinitionList);
-        var lastRow: SpreadsheetRow = null;
         for (var i = 0; i < dataCellMatrix.length; i++) {
           var row: SpreadsheetRow = null;
           if (rowDataSpreadsheetRowList.length >= i + 1) {

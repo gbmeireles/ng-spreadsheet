@@ -145,10 +145,8 @@ export class BodySectionComponent implements OnDestroy, OnInit {
   @HostListener('keydown', ['$event'])
   onKeyUp(evt: KeyboardEvent) {
     var scrollTop;
-    var scrollLeft;
     var sourceActiveCell = this.cellGetter.get(this.activeCellLocation);
     var targetActiveCell: Cell;
-    var keyCode = evt.keyCode;
     var rowspan = sourceActiveCell && sourceActiveCell.spreadsheetCell ? sourceActiveCell.spreadsheetCell.rowspan : 1;
     var colspan = sourceActiveCell && sourceActiveCell.spreadsheetCell ? sourceActiveCell.spreadsheetCell.colspan : 1;
 
@@ -231,9 +229,6 @@ export class BodySectionComponent implements OnDestroy, OnInit {
 
     if (scrollTop !== undefined) {
       this.eventEmitter.emit(new ScrollSpreadsheetAction(scrollTop));
-    }
-    if (scrollLeft !== undefined) {
-      this.eventEmitter.emit(new ScrollSpreadsheetSectionAction(this.spreadsheetSectionName, scrollLeft));
     }
   }
 

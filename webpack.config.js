@@ -60,7 +60,7 @@ const config = {
           {
             loader: 'ts-loader',
             options: {
-              transpileOnly: !isProduction,
+              transpileOnly: true,//!isProduction,
             },
           }, {
             loader: 'angular2-template-loader',//?keepUrl=true

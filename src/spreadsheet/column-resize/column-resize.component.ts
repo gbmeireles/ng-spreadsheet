@@ -12,11 +12,6 @@ import { ColumnSizeUpdater } from './column-size-updater';
 import { MousePositionGetter } from './mouse-position-getter';
 import { Subscription } from 'rxjs';
 
-var css = `
-`;
-
-var html = ``;
-
 @Component({
   selector: 'ColumnResize',
   templateUrl: './column-resize.component.html',
