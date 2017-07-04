@@ -14,7 +14,12 @@ export class SpreadsheetSectionScrollWidthMapCalculator {
 
       spreadsheetColumnList.forEach(gc => scrollWidth += spreadsheetState.columnPositionInformationMap[gc.index].width);
 
-      result[spreadsheetSection.name] = scrollWidth;
+      var spreadSectionWidth = spreadsheetState.spreadsheetSectionPositionInformationMap[spreadsheetSection.name].width;
+      if (scrollWidth - spreadSectionWidth > 5) {
+        result[spreadsheetSection.name] = scrollWidth + 5;
+      } else {
+        result[spreadsheetSection.name] = scrollWidth;
+      }
     });
     return result;
   }
