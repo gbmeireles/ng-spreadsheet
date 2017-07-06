@@ -169,6 +169,10 @@ export class CellComponent implements OnInit, OnDestroy, Cell, AfterViewInit {
   }
 
   confirmEdit() {
+    if (!this.editComponent || !this.isEditing) {
+      return;
+    }
+
     this.editComponent.instance.onEditDone(this.rowData);
     this.goToViewMode();
     this.updateZIndex();
