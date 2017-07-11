@@ -1,6 +1,6 @@
 {
   "name": "ng-spreadsheet",
-  "version": "0.20.7",
+  "version": "0.20.8",
   "description": "Spreadhsheet for angular 2",
   "typings": "src/ng-spreadsheet.ts",
   "scripts": {

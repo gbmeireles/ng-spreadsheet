@@ -32,23 +32,23 @@ export class CellLocationRelativeToViewportGetter {
     var rowHeight = spreadsheetState.dataRowHeight;
 
     var viewport = {
-      bottom: scrollTop + bodyHeight,
-      left: scrollLeft,
-      right: width + scrollLeft,
       top: scrollTop,
+      left: scrollLeft,
+      bottom: scrollTop + bodyHeight,
+      right: width + scrollLeft,
     };
 
     var target = {
-      bottom: (targetCellLocation.rowIndex + 1) * rowHeight,
+      top: targetCellLocation.rowIndex * rowHeight,
       left: targetCellPositionInformation.left,
+      bottom: (targetCellLocation.rowIndex + 1) * rowHeight,
       right: (targetCellPositionInformation.left + targetCellPositionInformation.width),
-      top: (targetCellLocation.rowIndex - 1) * rowHeight,
     };
 
     var relative = {
       top: target.top - viewport.top,
-      bottom: target.bottom - viewport.bottom,
       left: target.left - viewport.left,
+      bottom: target.bottom - viewport.bottom,
       right: target.right - viewport.right,
       isOutsideViewport: false,
       isOutsideViewportHorizontally: false,

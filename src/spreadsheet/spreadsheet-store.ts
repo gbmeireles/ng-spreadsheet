@@ -146,7 +146,7 @@ export class SpreadsheetStore {
   }
 
   private goToCellLocation(action: GoToCellLocationAction) {
-    if (action.payload.spreadsheetColumnIndex === this.spreadsheetState.activeCellLocation.columnIndex
+    if (!action.payload.isToForceFocus && action.payload.spreadsheetColumnIndex === this.spreadsheetState.activeCellLocation.columnIndex
       && action.payload.rowIndex === this.spreadsheetState.activeCellLocation.rowIndex) {
       return this.spreadsheetState;
     }
@@ -216,12 +216,15 @@ export class SpreadsheetStore {
     var relative = this.cellLocationRelativeToViewportGetter.get(spreadsheetState, spreadsheetState.activeCellLocation);
     if (relative.isOutsideViewport && action.payload.isNavigation) {
       var targetSpreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index === action.payload.spreadsheetColumnIndex);
-
       if (relative.isOutsideViewportVertically) {
-        var targetScrollTop = action.payload.isToUseMinimunScroll ?
-          spreadsheetState.scrollTop + (relative.top <= 0 ? relative.top : relative.bottom) :
-          action.payload.rowIndex * spreadsheetState.dataRowHeight;
-        spreadsheetState.scrollTop = Math.max(targetScrollTop, 0);
+        var titleHeight = spreadsheetState.titleSpreadsheetRowList.length * spreadsheetState.dataRowHeight;
+        var targetScrollTop = 0;
+        if (action.payload.isToUseMinimunScroll) {
+          targetScrollTop = spreadsheetState.scrollTop + (relative.top <= 0 ? relative.top : relative.bottom);
+        } else {
+          targetScrollTop = Math.max((action.payload.rowIndex * spreadsheetState.dataRowHeight), 0);
+        }
+        spreadsheetState.scrollTop = Math.max(targetScrollTop - titleHeight, 0);
       }
       if (relative.isOutsideViewportHorizontally) {
         var targetScrollLeft = action.payload.isToUseMinimunScroll ?

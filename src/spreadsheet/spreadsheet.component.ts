@@ -226,7 +226,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
     if (rowNumber >= this.firstDataRowRowNumber) {
       var rowIndex = (rowNumber - 1);
       var spreadsheetColumnIndex = this.spreadsheetState.activeCellLocation.columnIndex;
-      this.dispatcher.emit(new GoToCellLocationAction(rowIndex, spreadsheetColumnIndex, false));
+      this.dispatcher.emit(new GoToCellLocationAction(rowIndex, spreadsheetColumnIndex, false, true, true));
       this.cdr.markForCheck();
     }
   }
@@ -234,7 +234,7 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
   goToRowByRowData(rowData: any) {
     var row = this.spreadsheetState.dataSpreadsheetRowList.find(sr => sr.rowData === rowData);
     var spreadsheetColumnIndex = this.spreadsheetState.activeCellLocation.columnIndex;
-    var action = new GoToCellLocationAction(row.rowIndex, spreadsheetColumnIndex, false);
+    var action = new GoToCellLocationAction(row.rowIndex, spreadsheetColumnIndex, false, true, true);
     action.payload.rowData = rowData;
     this.dispatcher.emit(action);
     this.cdr.markForCheck();

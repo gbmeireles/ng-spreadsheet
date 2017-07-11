@@ -6,17 +6,19 @@ export class GoToCellLocationAction implements Action {
     rowIndex?: number;
     spreadsheetColumnIndex: number;
     isToUseMinimunScroll: boolean;
+    isToForceFocus: boolean;
     isNavigation: boolean;
     rowData?: any;
   };
 
-  constructor(rowIndex: number, spreadsheetColumnIndex: number, isToUseMinimunScroll: boolean, isNavigation: boolean = true) {
+  constructor(rowIndex: number, spreadsheetColumnIndex: number, isToUseMinimunScroll: boolean, isNavigation: boolean = true, isToForceFocus = false) {
     this.type = GoToCellLocationAction.type;
     this.payload = {
       rowIndex: rowIndex,
       spreadsheetColumnIndex: spreadsheetColumnIndex,
       isToUseMinimunScroll: isToUseMinimunScroll,
       isNavigation: isNavigation,
+      isToForceFocus: isToForceFocus,
     };
   }
 }
