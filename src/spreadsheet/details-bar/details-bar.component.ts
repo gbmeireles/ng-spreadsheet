@@ -27,7 +27,7 @@ export class DetailsBarComponent implements OnInit {
   }
 
   ngOnChanges(obj) {
-    if (!this.activeCellLocation) {
+    if (!this.activeCellLocation || this.activeCellLocation.rowIndex === 0) {
       this.activeCellData = this.defaultMessage;
     }
     if (obj['spreadsheetColumnList']) {

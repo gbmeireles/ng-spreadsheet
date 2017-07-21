@@ -21,6 +21,7 @@ import { CellLocationRelativeToViewportGetter } from './cell-location-relative-t
 import { CellGetter } from './cell-getter';
 import { FILTERS_PROVIDERS } from './filters/filters';
 import { ColumnIdentifierMapGetter } from './column-identifier-map-getter';
+import { ScrollbarDimensionsGetter } from './scrollbar-dimensions-getter';
 
 export * from './filters/filters';
 
@@ -47,6 +48,7 @@ export {
   CellManager,
   CellGetter,
   ColumnIdentifierMapGetter,
+  ScrollbarDimensionsGetter,
 };
 
 export const SPREADSHEET_SCOPE_PROVIDERS: Array<any> = [
@@ -73,4 +75,5 @@ export const SPREADSHEET_SCOPE_PROVIDERS: Array<any> = [
   CellManager,
   CellGetter,
   ColumnIdentifierMapGetter,
+  ScrollbarDimensionsGetter,
 ];

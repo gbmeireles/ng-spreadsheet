@@ -204,10 +204,15 @@ export class SpreadsheetStore {
       return spreadsheetState;
     }
 
+    var oldActiveCellLocation = this.spreadsheetState.activeCellLocation;
+
     spreadsheetState.activeCellLocation = {
       columnIndex: targetCell ? targetCell.columnIndex : action.payload.spreadsheetColumnIndex,
       rowIndex: targetCell ? targetCell.rowIndex : action.payload.rowIndex,
     };
+
+    var isGoingUp = oldActiveCellLocation.rowIndex > spreadsheetState.activeCellLocation.rowIndex;
+    var isGoingDown = oldActiveCellLocation.rowIndex < spreadsheetState.activeCellLocation.rowIndex;
 
     spreadsheetState.activeRowIndexList = spreadsheetState.dataSpreadsheetRowList
       .filter(sRow => sRow.rowData === (action.payload.rowData !== undefined ? action.payload.rowData : targetRow.rowData))
@@ -216,15 +221,16 @@ export class SpreadsheetStore {
     var relative = this.cellLocationRelativeToViewportGetter.get(spreadsheetState, spreadsheetState.activeCellLocation);
     if (relative.isOutsideViewport && action.payload.isNavigation) {
       var targetSpreadsheetColumn = spreadsheetState.spreadsheetColumnList.find(gc => gc.index === action.payload.spreadsheetColumnIndex);
-      if (relative.isOutsideViewportVertically) {
-        var titleHeight = spreadsheetState.titleSpreadsheetRowList.length * spreadsheetState.dataRowHeight;
+      var isToScrollVertically = (isGoingUp && relative.isTopOutsideViewport) || (isGoingDown && relative.isBottomOutsideViewport);
+      targetSpreadsheetColumn = targetSpreadsheetColumn || spreadsheetState.spreadsheetColumnList[spreadsheetState.spreadsheetColumnList.length - 1];
+      if (isToScrollVertically) {
         var targetScrollTop = 0;
         if (action.payload.isToUseMinimunScroll) {
           targetScrollTop = spreadsheetState.scrollTop + (relative.top <= 0 ? relative.top : relative.bottom);
         } else {
           targetScrollTop = Math.max((action.payload.rowIndex * spreadsheetState.dataRowHeight), 0);
         }
-        spreadsheetState.scrollTop = Math.max(targetScrollTop - titleHeight, 0);
+        spreadsheetState.scrollTop = Math.max(targetScrollTop, 0);
       }
       if (relative.isOutsideViewportHorizontally) {
         var targetScrollLeft = action.payload.isToUseMinimunScroll ?
