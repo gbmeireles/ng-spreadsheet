@@ -153,7 +153,7 @@ export class SpreadsheetStore {
     var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
 
     var firstRowIndex = spreadsheetState.numberTitleRowList.length;
-    var lastRowIndex = spreadsheetState.numberDataRowList.reduce((pv, cv) => Math.max(cv.rowIndex, pv), 0);
+    var lastRowIndex = spreadsheetState.dataSpreadsheetRowList.reduce((pv, cv) => Math.max(cv.rowIndex, pv), 0);
     var firstColumnIndex = spreadsheetState.spreadsheetColumnList.reduce((pv, cv) => Math.min(cv.index, pv), 999999999);
     var lastColumnIndex = spreadsheetState.spreadsheetColumnList.reduce((pv, cv) => Math.max(cv.index, pv), 0);
     if (action.payload.rowIndex <= lastRowIndex
@@ -228,7 +228,8 @@ export class SpreadsheetStore {
         if (action.payload.isToUseMinimunScroll) {
           targetScrollTop = spreadsheetState.scrollTop + (relative.top <= 0 ? relative.top : relative.bottom);
         } else {
-          targetScrollTop = Math.max((action.payload.rowIndex * spreadsheetState.dataRowHeight), 0);
+          var targetRowIndex = action.payload.rowIndex - spreadsheetState.titleSpreadsheetRowList.length;
+          targetScrollTop = Math.max((targetRowIndex * spreadsheetState.dataRowHeight), 0);
         }
         spreadsheetState.scrollTop = Math.max(targetScrollTop, 0);
       }
