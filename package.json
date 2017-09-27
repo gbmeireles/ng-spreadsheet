@@ -1,8 +1,8 @@
 {
   "name": "ng-spreadsheet",
-  "version": "0.20.11",
+  "version": "0.20.12",
   "description": "Spreadhsheet for angular 2",
-  "typings": "src/ng-spreadsheet.ts",
+  "typings": "src/index.ts",
   "scripts": {
     "build": "set NODE_ENV=production&& webpack --env build",
     "dev": "webpack --progress --colors --watch --env dev"
