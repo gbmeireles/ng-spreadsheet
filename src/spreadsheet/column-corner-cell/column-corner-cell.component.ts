@@ -13,9 +13,8 @@ import { COLUMN_NUMBER_WIDTH } from '../../model';
 })
 export class ColumnCornerCellComponent implements OnInit {
   @HostBinding('class.is-filtered')
-  @Input('isFiltered')
+  @Input('isFiltered') isFiltered: boolean;
   @HostBinding('style.width') width = COLUMN_NUMBER_WIDTH;
-  isFiltered: boolean;
 
   constructor( @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) { }
 

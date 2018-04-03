@@ -309,6 +309,11 @@ export class SpreadsheetStore {
     spreadsheetState.spreadsheetSectionList = this.rowViewportUpdater.update(spreadsheetState);
     spreadsheetState.numberTitleRowList = this.numberTitleRowListGetter.get(spreadsheetState);
     spreadsheetState.numberDataRowList = this.numberDataRowListGetter.get(spreadsheetState);
+    var isFilterOpenMap = {};
+    Object.keys(spreadsheetState.isFilterOpenMap).forEach(columnIndex => {
+      isFilterOpenMap[columnIndex] = false;
+    });
+    spreadsheetState.isFilterOpenMap = isFilterOpenMap;
 
     return spreadsheetState;
   }

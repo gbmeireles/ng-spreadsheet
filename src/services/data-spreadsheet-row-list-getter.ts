@@ -16,7 +16,7 @@ export class DataSpreadsheetRowListGetter {
   }
 
   get(spreadsheetState: SpreadsheetState, titleRowListCount: number) {
-    var result: SpreadsheetRow[] = new Array(spreadsheetState.dataRowList.length);
+    var result: SpreadsheetRow[] = spreadsheetState.columnList.length === 0 ? [] : new Array(spreadsheetState.dataRowList.length);
     var columnDefinitionMap: { [columnName: string]: ColumnDefinition } = {};
     spreadsheetState.columnList.forEach(column => {
       var columnDefinition = spreadsheetState.columnDefinitionList.find(cd => cd.name === column.name);
