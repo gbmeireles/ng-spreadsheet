@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef, HostBinding, HostListener, Renderer, ApplicationRef } from '@angular/core';
+import { Component, Input, ElementRef, HostBinding, HostListener, Renderer, ApplicationRef, ChangeDetectorRef } from '@angular/core';
 import { OnInit, OnDestroy } from '@angular/core';
 import { Inject, EventEmitter, Host } from '@angular/core';
 import {
@@ -11,6 +11,7 @@ import { ColumnTargetWidthGetter } from './column-target-width-getter';
 import { ColumnSizeUpdater } from './column-size-updater';
 import { MousePositionGetter } from './mouse-position-getter';
 import { Subscription } from 'rxjs';
+import { MIN_COLUMN_SIZE } from '../spreadsheet-constants';
 
 @Component({
   selector: 'ColumnResize',
@@ -37,7 +38,9 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
     private columnTargetWidthGetter: ColumnTargetWidthGetter,
     private columnSizeUpdater: ColumnSizeUpdater,
     private mousePositionGetter: MousePositionGetter,
-    @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>) {
+    @Inject(DISPATCHER_TOKEN) private eventEmitter: EventEmitter<Action>,
+    private cdr: ChangeDetectorRef,
+  ) {
   }
 
   ngOnInit() {
@@ -96,7 +99,11 @@ export class ColumnResizeComponent implements OnInit, OnDestroy {
     if (!this.isDragging && Math.abs(movementX) > 0) {
       this.isDragging = true;
     }
-    this.left = this.originalLeft + movementX;
+    var newColumnSize = this.spreadsheetColumn.width + (this.currentPosition - this.startPosition);
+    if (newColumnSize >= MIN_COLUMN_SIZE) {
+      this.left = this.originalLeft + movementX;
+      this.cdr.markForCheck();
+    }
   }
 
   private onMouseUp(evt: MouseEvent) {

@@ -10,6 +10,7 @@ import {
   UpdateColumnSizeAction,
 } from '../../events/events';
 import { SpreadsheetState } from '../spreadsheet-state';
+import { MIN_COLUMN_SIZE } from '../spreadsheet-constants';
 
 @Injectable()
 export class ColumnSizeUpdater {
@@ -17,14 +18,14 @@ export class ColumnSizeUpdater {
   constructor() { }
 
   columnSizeUpdater(spreadsheetState: SpreadsheetState, action: UpdateColumnSizeAction): Column[] {
-    var columnList = spreadsheetState.columnList.slice(0).map(i => <Column>Object.assign({}, i));
-    var column = columnList.find(c => c.name === action.payload.columnName);
-    if (!column) {
-      return;
-    }
-
-    column.width = action.payload.columnSize;
-
-    return columnList;
+    return spreadsheetState.columnList.map(i => {
+      if (i.name === action.payload.columnName) {
+        return <Column>Object.assign({}, i, {
+          width: Math.max(action.payload.columnSize, MIN_COLUMN_SIZE),
+        });
+      } else {
+        return <Column>Object.assign({}, i);
+      }
+    });
   }
 }

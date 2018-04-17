@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Column, ColumnDefinition } from '../model';
+import { MIN_COLUMN_SIZE } from '../spreadsheet/spreadsheet-constants';
 
 @Injectable()
 export class ColumnListGetter {
@@ -11,7 +12,7 @@ export class ColumnListGetter {
       spreadsheetColumn.name = columnDefinition.name;
 
       lastIndex = spreadsheetColumn.endIndex;
-      spreadsheetColumn.width = spreadsheetColumn.width || spreadsheetColumn.defaultWidth;
+      spreadsheetColumn.width = Math.max(spreadsheetColumn.width || spreadsheetColumn.defaultWidth, MIN_COLUMN_SIZE);
       spreadsheetColumn.dataType = columnDefinition.dataType;
       spreadsheetColumn.sectionName = columnDefinition.spreadsheetSection;
       spreadsheetColumn.isExportable = columnDefinition.isExportable;
