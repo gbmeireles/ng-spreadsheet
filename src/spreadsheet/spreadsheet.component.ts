@@ -85,11 +85,14 @@ export class SpreadsheetComponent implements OnInit, OnDestroy, OnChanges {
   @Input('height') height: number;
   @Input('defaultDetailsBarMessage') defaultDetailsBarMessage: string;
   @Input('rowClassGetter') rowClassGetter: (dataRow, rowType: ContentTypeEnum, rowIndex: number) => string;
+
   @Output('event') onSpreadsheetEvent = new Subject<any>();
   @Output('state') onStateChanged = new BehaviorSubject<SpreadsheetState>(new SpreadsheetState());
   @Output('download') onDownload = new Subject<ExportData>();
   @Output('toggleFullScreen') onToggleFullScreen = new Subject<boolean>();
+
   @ViewChild(BodyComponent) body: BodyComponent;
+
   statusMessage: string;
   statusMessageTimeout: number;
   statusMessageCount: number = 0;

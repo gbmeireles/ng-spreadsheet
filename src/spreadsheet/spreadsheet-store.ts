@@ -37,6 +37,7 @@ import {
   GoToCellLocationAction,
   ClearFilterAction,
   ToggleFilterAction,
+  SetIsToShowStatusBarAction,
 } from '../events/events';
 import { SpreadsheetCell, SpreadsheetRow } from '../model';
 import { ColumnMover } from './column-cell/column-mover';
@@ -50,7 +51,7 @@ export class SpreadsheetStore {
   spreadsheetState: SpreadsheetState;
   onChanged: EventEmitter<SpreadsheetState> = new EventEmitter<SpreadsheetState>(false);
 
-  constructor( @Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<any>,
+  constructor(@Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<any>,
     private columnListGetter: ColumnListGetter,
     private spreadsheetSectionListGetter: SpreadsheetSectionListGetter,
     private spreadsheetColumnListGetter: SpreadsheetColumnListGetter,
@@ -90,6 +91,10 @@ export class SpreadsheetStore {
           this.spreadsheetState = this.updateDataRowList(<UpdateDataRowListAction>action);
           break;
         }
+        case SetIsToShowStatusBarAction.type: {
+          this.spreadsheetState = this.setIsToShowStatusBar(<SetIsToShowStatusBarAction>action);
+          break;
+        }
         case MoveColumnAction.type: {
           this.spreadsheetState = this.moveColumn(<MoveColumnAction>action);
           break;
@@ -119,7 +124,7 @@ export class SpreadsheetStore {
           break;
         }
         case UpdateSpreadsheetSizeAction.type: {
-          this.spreadsheetState = this.updateSpreadsheetSize(<UpdateSpreadsheetSizeAction>action);
+          this.spreadsheetState = this.updateSpreadsheetSize(<UpdateSpreadsheetSizeAction>action, this.spreadsheetState);
           break;
         }
         case FilterColumnAction.type: {
@@ -327,13 +332,16 @@ export class SpreadsheetStore {
     return spreadsheetState;
   }
 
-  private updateSpreadsheetSize(action: UpdateSpreadsheetSizeAction) {
-    var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
+  private updateSpreadsheetSize(action: UpdateSpreadsheetSizeAction, spreadsheetState: SpreadsheetState) {
+    spreadsheetState = <SpreadsheetState>Object.assign({}, spreadsheetState);
 
-    var headerHeight = spreadsheetState.numberTitleRowList.length * spreadsheetState.titleRowHeight + 20;
+    const columnBarHeight = 20;
+    var headerHeight = spreadsheetState.numberTitleRowList.length * spreadsheetState.titleRowHeight + columnBarHeight;
     spreadsheetState.spreadsheetWidth = action.payload.newWidth;
     spreadsheetState.totalHeight = action.payload.newHeight;
-    var bodyHeight = Math.max(spreadsheetState.totalHeight - headerHeight - statusBarHeight - detailsBarHeight, spreadsheetState.dataRowHeight * 3);
+    var calculatedStatusBarHeight = spreadsheetState.isToShowStatusBar ? statusBarHeight : 0;
+    var bodyHeight = Math.max(spreadsheetState.totalHeight - headerHeight - calculatedStatusBarHeight - detailsBarHeight,
+      spreadsheetState.dataRowHeight * 3);
     spreadsheetState.bodyHeight = bodyHeight;
 
     spreadsheetState.spreadsheetSectionPositionInformationMap = this.sectionPositionInformationMapCalculator.calculate(spreadsheetState);
@@ -487,7 +495,9 @@ export class SpreadsheetStore {
       this.dataSpreadsheetRowListGetter.get(spreadsheetState, spreadsheetState.titleSpreadsheetRowList.length);
 
     var headerHeight = (spreadsheetState.titleSpreadsheetRowList.length * spreadsheetState.titleRowHeight + 20) || 0;
-    var bodyHeight = Math.max(spreadsheetState.totalHeight - headerHeight - statusBarHeight - detailsBarHeight, spreadsheetState.dataRowHeight * 3);
+    var calculatedStatusBarHeight = spreadsheetState.isToShowStatusBar ? statusBarHeight : 0;
+    var bodyHeight = Math.max(spreadsheetState.totalHeight - headerHeight - calculatedStatusBarHeight - detailsBarHeight,
+      spreadsheetState.dataRowHeight * 3);
     spreadsheetState.bodyHeight = bodyHeight;
 
     spreadsheetState.spreadsheetSectionList = this.spreadsheetSectionListGetter.get(spreadsheetState);
@@ -540,5 +550,14 @@ export class SpreadsheetStore {
     });
 
     return spreadsheetState;
+  }
+
+  private setIsToShowStatusBar(action: SetIsToShowStatusBarAction): SpreadsheetState {
+    var spreadsheetState = <SpreadsheetState>Object.assign({}, this.spreadsheetState);
+
+    spreadsheetState.isToShowStatusBar = action.payload;
+
+    var updateSizeAction = new UpdateSpreadsheetSizeAction(spreadsheetState.totalHeight, spreadsheetState.spreadsheetWidth);
+    return this.updateSpreadsheetSize(updateSizeAction, spreadsheetState);
   }
 }

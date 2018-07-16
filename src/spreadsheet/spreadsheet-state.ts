@@ -40,6 +40,7 @@ export class SpreadsheetState {
   numberTitleRowList: SpreadsheetRow[];
   titleSpreadsheetRowList: SpreadsheetRow[];
   dataSpreadsheetRowList: SpreadsheetRow[];
+  isToShowStatusBar: boolean;
 
   constructor(spreadsheetState?: SpreadsheetState) {
     if (spreadsheetState == null) {
@@ -66,6 +67,7 @@ export class SpreadsheetState {
       this.spreadsheetSectionColumnToRendexIndexListMap = {};
       this.titleSpreadsheetRowList = [];
       this.dataSpreadsheetRowList = [];
+      this.isToShowStatusBar = false;
       return;
     }
   }

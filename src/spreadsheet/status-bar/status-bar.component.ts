@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, OnChanges, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChange, ChangeDetectionStrategy, ChangeDetectorRef, Inject, EventEmitter } from '@angular/core';
+import { DISPATCHER_TOKEN, Action, SetIsToShowStatusBarAction } from '../../events/events';
 
 @Component({
   selector: 'StatusBar',
@@ -12,15 +13,20 @@ export class StatusBarComponent implements OnInit, OnChanges {
   @Input('count') count: number;
   isVisible: boolean = false;
   private timeoutId: number;
-  constructor(private cdr: ChangeDetectorRef) { }
+  constructor(
+    private cdr: ChangeDetectorRef,
+    @Inject(DISPATCHER_TOKEN) private dispatcher: EventEmitter<Action>,
+  ) { }
 
   ngOnInit() { }
 
   ngOnChanges(changes: { [key: string]: SimpleChange }) {
     if (this.message == null || this.message == '') {
       this.isVisible = false;
+      this.dispatcher.emit(new SetIsToShowStatusBarAction(false));
     } else {
       this.isVisible = true;
+      this.dispatcher.emit(new SetIsToShowStatusBarAction(true));
     }
 
     clearTimeout(this.timeoutId);

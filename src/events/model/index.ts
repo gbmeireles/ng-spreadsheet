@@ -13,3 +13,4 @@ export * from './update-spreadsheet-height-action';
 export * from './go-to-cell-location-action';
 export * from './clear-filter-action';
 export * from './toggle-filter-action';
+export * from './set-is-to-show-status-bar-action';
