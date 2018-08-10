@@ -110,6 +110,9 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
 
   @HostListener('dragover', ['$event'])
   onDragOver(evt: DragEvent) {
+    if (!ColumnCellComponent.columnToMove) {
+      return;
+    }
     var currentColumn = this.columnGetter.getBySpreadsheetColumnIndex(this.columnList, this.spreadsheetColumnIndex);
     if (currentColumn.sectionName === ColumnCellComponent.columnToMove.sectionName) {
       evt.preventDefault();
