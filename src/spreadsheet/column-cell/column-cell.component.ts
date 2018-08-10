@@ -101,6 +101,7 @@ export class ColumnCellComponent implements OnInit, OnDestroy, Cell {
       evt.preventDefault();
     }
     ColumnCellComponent.columnToMove = columnToMove;
+    evt.dataTransfer.setData('column', columnToMove.name);
   }
 
   @HostListener('dragend', ['$event'])
